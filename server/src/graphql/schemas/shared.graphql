@@ -1,0 +1,13 @@
+interface Success {
+  successMsg: String
+}
+
+interface Error {
+  errorMsg: String!
+  code: Int!
+}
+
+type AuthenticationError implements Error {
+  errorMsg: String!
+  code: Int!
+}

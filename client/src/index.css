@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+}
+
+.btn_blue {
+  @apply rounded-lg bg-blue-500 text-white font-bold hover:bg-blue-400 transition-colors duration-200;
+}

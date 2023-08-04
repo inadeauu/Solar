@@ -1,0 +1,70 @@
+type Query {
+  getAuthUser: GetAuthUserResult!
+}
+
+type Mutation {
+  emailRegister(input: EmailRegisterInput!): EmailRegisterResult!
+  emailLogin(input: EmailLoginInput!): EmailLoginResult!
+}
+
+# EMAILREGISTER MUTATION
+union EmailRegisterResult =
+    EmailRegisterSuccess
+  | EmailRegisterInputError
+  | DuplicateEmailError
+
+input EmailRegisterInput {
+  username: String!
+  email: String!
+  password: String!
+}
+
+type EmailRegisterSuccess implements Success {
+  successMsg: String
+}
+
+type EmailRegisterInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: EmailRegisterInputErrors!
+}
+
+type EmailRegisterInputErrors {
+  username: String
+  email: String
+  password: String
+}
+
+type DuplicateEmailError implements Error {
+  errorMsg: String!
+  code: Int!
+}
+
+# EMAILLOGIN MUTATION
+union EmailLoginResult = EmailLoginSuccess | EmailLoginInputError
+
+input EmailLoginInput {
+  email: String!
+  password: String!
+}
+
+type EmailLoginSuccess implements Success {
+  successMsg: String
+}
+
+type EmailLoginInputError implements Error {
+  errorMsg: String!
+  code: Int!
+}
+
+# GETAUTHUSER QUERY
+union GetAuthUserResult = GetAuthUserSuccess | AuthenticationError
+
+input GetAuthUserInput {
+  userId: String!
+}
+
+type GetAuthUserSuccess implements Success {
+  successMsg: String
+  user: User
+}

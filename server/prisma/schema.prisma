@@ -1,0 +1,68 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Provider {
+  EMAIL
+  GOOGLE
+  GITHUB
+}
+
+model User {
+  id                   String   @id @default(cuid())
+  username             String
+  email                String
+  email_verified       Boolean
+  password             String
+  provider             Provider @default(EMAIL)
+  provider_id          String?
+  email_verify_token   String?
+  password_reset_token String?
+  image                String?
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  communities Community[]
+  posts       Post[]
+
+  @@unique([email, provider])
+}
+
+model Community {
+  id         String   @id @default(cuid())
+  userId     String
+  title      String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  users User[]
+  posts Post[]
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  userId      String
+  communityId String
+  body        String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model PostVote {
+  userId     String
+  postId     String
+  like       Boolean
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@id([userId, postId])
+}

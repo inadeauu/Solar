@@ -1,11 +1,11 @@
 scalar DateTime
 
 type Post {
-  id: String!
+  id: ID!
   body: String!
   created_at: DateTime!
   updated_at: DateTime!
 
-  owner: User
-  community: Community
+  owner: User!
+  community: Community!
 }

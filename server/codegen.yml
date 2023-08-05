@@ -5,7 +5,11 @@ generates:
       - "typescript"
       - "typescript-resolvers"
     config:
-      # defaultMapper: Partial<{T}>
-      useIndexSignature: true
+      mappers:
+        User: .prisma/client#User as UserModel
+        Post: .prisma/client#Post as PostModel
+        Community: .prisma/client#Community as CommunityModel
+      inputMaybeValue: undefined | T
       contextType: "../index#Context"
+      useIndexSignature: true
       enumsAsConst: true

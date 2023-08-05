@@ -11,7 +11,7 @@ enum Provider {
 }
 
 type User {
-  id: String!
+  id: ID!
   username: String!
   email: String!
   email_verified: Boolean!
@@ -20,7 +20,7 @@ type User {
   created_at: DateTime!
   updated_at: DateTime!
 
-  ownedCommunities: [Community!]
+  ownedCommunities(input: UserOwnedCommunitiesInput!): CommunityConnection
   inCommunities: [Community!]
   posts: [Post!]
 }
@@ -43,3 +43,9 @@ input UserOrderBy {
   type: UserOrderByType!
   dir: OrderByDir!
 }
+
+input UserOwnedCommunitiesInput {
+  paginate: PaginateInput!
+}
+
+union UserOwnedCommunitiesResult = CommunityConnection

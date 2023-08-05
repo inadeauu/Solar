@@ -1,5 +1,11 @@
-import { Resolvers, UserOrderByType } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
+import { Resolvers, UserOrderByType } from "../../__generated__/resolvers-types"
+import {
+  checkPaginationArgs,
+  generateEdges,
+  generatePageInfo,
+  generatePaginationOptions,
+} from "../paginate"
 
 export const resolvers: Resolvers = {
   Query: {
@@ -26,15 +32,24 @@ export const resolvers: Resolvers = {
     },
   },
   User: {
-    ownedCommunities: async (user) => {
-      return prisma.user
+    ownedCommunities: async (user, args) => {
+      checkPaginationArgs(args.input.paginate)
+      const paginationOptions = generatePaginationOptions(args.input.paginate)
+      const results = await prisma.user
         .findUnique({ where: { id: user.id } })
-        .ownedCommunities()
+        .ownedCommunities({ ...paginationOptions })
+      const edges = generateEdges(results)
+      const pageInfo = generatePageInfo(results, args.input.paginate)
+
+      return {
+        edges,
+        pageInfo,
+      }
     },
-    inCommunities: async (user) => {
+    inCommunities: async (user, args) => {
       return prisma.user.findUnique({ where: { id: user.id } }).inCommunities()
     },
-    posts: async (user) => {
+    posts: async (user, args) => {
       return prisma.user.findUnique({ where: { id: user.id } }).posts()
     },
   },

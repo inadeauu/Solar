@@ -1,12 +1,22 @@
 scalar DateTime
 
 type Community {
-  id: String!
+  id: ID!
   title: String!
   created_at: DateTime!
   updated_at: DateTime!
 
-  owner: User
+  owner: User!
   members: [User!]
   posts: [Post!]
+}
+
+type CommunityEdge {
+  node: Community!
+  cursor: String!
+}
+
+type CommunityConnection {
+  edges: [CommunityEdge!]
+  pageInfo: PageInfo!
 }

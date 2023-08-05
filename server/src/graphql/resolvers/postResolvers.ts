@@ -4,10 +4,18 @@ import prisma from "../../config/prisma"
 export const resolvers: Resolvers = {
   Post: {
     owner: async (post) => {
-      return prisma.post.findUnique({ where: { id: post.id } }).owner()
+      const owner = (await prisma.post
+        .findUnique({ where: { id: post.id } })
+        .owner())!
+
+      return owner
     },
     community: async (post) => {
-      return prisma.post.findUnique({ where: { id: post.id } }).community()
+      const community = (await prisma.post
+        .findUnique({ where: { id: post.id } })
+        .community())!
+
+      return community
     },
   },
 }

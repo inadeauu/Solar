@@ -1,6 +1,8 @@
 import { Request, Response } from "express"
 import jwt from "jsonwebtoken"
 import prisma from "../../config/prisma"
+import axios from "axios"
+import bcrypt from "bcrypt"
 import { Provider, User } from "@prisma/client"
 import {
   Config,
@@ -12,26 +14,14 @@ import {
 import { generate } from "generate-password"
 import { env } from "../utils/env"
 import { oauth2Client } from "../utils/google"
-import axios from "axios"
-import { errorResponse, successResponse } from "../utils/response"
-import bcrypt from "bcrypt"
-import { ResponseBody } from "../utils/response"
+import { errorResponse, successResponse, ResponseBody } from "../utils/response"
 
 type UserInfoGoogle = {
-  iss: string
-  azp?: string
-  aud: string
   sub: string
+  name?: string
   email: string
   email_verified: boolean
-  at_hash?: string
-  name?: string
   picture?: string
-  given_name?: string
-  family_name?: string
-  locale?: string
-  iat: number
-  exp: number
 }
 
 type UserInfoGithub = {
@@ -42,44 +32,12 @@ type UserInfoGithub = {
 
 type UserEmailGithub = {
   email: string
-  primary: boolean
   verified: boolean
-  visibility: string
 }
 
 type LoginCallbackQuery = {
   state: string
   code: string
-}
-
-export const getAuthUser = async (
-  req: Request,
-  res: Response<ResponseBody>
-) => {
-  if (req.session.userId) {
-    const user = (await prisma.user.findFirst({
-      where: { id: req.session.userId },
-    })) as User
-
-    const modifiedUser = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      email_verified: user.email_verified,
-      provider: user.provider,
-      image: user.image,
-      created_at: user.created_at,
-      updated_at: user.updated_at,
-    }
-
-    return res.json(
-      successResponse({ user: modifiedUser }, null, 200, req.path)
-    )
-  }
-
-  return res.json(
-    successResponse({ user: null }, "No signed in user", 200, req.path)
-  )
 }
 
 export const googleLogin = (req: Request, res: Response<ResponseBody>) => {
@@ -108,13 +66,13 @@ export const googleCallback = async (
   req: Request<{}, {}, {}, LoginCallbackQuery>,
   res: Response<ResponseBody>
 ) => {
-  const { state: stateQuery } = req.query
+  const state = req.query.state
   const stateCookie = req.signedCookies.state
 
-  if (stateQuery !== stateCookie) {
+  if (state !== stateCookie) {
     return res
-      .status(200)
-      .json(errorResponse("Authentication error", 200, req.path))
+      .status(500)
+      .json(errorResponse("Error logging in", 500, req.path))
   }
 
   res.clearCookie("state")
@@ -191,10 +149,10 @@ export const githubCallback = async (
   req: Request<{}, {}, {}, LoginCallbackQuery>,
   res: Response<ResponseBody>
 ) => {
-  const { state: stateQuery } = req.query
+  const state = req.query.state
   const stateCookie = req.signedCookies.state
 
-  if (stateQuery !== stateCookie) {
+  if (state !== stateCookie) {
     return res
       .status(500)
       .json(errorResponse("Error logging in", 500, req.path))

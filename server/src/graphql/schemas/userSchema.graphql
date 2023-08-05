@@ -1,5 +1,9 @@
 scalar DateTime
 
+type Query {
+  users(input: UsersInput): [User!]!
+}
+
 enum Provider {
   EMAIL
   GOOGLE
@@ -8,10 +12,34 @@ enum Provider {
 
 type User {
   id: String!
+  username: String!
   email: String!
   email_verified: Boolean!
   provider: Provider!
   image: String
   created_at: DateTime!
   updated_at: DateTime!
+
+  ownedCommunities: [Community!]
+  inCommunities: [Community!]
+  posts: [Post!]
+}
+
+input UsersInput {
+  filters: UsersFilters
+}
+
+input UsersFilters {
+  usernameContains: String
+  orderBy: UserOrderBy
+}
+
+enum UserOrderByType {
+  username
+  postCount
+}
+
+input UserOrderBy {
+  type: UserOrderByType!
+  dir: OrderByDir!
 }

@@ -1,13 +1,29 @@
-interface Success {
-  successMsg: String
-}
-
 interface Error {
   errorMsg: String!
+  code: Int!
+}
+
+interface Success {
+  successMsg: String
   code: Int!
 }
 
 type AuthenticationError implements Error {
   errorMsg: String!
   code: Int!
+}
+
+type DuplicateEmailError implements Error {
+  errorMsg: String!
+  code: Int!
+}
+
+type UserNotFoundError implements Error {
+  errorMsg: String!
+  code: Int!
+}
+
+enum OrderByDir {
+  asc
+  desc
 }

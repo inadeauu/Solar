@@ -6,13 +6,12 @@ import bcrypt from "bcrypt"
 
 export const resolvers: Resolvers = {
   Query: {
-    getAuthUser: async (_0, _1, { req }) => {
+    authUser: async (_0, _1, { req }) => {
       if (!req.session.userId) {
         return {
           __typename: "AuthenticationError",
           errorMsg: "No authenticated user",
           code: 401,
-          user: null,
         }
       }
 
@@ -20,14 +19,23 @@ export const resolvers: Resolvers = {
         where: { id: req.session.userId },
       })
 
+      if (!user) {
+        return {
+          __typename: "UserNotFoundError",
+          errorMsg: "User not found",
+          code: 404,
+        }
+      }
+
       return {
-        __typename: "GetAuthUserSuccess",
+        __typename: "AuthUserSuccess",
+        code: 200,
         user,
       }
     },
   },
   Mutation: {
-    emailRegister: async (_0, args) => {
+    registerEmail: async (_0, args) => {
       const usernameError =
         args.input.username.length < 5 || args.input.username.length > 15
       const emailError = !validate(args.input.email)
@@ -35,7 +43,7 @@ export const resolvers: Resolvers = {
 
       if (usernameError || emailError || passwordError) {
         return {
-          __typename: "EmailRegisterInputError",
+          __typename: "RegisterEmailInputError",
           errorMsg: "Invalid input",
           inputErrors: {
             username: usernameError
@@ -75,11 +83,12 @@ export const resolvers: Resolvers = {
       })
 
       return {
-        __typename: "EmailRegisterSuccess",
+        __typename: "RegisterEmailSuccess",
         successMsg: "Successfully registered",
+        code: 200,
       }
     },
-    emailLogin: async (_0, args, { req }) => {
+    loginEmail: async (_0, args, { req }) => {
       const user = await prisma.user.findFirst({
         where: { email: args.input.email, provider: Provider.EMAIL },
       })
@@ -89,7 +98,7 @@ export const resolvers: Resolvers = {
         !(await bcrypt.compare(args.input.password, user.password))
       ) {
         return {
-          __typename: "EmailLoginInputError",
+          __typename: "LoginEmailInputError",
           errorMsg: "Invalid email and/or password",
           code: 400,
         }
@@ -98,8 +107,9 @@ export const resolvers: Resolvers = {
       req.session.userId = user.id
 
       return {
-        __typename: "EmailLoginSuccess",
+        __typename: "LoginEmailSuccess",
         successMsg: "Successfully logged in",
+        code: 200,
       }
     },
   },

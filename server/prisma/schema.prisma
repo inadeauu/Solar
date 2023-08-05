@@ -28,8 +28,9 @@ model User {
   created_at           DateTime @default(now())
   updated_at           DateTime @updatedAt
 
-  communities Community[]
-  posts       Post[]
+  ownedCommunities Community[] @relation("UserOwnedCommunities")
+  inCommunities    Community[] @relation("UserInCommunities")
+  posts            Post[]
 
   @@unique([email, provider])
 }
@@ -41,8 +42,9 @@ model Community {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  users User[]
-  posts Post[]
+  owner   User   @relation("UserOwnedCommunities", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  members User[] @relation("UserInCommunities")
+  posts   Post[]
 }
 
 model Post {
@@ -53,16 +55,6 @@ model Post {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  owner     User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   community Community @relation(fields: [communityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-}
-
-model PostVote {
-  userId     String
-  postId     String
-  like       Boolean
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@id([userId, postId])
 }

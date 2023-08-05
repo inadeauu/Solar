@@ -1,0 +1,11 @@
+scalar DateTime
+
+type Post {
+  id: String!
+  body: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+
+  owner: User
+  community: Community
+}

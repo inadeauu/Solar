@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express"
-import { errorResponse } from "../utils/response"
-import { ResponseBody } from "../utils/response"
+import { errorResponse, ResponseBody } from "../utils/response"
 
 export const verifyUser = (
   req: Request,
@@ -9,8 +8,8 @@ export const verifyUser = (
 ) => {
   if (!req.session.userId) {
     return res
-      .status(403)
-      .json(errorResponse("Must be signed in", 403, req.path))
+      .status(401)
+      .json(errorResponse("No authenticated user", 401, req.path))
   }
 
   next()

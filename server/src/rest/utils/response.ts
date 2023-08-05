@@ -25,7 +25,7 @@ export function successResponse(
   status: number,
   path: string
 ): SuccessResponse {
-  const obj: SuccessResponse = {
+  const resoonse: SuccessResponse = {
     data,
     message,
     status,
@@ -33,7 +33,7 @@ export function successResponse(
     path,
   }
 
-  return obj
+  return resoonse
 }
 
 export function errorResponse(
@@ -41,7 +41,7 @@ export function errorResponse(
   status: number,
   path: string
 ): ErrorResponse {
-  const obj: ErrorResponse = {
+  const response: ErrorResponse = {
     error: {
       message,
       status,
@@ -50,5 +50,5 @@ export function errorResponse(
     },
   }
 
-  return obj
+  return response
 }

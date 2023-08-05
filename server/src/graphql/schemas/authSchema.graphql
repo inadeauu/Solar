@@ -1,70 +1,68 @@
 type Query {
-  getAuthUser: GetAuthUserResult!
+  authUser: AuthUserResult!
 }
 
 type Mutation {
-  emailRegister(input: EmailRegisterInput!): EmailRegisterResult!
-  emailLogin(input: EmailLoginInput!): EmailLoginResult!
+  registerEmail(input: RegisterEmailInput!): RegisterEmailResult!
+  loginEmail(input: LoginEmailInput!): LoginEmailResult!
 }
 
-# EMAILREGISTER MUTATION
-union EmailRegisterResult =
-    EmailRegisterSuccess
-  | EmailRegisterInputError
+# Mutation - registerEmail
+union RegisterEmailResult =
+    RegisterEmailSuccess
+  | RegisterEmailInputError
   | DuplicateEmailError
 
-input EmailRegisterInput {
+input RegisterEmailInput {
   username: String!
   email: String!
   password: String!
 }
 
-type EmailRegisterSuccess implements Success {
+type RegisterEmailSuccess implements Success {
   successMsg: String
+  code: Int!
 }
 
-type EmailRegisterInputError implements Error {
+type RegisterEmailInputError implements Error {
   errorMsg: String!
   code: Int!
-  inputErrors: EmailRegisterInputErrors!
+  inputErrors: RegisterEmailInputErrors!
 }
 
-type EmailRegisterInputErrors {
+type RegisterEmailInputErrors {
   username: String
   email: String
   password: String
 }
 
-type DuplicateEmailError implements Error {
-  errorMsg: String!
-  code: Int!
-}
+# Mutation - loginEmail
+union LoginEmailResult = LoginEmailSuccess | LoginEmailInputError
 
-# EMAILLOGIN MUTATION
-union EmailLoginResult = EmailLoginSuccess | EmailLoginInputError
-
-input EmailLoginInput {
+input LoginEmailInput {
   email: String!
   password: String!
 }
 
-type EmailLoginSuccess implements Success {
+type LoginEmailSuccess implements Success {
   successMsg: String
+  code: Int!
 }
 
-type EmailLoginInputError implements Error {
+type LoginEmailInputError implements Error {
   errorMsg: String!
   code: Int!
 }
 
-# GETAUTHUSER QUERY
-union GetAuthUserResult = GetAuthUserSuccess | AuthenticationError
+# Query - authUser
+union AuthUserResult = AuthUserSuccess | AuthenticationError | UserNotFoundError
 
-input GetAuthUserInput {
+input AuthUserInput {
   userId: String!
 }
 
-type GetAuthUserSuccess implements Success {
+type AuthUserSuccess implements Success {
   successMsg: String
-  user: User
+  code: Int!
+  user: User!
 }

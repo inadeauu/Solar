@@ -5,26 +5,27 @@ import "express-async-errors"
 import cookieParser from "cookie-parser"
 import bodyParser from "body-parser"
 import cors from "cors"
-import { corsOptions } from "./config/corsOptions"
-import { env } from "./rest/utils/env"
 import http from "http"
 import helmet from "helmet"
 import session from "express-session"
+import routes from "./rest/routes"
+import { corsOptions } from "./config/corsOptions"
+import { env } from "./rest/utils/env"
 import { expressMiddleware } from "@apollo/server/express4"
 import schema from "./graphql/schema"
 import { ApolloServer } from "@apollo/server"
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"
 import { unwrapResolverError } from "@apollo/server/errors"
 import { Prisma } from "@prisma/client"
-import routes from "./rest/routes"
 
 export interface Context {
   req: Request
-  res: Response
 }
 
 const main = async () => {
   const app = express()
+
+  const isProduction: boolean = process.env.NODE_ENV === "production"
 
   app.use(
     session({
@@ -34,17 +35,15 @@ const main = async () => {
       cookie: {
         sameSite: "none",
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction,
       },
     })
   )
 
-  const isDevelopment = process.env.NODE_ENV === "development"
-
   app.use(
     helmet({
-      crossOriginEmbedderPolicy: !isDevelopment,
-      contentSecurityPolicy: !isDevelopment,
+      crossOriginEmbedderPolicy: isProduction,
+      contentSecurityPolicy: isProduction,
     })
   )
 
@@ -79,9 +78,8 @@ const main = async () => {
     bodyParser.urlencoded({ extended: true }),
     cookieParser(env.COOKIE_SECRET),
     expressMiddleware(server, {
-      context: async ({ req, res }) => ({
+      context: async ({ req }) => ({
         req,
-        res,
       }),
     })
   )

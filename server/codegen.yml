@@ -5,6 +5,7 @@ generates:
       - "typescript"
       - "typescript-resolvers"
     config:
+      # defaultMapper: Partial<{T}>
       useIndexSignature: true
       contextType: "../index#Context"
       enumsAsConst: true

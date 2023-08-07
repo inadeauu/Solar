@@ -1,11 +1,7 @@
 import prisma from "../../config/prisma"
+import { Community, Post, User } from "@prisma/client"
 import { Resolvers, UserOrderByType } from "../../__generated__/resolvers-types"
-import {
-  checkPaginationArgs,
-  generateEdges,
-  generatePageInfo,
-  generatePaginationOptions,
-} from "../paginate"
+import { checkPaginationArgs, paginate } from "../paginate"
 
 export const resolvers: Resolvers = {
   Query: {
@@ -13,44 +9,68 @@ export const resolvers: Resolvers = {
       const filters = args.input?.filters
       const orderBy = filters?.orderBy
 
-      const users = await prisma.user.findMany({
-        where: {
-          username: {
-            contains: filters?.usernameContains ?? undefined,
+      const results = await paginate<User>(args.input.paginate, (options) =>
+        prisma.user.findMany({
+          where: {
+            username: {
+              contains: filters?.usernameContains ?? undefined,
+            },
           },
-        },
-        ...(orderBy && {
           orderBy: {
-            ...(orderBy.type == UserOrderByType.PostCount && {
-              posts: { _count: orderBy.dir },
-            }),
+            id: "asc",
+            ...(orderBy &&
+              orderBy.type == UserOrderByType.PostCount && {
+                posts: { _count: orderBy.dir },
+              }),
           },
-        }),
-      })
+          ...options,
+        })
+      )
 
-      return users
+      return {
+        edges: results.edges ?? [],
+        pageInfo: results.pageInfo,
+      }
     },
   },
   User: {
     ownedCommunities: async (user, args) => {
-      checkPaginationArgs(args.input.paginate)
-      const paginationOptions = generatePaginationOptions(args.input.paginate)
-      const results = await prisma.user
-        .findUnique({ where: { id: user.id } })
-        .ownedCommunities({ ...paginationOptions })
-      const edges = generateEdges(results)
-      const pageInfo = generatePageInfo(results, args.input.paginate)
+      const results = await paginate<Community>(
+        args.input.paginate,
+        (options) =>
+          prisma.user
+            .findUnique({ where: { id: user.id } })
+            .ownedCommunities({ ...options })
+      )
 
       return {
-        edges,
-        pageInfo,
+        edges: results.edges ?? [],
+        pageInfo: results.pageInfo,
       }
     },
     inCommunities: async (user, args) => {
-      return prisma.user.findUnique({ where: { id: user.id } }).inCommunities()
+      const results = await paginate<Community>(
+        args.input.paginate,
+        (options) =>
+          prisma.user
+            .findUnique({ where: { id: user.id } })
+            .inCommunities({ ...options })
+      )
+
+      return {
+        edges: results.edges ?? [],
+        pageInfo: results.pageInfo,
+      }
     },
     posts: async (user, args) => {
-      return prisma.user.findUnique({ where: { id: user.id } }).posts()
+      const results = await paginate<Post>(args.input.paginate, (options) =>
+        prisma.user.findUnique({ where: { id: user.id } }).posts({ ...options })
+      )
+
+      return {
+        edges: results.edges ?? [],
+        pageInfo: results.pageInfo,
+      }
     },
   },
 }

@@ -9,3 +9,13 @@ type Post {
   owner: User!
   community: Community!
 }
+
+type PostEdge {
+  node: Post!
+  cursor: String!
+}
+
+type PostConnection {
+  edges: [PostEdge!]!
+  pageInfo: PageInfo!
+}

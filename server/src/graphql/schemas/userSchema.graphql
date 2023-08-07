@@ -1,13 +1,13 @@
 scalar DateTime
 
-type Query {
-  users(input: UsersInput): [User!]!
-}
-
 enum Provider {
   EMAIL
   GOOGLE
   GITHUB
+}
+
+type Query {
+  users(input: UsersInput!): UserConnection!
 }
 
 type User {
@@ -20,13 +20,24 @@ type User {
   created_at: DateTime!
   updated_at: DateTime!
 
-  ownedCommunities(input: UserOwnedCommunitiesInput!): CommunityConnection
-  inCommunities: [Community!]
-  posts: [Post!]
+  ownedCommunities(input: UserOwnedCommunitiesInput!): CommunityConnection!
+  inCommunities(input: UserInCommunitiesInput!): CommunityConnection!
+  posts(input: UserPostInput!): PostConnection!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
 }
 
 input UsersInput {
   filters: UsersFilters
+  paginate: PaginateInput!
 }
 
 input UsersFilters {
@@ -48,4 +59,10 @@ input UserOwnedCommunitiesInput {
   paginate: PaginateInput!
 }
 
-union UserOwnedCommunitiesResult = CommunityConnection
+input UserInCommunitiesInput {
+  paginate: PaginateInput!
+}
+
+input UserPostInput {
+  paginate: PaginateInput!
+}

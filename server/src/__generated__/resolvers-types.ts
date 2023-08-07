@@ -52,7 +52,7 @@ export type Community = {
 
 export type CommunityConnection = {
   __typename?: 'CommunityConnection';
-  edges?: Maybe<Array<CommunityEdge>>;
+  edges: Array<CommunityEdge>;
   pageInfo: PageInfo;
 };
 
@@ -139,6 +139,18 @@ export type Post = {
   updated_at: Scalars['DateTime']['output'];
 };
 
+export type PostConnection = {
+  __typename?: 'PostConnection';
+  edges: Array<PostEdge>;
+  pageInfo: PageInfo;
+};
+
+export type PostEdge = {
+  __typename?: 'PostEdge';
+  cursor: Scalars['String']['output'];
+  node: Post;
+};
+
 export const Provider = {
   Email: 'EMAIL',
   Github: 'GITHUB',
@@ -149,12 +161,12 @@ export type Provider = typeof Provider[keyof typeof Provider];
 export type Query = {
   __typename?: 'Query';
   authUser: AuthUserResult;
-  users: Array<User>;
+  users: UserConnection;
 };
 
 
 export type QueryUsersArgs = {
-  input?: InputMaybe<UsersInput>;
+  input: UsersInput;
 };
 
 export type RegisterEmailInput = {
@@ -197,17 +209,43 @@ export type User = {
   email_verified: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   image?: Maybe<Scalars['String']['output']>;
-  inCommunities?: Maybe<Array<Community>>;
-  ownedCommunities?: Maybe<CommunityConnection>;
-  posts?: Maybe<Array<Post>>;
+  inCommunities: CommunityConnection;
+  ownedCommunities: CommunityConnection;
+  posts: PostConnection;
   provider: Provider;
   updated_at: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
 };
 
 
+export type UserInCommunitiesArgs = {
+  input: UserInCommunitiesInput;
+};
+
+
 export type UserOwnedCommunitiesArgs = {
   input: UserOwnedCommunitiesInput;
+};
+
+
+export type UserPostsArgs = {
+  input: UserPostInput;
+};
+
+export type UserConnection = {
+  __typename?: 'UserConnection';
+  edges: Array<UserEdge>;
+  pageInfo: PageInfo;
+};
+
+export type UserEdge = {
+  __typename?: 'UserEdge';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type UserInCommunitiesInput = {
+  paginate: PaginateInput;
 };
 
 export type UserNotFoundError = Error & {
@@ -231,7 +269,9 @@ export type UserOwnedCommunitiesInput = {
   paginate: PaginateInput;
 };
 
-export type UserOwnedCommunitiesResult = CommunityConnection;
+export type UserPostInput = {
+  paginate: PaginateInput;
+};
 
 export type UsersFilters = {
   orderBy?: InputMaybe<UserOrderBy>;
@@ -240,6 +280,7 @@ export type UsersFilters = {
 
 export type UsersInput = {
   filters?: InputMaybe<UsersFilters>;
+  paginate: PaginateInput;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -315,7 +356,6 @@ export type ResolversUnionTypes<RefType extends Record<string, unknown>> = Resol
   AuthUserResult: ( Omit<AuthUserSuccess, 'user'> & { user: RefType['User'] } ) | ( AuthenticationError ) | ( UserNotFoundError );
   LoginEmailResult: ( LoginEmailInputError ) | ( LoginEmailSuccess );
   RegisterEmailResult: ( DuplicateEmailError ) | ( RegisterEmailInputError ) | ( RegisterEmailSuccess );
-  UserOwnedCommunitiesResult: ( Omit<CommunityConnection, 'edges'> & { edges?: Maybe<Array<RefType['CommunityEdge']>> } );
 }>;
 
 /** Mapping of interface types */
@@ -332,7 +372,7 @@ export type ResolversTypes = ResolversObject<{
   AuthenticationError: ResolverTypeWrapper<AuthenticationError>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Community: ResolverTypeWrapper<CommunityModel>;
-  CommunityConnection: ResolverTypeWrapper<Omit<CommunityConnection, 'edges'> & { edges?: Maybe<Array<ResolversTypes['CommunityEdge']>> }>;
+  CommunityConnection: ResolverTypeWrapper<Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversTypes['CommunityEdge']> }>;
   CommunityEdge: ResolverTypeWrapper<Omit<CommunityEdge, 'node'> & { node: ResolversTypes['Community'] }>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   DuplicateEmailError: ResolverTypeWrapper<DuplicateEmailError>;
@@ -348,6 +388,8 @@ export type ResolversTypes = ResolversObject<{
   PageInfo: ResolverTypeWrapper<PageInfo>;
   PaginateInput: PaginateInput;
   Post: ResolverTypeWrapper<PostModel>;
+  PostConnection: ResolverTypeWrapper<Omit<PostConnection, 'edges'> & { edges: Array<ResolversTypes['PostEdge']> }>;
+  PostEdge: ResolverTypeWrapper<Omit<PostEdge, 'node'> & { node: ResolversTypes['Post'] }>;
   Provider: Provider;
   Query: ResolverTypeWrapper<{}>;
   RegisterEmailInput: RegisterEmailInput;
@@ -358,11 +400,14 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Success: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Success']>;
   User: ResolverTypeWrapper<UserModel>;
+  UserConnection: ResolverTypeWrapper<Omit<UserConnection, 'edges'> & { edges: Array<ResolversTypes['UserEdge']> }>;
+  UserEdge: ResolverTypeWrapper<Omit<UserEdge, 'node'> & { node: ResolversTypes['User'] }>;
+  UserInCommunitiesInput: UserInCommunitiesInput;
   UserNotFoundError: ResolverTypeWrapper<UserNotFoundError>;
   UserOrderBy: UserOrderBy;
   UserOrderByType: UserOrderByType;
   UserOwnedCommunitiesInput: UserOwnedCommunitiesInput;
-  UserOwnedCommunitiesResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['UserOwnedCommunitiesResult']>;
+  UserPostInput: UserPostInput;
   UsersFilters: UsersFilters;
   UsersInput: UsersInput;
 }>;
@@ -375,7 +420,7 @@ export type ResolversParentTypes = ResolversObject<{
   AuthenticationError: AuthenticationError;
   Boolean: Scalars['Boolean']['output'];
   Community: CommunityModel;
-  CommunityConnection: Omit<CommunityConnection, 'edges'> & { edges?: Maybe<Array<ResolversParentTypes['CommunityEdge']>> };
+  CommunityConnection: Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversParentTypes['CommunityEdge']> };
   CommunityEdge: Omit<CommunityEdge, 'node'> & { node: ResolversParentTypes['Community'] };
   DateTime: Scalars['DateTime']['output'];
   DuplicateEmailError: DuplicateEmailError;
@@ -390,6 +435,8 @@ export type ResolversParentTypes = ResolversObject<{
   PageInfo: PageInfo;
   PaginateInput: PaginateInput;
   Post: PostModel;
+  PostConnection: Omit<PostConnection, 'edges'> & { edges: Array<ResolversParentTypes['PostEdge']> };
+  PostEdge: Omit<PostEdge, 'node'> & { node: ResolversParentTypes['Post'] };
   Query: {};
   RegisterEmailInput: RegisterEmailInput;
   RegisterEmailInputError: RegisterEmailInputError;
@@ -399,10 +446,13 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String']['output'];
   Success: ResolversInterfaceTypes<ResolversParentTypes>['Success'];
   User: UserModel;
+  UserConnection: Omit<UserConnection, 'edges'> & { edges: Array<ResolversParentTypes['UserEdge']> };
+  UserEdge: Omit<UserEdge, 'node'> & { node: ResolversParentTypes['User'] };
+  UserInCommunitiesInput: UserInCommunitiesInput;
   UserNotFoundError: UserNotFoundError;
   UserOrderBy: UserOrderBy;
   UserOwnedCommunitiesInput: UserOwnedCommunitiesInput;
-  UserOwnedCommunitiesResult: ResolversUnionTypes<ResolversParentTypes>['UserOwnedCommunitiesResult'];
+  UserPostInput: UserPostInput;
   UsersFilters: UsersFilters;
   UsersInput: UsersInput;
 }>;
@@ -436,7 +486,7 @@ export type CommunityResolvers<ContextType = Context, ParentType extends Resolve
 }>;
 
 export type CommunityConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CommunityConnection'] = ResolversParentTypes['CommunityConnection']> = ResolversObject<{
-  edges?: Resolver<Maybe<Array<ResolversTypes['CommunityEdge']>>, ParentType, ContextType>;
+  edges?: Resolver<Array<ResolversTypes['CommunityEdge']>, ParentType, ContextType>;
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -502,9 +552,21 @@ export type PostResolvers<ContextType = Context, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type PostConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PostConnection'] = ResolversParentTypes['PostConnection']> = ResolversObject<{
+  edges?: Resolver<Array<ResolversTypes['PostEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type PostEdgeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PostEdge'] = ResolversParentTypes['PostEdge']> = ResolversObject<{
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   authUser?: Resolver<ResolversTypes['AuthUserResult'], ParentType, ContextType>;
-  users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType, Partial<QueryUsersArgs>>;
+  users?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, RequireFields<QueryUsersArgs, 'input'>>;
 }>;
 
 export type RegisterEmailInputErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RegisterEmailInputError'] = ResolversParentTypes['RegisterEmailInputError']> = ResolversObject<{
@@ -543,12 +605,24 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
   email_verified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  inCommunities?: Resolver<Maybe<Array<ResolversTypes['Community']>>, ParentType, ContextType>;
-  ownedCommunities?: Resolver<Maybe<ResolversTypes['CommunityConnection']>, ParentType, ContextType, RequireFields<UserOwnedCommunitiesArgs, 'input'>>;
-  posts?: Resolver<Maybe<Array<ResolversTypes['Post']>>, ParentType, ContextType>;
+  inCommunities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<UserInCommunitiesArgs, 'input'>>;
+  ownedCommunities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<UserOwnedCommunitiesArgs, 'input'>>;
+  posts?: Resolver<ResolversTypes['PostConnection'], ParentType, ContextType, RequireFields<UserPostsArgs, 'input'>>;
   provider?: Resolver<ResolversTypes['Provider'], ParentType, ContextType>;
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserConnection'] = ResolversParentTypes['UserConnection']> = ResolversObject<{
+  edges?: Resolver<Array<ResolversTypes['UserEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserEdgeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserEdge'] = ResolversParentTypes['UserEdge']> = ResolversObject<{
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -556,10 +630,6 @@ export type UserNotFoundErrorResolvers<ContextType = Context, ParentType extends
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export type UserOwnedCommunitiesResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserOwnedCommunitiesResult'] = ResolversParentTypes['UserOwnedCommunitiesResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'CommunityConnection', ParentType, ContextType>;
 }>;
 
 export type Resolvers<ContextType = Context> = ResolversObject<{
@@ -578,6 +648,8 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   Mutation?: MutationResolvers<ContextType>;
   PageInfo?: PageInfoResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
+  PostConnection?: PostConnectionResolvers<ContextType>;
+  PostEdge?: PostEdgeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   RegisterEmailInputError?: RegisterEmailInputErrorResolvers<ContextType>;
   RegisterEmailInputErrors?: RegisterEmailInputErrorsResolvers<ContextType>;
@@ -585,7 +657,8 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   RegisterEmailSuccess?: RegisterEmailSuccessResolvers<ContextType>;
   Success?: SuccessResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserConnection?: UserConnectionResolvers<ContextType>;
+  UserEdge?: UserEdgeResolvers<ContextType>;
   UserNotFoundError?: UserNotFoundErrorResolvers<ContextType>;
-  UserOwnedCommunitiesResult?: UserOwnedCommunitiesResultResolvers<ContextType>;
 }>;
 

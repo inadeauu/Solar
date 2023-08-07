@@ -17,6 +17,6 @@ type CommunityEdge {
 }
 
 type CommunityConnection {
-  edges: [CommunityEdge!]
+  edges: [CommunityEdge!]!
   pageInfo: PageInfo!
 }

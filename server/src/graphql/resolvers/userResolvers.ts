@@ -1,7 +1,7 @@
 import prisma from "../../config/prisma"
 import { Community, Post, User } from "@prisma/client"
 import { Resolvers, UserOrderByType } from "../../__generated__/resolvers-types"
-import { checkPaginationArgs, paginate } from "../paginate"
+import { paginate } from "../paginate"
 
 export const resolvers: Resolvers = {
   Query: {
@@ -28,7 +28,7 @@ export const resolvers: Resolvers = {
       )
 
       return {
-        edges: results.edges ?? [],
+        edges: results.edges,
         pageInfo: results.pageInfo,
       }
     },
@@ -44,7 +44,7 @@ export const resolvers: Resolvers = {
       )
 
       return {
-        edges: results.edges ?? [],
+        edges: results.edges,
         pageInfo: results.pageInfo,
       }
     },
@@ -58,7 +58,7 @@ export const resolvers: Resolvers = {
       )
 
       return {
-        edges: results.edges ?? [],
+        edges: results.edges,
         pageInfo: results.pageInfo,
       }
     },
@@ -68,7 +68,7 @@ export const resolvers: Resolvers = {
       )
 
       return {
-        edges: results.edges ?? [],
+        edges: results.edges,
         pageInfo: results.pageInfo,
       }
     },

@@ -7,7 +7,7 @@ type Mutation {
   loginEmail(input: LoginEmailInput!): LoginEmailResult!
 }
 
-# Mutation - registerEmail
+# REGISTEREMAIL MUTATION
 union RegisterEmailResult =
     RegisterEmailSuccess
   | RegisterEmailInputError
@@ -36,7 +36,7 @@ type RegisterEmailInputErrors {
   password: String
 }
 
-# Mutation - loginEmail
+# LOGINEMAIL MUTATION
 union LoginEmailResult = LoginEmailSuccess | LoginEmailInputError
 
 input LoginEmailInput {
@@ -54,7 +54,7 @@ type LoginEmailInputError implements Error {
   code: Int!
 }
 
-# Query - authUser
+# AUTHUSER QUERY
 union AuthUserResult = AuthUserSuccess | AuthenticationError | UserNotFoundError
 
 input AuthUserInput {

@@ -10,6 +10,7 @@ type Post {
   community: Community!
 }
 
+# -- PAGINATION --
 type PostEdge {
   node: Post!
   cursor: String!

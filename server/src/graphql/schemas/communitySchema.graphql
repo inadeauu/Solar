@@ -7,10 +7,11 @@ type Community {
   updated_at: DateTime!
 
   owner: User!
-  members: [User!]
-  posts: [Post!]
+  members: [User!]!
+  posts: [Post!]!
 }
 
+# -- PAGINATION --
 type CommunityEdge {
   node: Community!
   cursor: String!

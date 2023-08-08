@@ -43,9 +43,9 @@ export type Community = {
   __typename?: 'Community';
   created_at: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
-  members?: Maybe<Array<User>>;
+  members: Array<User>;
   owner: User;
-  posts?: Maybe<Array<Post>>;
+  posts: Array<Post>;
   title: Scalars['String']['output'];
   updated_at: Scalars['DateTime']['output'];
 };
@@ -161,7 +161,13 @@ export type Provider = typeof Provider[keyof typeof Provider];
 export type Query = {
   __typename?: 'Query';
   authUser: AuthUserResult;
+  user?: Maybe<User>;
   users: UserConnection;
+};
+
+
+export type QueryUserArgs = {
+  input: UserInput;
 };
 
 
@@ -248,15 +254,14 @@ export type UserInCommunitiesInput = {
   paginate: PaginateInput;
 };
 
+export type UserInput = {
+  id: Scalars['ID']['input'];
+};
+
 export type UserNotFoundError = Error & {
   __typename?: 'UserNotFoundError';
   code: Scalars['Int']['output'];
   errorMsg: Scalars['String']['output'];
-};
-
-export type UserOrderBy = {
-  dir: OrderByDir;
-  type: UserOrderByType;
 };
 
 export const UserOrderByType = {
@@ -274,13 +279,18 @@ export type UserPostInput = {
 };
 
 export type UsersFilters = {
-  orderBy?: InputMaybe<UserOrderBy>;
+  orderBy?: InputMaybe<UsersOrderBy>;
   usernameContains?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UsersInput = {
   filters?: InputMaybe<UsersFilters>;
   paginate: PaginateInput;
+};
+
+export type UsersOrderBy = {
+  dir: OrderByDir;
+  type: UserOrderByType;
 };
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
@@ -403,13 +413,14 @@ export type ResolversTypes = ResolversObject<{
   UserConnection: ResolverTypeWrapper<Omit<UserConnection, 'edges'> & { edges: Array<ResolversTypes['UserEdge']> }>;
   UserEdge: ResolverTypeWrapper<Omit<UserEdge, 'node'> & { node: ResolversTypes['User'] }>;
   UserInCommunitiesInput: UserInCommunitiesInput;
+  UserInput: UserInput;
   UserNotFoundError: ResolverTypeWrapper<UserNotFoundError>;
-  UserOrderBy: UserOrderBy;
   UserOrderByType: UserOrderByType;
   UserOwnedCommunitiesInput: UserOwnedCommunitiesInput;
   UserPostInput: UserPostInput;
   UsersFilters: UsersFilters;
   UsersInput: UsersInput;
+  UsersOrderBy: UsersOrderBy;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -449,12 +460,13 @@ export type ResolversParentTypes = ResolversObject<{
   UserConnection: Omit<UserConnection, 'edges'> & { edges: Array<ResolversParentTypes['UserEdge']> };
   UserEdge: Omit<UserEdge, 'node'> & { node: ResolversParentTypes['User'] };
   UserInCommunitiesInput: UserInCommunitiesInput;
+  UserInput: UserInput;
   UserNotFoundError: UserNotFoundError;
-  UserOrderBy: UserOrderBy;
   UserOwnedCommunitiesInput: UserOwnedCommunitiesInput;
   UserPostInput: UserPostInput;
   UsersFilters: UsersFilters;
   UsersInput: UsersInput;
+  UsersOrderBy: UsersOrderBy;
 }>;
 
 export type AuthUserResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['AuthUserResult'] = ResolversParentTypes['AuthUserResult']> = ResolversObject<{
@@ -477,9 +489,9 @@ export type AuthenticationErrorResolvers<ContextType = Context, ParentType exten
 export type CommunityResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Community'] = ResolversParentTypes['Community']> = ResolversObject<{
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  members?: Resolver<Maybe<Array<ResolversTypes['User']>>, ParentType, ContextType>;
+  members?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  posts?: Resolver<Maybe<Array<ResolversTypes['Post']>>, ParentType, ContextType>;
+  posts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -566,6 +578,7 @@ export type PostEdgeResolvers<ContextType = Context, ParentType extends Resolver
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   authUser?: Resolver<ResolversTypes['AuthUserResult'], ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'input'>>;
   users?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, RequireFields<QueryUsersArgs, 'input'>>;
 }>;
 

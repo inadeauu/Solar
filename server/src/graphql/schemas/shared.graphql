@@ -1,4 +1,4 @@
-# -- SUCCESS/ERROR --
+# -- SUCCESS/ERROR
 interface Error {
   errorMsg: String!
   code: Int!
@@ -24,7 +24,7 @@ type UserNotFoundError implements Error {
   code: Int!
 }
 
-# -- FILTER/PAGINATION --
+# -- FILTER/PAGINATION
 type PageInfo {
   endCursor: String
   hasNextPage: Boolean!

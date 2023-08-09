@@ -16,8 +16,8 @@ import TextInput from "../components/TextInput"
 import { api } from "../utils/axios"
 import { graphql } from "../gql"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import request from "graphql-request"
 import { RegisterEmailInput } from "../gql/graphql"
+import { graphQLClient } from "../utils/graphql"
 
 const emailRegisterDocument = graphql(/* GraphQL */ `
   mutation EmailRegister($input: RegisterEmailInput!) {
@@ -52,13 +52,9 @@ const Signup = () => {
 
   const emailRegister = useMutation({
     mutationFn: async ({ username, email, password }: RegisterEmailInput) => {
-      return await request(
-        "http://localhost:4000/graphql",
-        emailRegisterDocument,
-        {
-          input: { username, email, password },
-        }
-      )
+      return await graphQLClient.request(emailRegisterDocument, {
+        input: { username, email, password },
+      })
     },
     onSuccess: (data) => {
       if (

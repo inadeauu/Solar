@@ -15,6 +15,8 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "\n  mutation Logout {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.LogoutDocument,
     "\n  query AuthUser {\n    authUser {\n      ... on AuthUserSuccess {\n        successMsg\n        code\n        user {\n          username\n          updated_at\n          provider\n          image\n          id\n          email_verified\n          email\n          created_at\n        }\n      }\n    }\n  }\n": types.AuthUserDocument,
+    "\n  query CommunityTitleExists($title: String!) {\n    titleExists(title: $title)\n  }\n": types.CommunityTitleExistsDocument,
+    "\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on CreateCommunityInputError {\n        inputErrors {\n          title\n        }\n      }\n    }\n  }\n": types.CreateCommunityDocument,
     "\n  mutation EmailLogin($input: LoginEmailInput!) {\n    loginEmail(input: $input) {\n      ... on LoginEmailSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on LoginEmailInputError {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.EmailLoginDocument,
     "\n  mutation EmailRegister($input: RegisterEmailInput!) {\n    registerEmail(input: $input) {\n      ... on RegisterEmailSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on RegisterEmailInputError {\n        inputErrors {\n          email\n          password\n          username\n        }\n      }\n    }\n  }\n": types.EmailRegisterDocument,
 };
@@ -41,6 +43,14 @@ export function graphql(source: "\n  mutation Logout {\n    logout {\n      ... 
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query AuthUser {\n    authUser {\n      ... on AuthUserSuccess {\n        successMsg\n        code\n        user {\n          username\n          updated_at\n          provider\n          image\n          id\n          email_verified\n          email\n          created_at\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query AuthUser {\n    authUser {\n      ... on AuthUserSuccess {\n        successMsg\n        code\n        user {\n          username\n          updated_at\n          provider\n          image\n          id\n          email_verified\n          email\n          created_at\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CommunityTitleExists($title: String!) {\n    titleExists(title: $title)\n  }\n"): (typeof documents)["\n  query CommunityTitleExists($title: String!) {\n    titleExists(title: $title)\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on CreateCommunityInputError {\n        inputErrors {\n          title\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on CreateCommunityInputError {\n        inputErrors {\n          title\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

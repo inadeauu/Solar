@@ -53,7 +53,7 @@ enum UserOrderByType {
   postCount
 }
 
-# -- PAGINATION --
+# -- PAGINATION
 type UserEdge {
   node: User!
   cursor: String!

@@ -1,29 +1,22 @@
-import { useField } from "formik"
+import { FieldProps } from "formik"
 
-type InputProps = {
-  [x: string]: any
-}
-
-const TextInput = ({ ...props }: InputProps) => {
-  const [field, meta] = useField(props.name)
-
+const TextInput = ({ field, form: { errors } }: FieldProps) => {
   return (
     <div
-      className={`flex flex-col gap-1 ${
-        meta.touched && meta.error ? "mb-2" : "mb-4"
-      }`}
+      className={`flex flex-col gap-1 ${errors[field.name] ? "mb-2" : "mb-4"}`}
     >
       <input
         className={`border-2 border-neutral-500 w-full p-1 outline-none ${
-          meta.touched && meta.error
+          errors[field.name]
             ? "border-red-400 hover:border-red-600 focus:border-red-600"
             : "hover:border-blue-400 focus:border-blue-400"
         }`}
         {...field}
-        {...props}
       />
-      {meta.touched && meta.error ? (
-        <div className="text-red-400 text-xs font-bold">{meta.error}</div>
+      {errors[field.name] ? (
+        <p className="text-red-400 text-xs font-bold">{`${
+          errors[field.name]
+        }`}</p>
       ) : null}
     </div>
   )

@@ -1,5 +1,13 @@
 scalar DateTime
 
+type Query {
+  titleExists(title: String!): Boolean!
+}
+
+type Mutation {
+  createCommunity(input: CreateCommunityInput!): CreateCommunityResult!
+}
+
 type Community {
   id: ID!
   title: String!
@@ -11,7 +19,7 @@ type Community {
   posts: [Post!]!
 }
 
-# -- PAGINATION --
+# -- PAGINATION
 type CommunityEdge {
   node: Community!
   cursor: String!
@@ -20,4 +28,29 @@ type CommunityEdge {
 type CommunityConnection {
   edges: [CommunityEdge!]!
   pageInfo: PageInfo!
+}
+
+# -- CREATECOMMUNITY MUTATION
+union CreateCommunityResult =
+    CreateCommunitySuccess
+  | CreateCommunityInputError
+  | AuthenticationError
+
+input CreateCommunityInput {
+  title: String!
+}
+
+type CreateCommunitySuccess implements Success {
+  successMsg: String!
+  code: Int!
+}
+
+type CreateCommunityInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: CreateCommunityInputErrors!
+}
+
+type CreateCommunityInputErrors {
+  title: String
 }

@@ -1,39 +1,99 @@
-import { Form, Formik } from "formik"
+import { Field, Form, Formik } from "formik"
 import { ImSpinner11 } from "react-icons/im"
 import ErrorCard from "../components/ErrorCard"
-import * as Yup from "yup"
 import TextInput from "../components/TextInput"
 import { useState } from "react"
-import { AxiosError } from "axios"
 import { useNavigate } from "react-router-dom"
-import { api } from "../utils/axios"
+import { graphql } from "../gql"
+import { graphQLClient } from "../utils/graphql"
+import { debounce } from "lodash"
+import { useMutation } from "@tanstack/react-query"
+import { CreateCommunityInput } from "../gql/graphql"
+
+const communityTitleExistsDocument = graphql(/* GraphQL */ `
+  query CommunityTitleExists($title: String!) {
+    titleExists(title: $title)
+  }
+`)
+
+const createCommunityDocument = graphql(/* GraphQL */ `
+  mutation CreateCommunity($input: CreateCommunityInput!) {
+    createCommunity(input: $input) {
+      ... on CreateCommunitySuccess {
+        __typename
+        successMsg
+        code
+      }
+      ... on Error {
+        __typename
+        errorMsg
+        code
+      }
+      ... on CreateCommunityInputError {
+        inputErrors {
+          title
+        }
+      }
+    }
+  }
+`)
 
 const CreateCommunity = () => {
   const [error, setError] = useState<string>("")
   const navigate = useNavigate()
 
-  const submit = async (title: string) => {
-    try {
-      await api.post("/community", { title })
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        setError(error.response?.data.error.message)
+  const emailRegister = useMutation({
+    mutationFn: async ({ title }: CreateCommunityInput) => {
+      return await graphQLClient.request(createCommunityDocument, {
+        input: { title },
+      })
+    },
+    onSuccess: (data) => {
+      if (data.createCommunity.__typename == "CreateCommunityInputError") {
+        setError(data.createCommunity.errorMsg)
+      } else if (data.createCommunity.__typename == "CreateCommunitySuccess") {
+        navigate("/")
       }
-    }
+    },
+  })
+
+  const validateTitle = async (title: string) => {
+    return new Promise((resolve) =>
+      debounce(
+        async (title) => {
+          let error
+
+          if (!title) {
+            error = "Required"
+          } else {
+            const response = await graphQLClient.request(
+              communityTitleExistsDocument,
+              {
+                title,
+              }
+            )
+
+            if (response.titleExists) {
+              error = "Title in use"
+            }
+          }
+
+          resolve(error)
+        },
+        500,
+        { leading: true }
+      )(title)
+    )
   }
 
   return (
     <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border-2 border-black">
       <Formik
-        validateOnChange={false}
         initialValues={{ title: "" }}
-        validationSchema={Yup.object({
-          title: Yup.string().required("Required"),
-        })}
+        validateOnBlur={false}
         onSubmit={(values, { setSubmitting }) => {
-          submit(values.title)
+          emailRegister.mutate({ title: values.title })
           setSubmitting(false)
-          navigate("/")
         }}
       >
         {({ isSubmitting }) => (
@@ -43,7 +103,11 @@ const CreateCommunity = () => {
               {error && <ErrorCard error={error} className="mb-4" />}
               <label className="flex flex-col gap-2">
                 <p className="text-xl">Title</p>
-                <TextInput name="title" />
+                <Field
+                  name="title"
+                  validate={validateTitle}
+                  component={TextInput}
+                />
               </label>
               <button
                 className="btn_blue py-2 mt-6 w-[60%] mx-auto"

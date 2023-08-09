@@ -14,6 +14,32 @@ import ErrorCard from "../components/ErrorCard"
 import { ImSpinner11 } from "react-icons/im"
 import TextInput from "../components/TextInput"
 import { api } from "../utils/axios"
+import { graphql } from "../gql"
+import { useMutation } from "@tanstack/react-query"
+import request from "graphql-request"
+import { RegisterEmailInput } from "../gql/graphql"
+
+const emailRegisterDocument = graphql(/* GraphQL */ `
+  mutation EmailRegister($input: RegisterEmailInput!) {
+    registerEmail(input: $input) {
+      ... on RegisterEmailSuccess {
+        successMsg
+        code
+      }
+      ... on Error {
+        errorMsg
+        code
+      }
+      ... on RegisterEmailInputError {
+        inputErrors {
+          email
+          password
+          username
+        }
+      }
+    }
+  }
+`)
 
 const Signup = () => {
   const [showPass, setShowPass] = useState<boolean>(false)
@@ -21,29 +47,26 @@ const Signup = () => {
 
   const navigate = useNavigate()
 
-  const socialSignIn = async (provider: string) => {
+  const emailRegister = useMutation({
+    mutationFn: async ({ username, email, password }: RegisterEmailInput) => {
+      return request("http://localhost:4000/graphql", emailRegisterDocument, {
+        input: { username, email, password },
+      })
+    },
+    onSuccess: (data) => {
+      if (data?.registerEmail.__typename == "DuplicateEmailError") {
+        setError(data.registerEmail.errorMsg)
+      } else if (data?.registerEmail.__typename == "RegisterEmailInputError") {
+        setError(data.registerEmail.errorMsg)
+      }
+    },
+  })
+
+  const socialSignUp = async (provider: string) => {
     try {
       const response = await api.get(`/auth/${provider}`)
 
       window.location.assign(response.data.data.url)
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        setError(error.response?.data.error.message)
-      }
-    }
-  }
-
-  const emailSignIn = async (
-    username: string,
-    email: string,
-    password: string
-  ) => {
-    try {
-      await api.post("/auth/register", {
-        username,
-        email,
-        password,
-      })
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         setError(error.response?.data.error.message)
@@ -78,7 +101,11 @@ const Signup = () => {
               .required("Required"),
           })}
           onSubmit={(values, { setSubmitting }) => {
-            emailSignIn(values.username, values.email, values.password)
+            emailRegister.mutate({
+              username: values.username,
+              email: values.email,
+              password: values.password,
+            })
             setSubmitting(false)
             navigate("/")
           }}
@@ -91,7 +118,7 @@ const Signup = () => {
                 <button
                   type="button"
                   className={inputStyle}
-                  onClick={() => socialSignIn("google")}
+                  onClick={() => socialSignUp("google")}
                 >
                   <FcGoogle className="h-5 w-5" />
                   Sign up with Google
@@ -99,7 +126,7 @@ const Signup = () => {
                 <button
                   type="button"
                   className={inputStyle}
-                  onClick={() => socialSignIn("github")}
+                  onClick={() => socialSignUp("github")}
                 >
                   <BsGithub className="h-5 w-5" />
                   Sign up with Github

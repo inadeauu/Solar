@@ -55,7 +55,7 @@ type LoginEmailInputError implements Error {
 }
 
 # AUTHUSER QUERY
-union AuthUserResult = AuthUserSuccess | AuthenticationError | UserNotFoundError
+union AuthUserResult = AuthUserSuccess
 
 input AuthUserInput {
   userId: String!
@@ -64,5 +64,5 @@ input AuthUserInput {
 type AuthUserSuccess implements Success {
   successMsg: String
   code: Int!
-  user: User!
+  user: User
 }

@@ -9,23 +9,15 @@ export const resolvers: Resolvers = {
     authUser: async (_0, _1, { req }) => {
       if (!req.session.userId) {
         return {
-          __typename: "AuthenticationError",
-          errorMsg: "No authenticated user",
-          code: 401,
+          __typename: "AuthUserSuccess",
+          code: 200,
+          user: null,
         }
       }
 
       const user = await prisma.user.findFirst({
         where: { id: req.session.userId },
       })
-
-      if (!user) {
-        return {
-          __typename: "UserNotFoundError",
-          errorMsg: "User not found",
-          code: 404,
-        }
-      }
 
       return {
         __typename: "AuthUserSuccess",

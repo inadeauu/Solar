@@ -24,13 +24,13 @@ export type AuthUserInput = {
   userId: Scalars['String']['input'];
 };
 
-export type AuthUserResult = AuthUserSuccess | AuthenticationError | UserNotFoundError;
+export type AuthUserResult = AuthUserSuccess;
 
 export type AuthUserSuccess = Success & {
   __typename?: 'AuthUserSuccess';
   code: Scalars['Int']['output'];
   successMsg?: Maybe<Scalars['String']['output']>;
-  user: User;
+  user?: Maybe<User>;
 };
 
 export type AuthenticationError = Error & {
@@ -363,7 +363,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping of union types */
 export type ResolversUnionTypes<RefType extends Record<string, unknown>> = ResolversObject<{
-  AuthUserResult: ( Omit<AuthUserSuccess, 'user'> & { user: RefType['User'] } ) | ( AuthenticationError ) | ( UserNotFoundError );
+  AuthUserResult: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } );
   LoginEmailResult: ( LoginEmailInputError ) | ( LoginEmailSuccess );
   RegisterEmailResult: ( DuplicateEmailError ) | ( RegisterEmailInputError ) | ( RegisterEmailSuccess );
 }>;
@@ -371,14 +371,14 @@ export type ResolversUnionTypes<RefType extends Record<string, unknown>> = Resol
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
   Error: ( AuthenticationError ) | ( DuplicateEmailError ) | ( LoginEmailInputError ) | ( RegisterEmailInputError ) | ( UserNotFoundError );
-  Success: ( Omit<AuthUserSuccess, 'user'> & { user: RefType['User'] } ) | ( LoginEmailSuccess ) | ( RegisterEmailSuccess );
+  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( LoginEmailSuccess ) | ( RegisterEmailSuccess );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
   AuthUserInput: AuthUserInput;
   AuthUserResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['AuthUserResult']>;
-  AuthUserSuccess: ResolverTypeWrapper<Omit<AuthUserSuccess, 'user'> & { user: ResolversTypes['User'] }>;
+  AuthUserSuccess: ResolverTypeWrapper<Omit<AuthUserSuccess, 'user'> & { user?: Maybe<ResolversTypes['User']> }>;
   AuthenticationError: ResolverTypeWrapper<AuthenticationError>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Community: ResolverTypeWrapper<CommunityModel>;
@@ -427,7 +427,7 @@ export type ResolversTypes = ResolversObject<{
 export type ResolversParentTypes = ResolversObject<{
   AuthUserInput: AuthUserInput;
   AuthUserResult: ResolversUnionTypes<ResolversParentTypes>['AuthUserResult'];
-  AuthUserSuccess: Omit<AuthUserSuccess, 'user'> & { user: ResolversParentTypes['User'] };
+  AuthUserSuccess: Omit<AuthUserSuccess, 'user'> & { user?: Maybe<ResolversParentTypes['User']> };
   AuthenticationError: AuthenticationError;
   Boolean: Scalars['Boolean']['output'];
   Community: CommunityModel;
@@ -470,13 +470,13 @@ export type ResolversParentTypes = ResolversObject<{
 }>;
 
 export type AuthUserResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['AuthUserResult'] = ResolversParentTypes['AuthUserResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'AuthenticationError' | 'UserNotFoundError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthUserSuccess', ParentType, ContextType>;
 }>;
 
 export type AuthUserSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['AuthUserSuccess'] = ResolversParentTypes['AuthUserSuccess']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successMsg?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

@@ -10,7 +10,11 @@ const ProfileImage = ({ className, ...props }: ProfileImageProps) => {
   const { user } = useAuth()
 
   return user && user.provider !== "EMAIL" ? (
-    <img className={`rounded-full ${className}`} src={user.image} {...props} />
+    <img
+      className={`rounded-full ${className}`}
+      src={user.image || ""}
+      {...props}
+    />
   ) : (
     <CgProfile className={className} {...props} />
   )

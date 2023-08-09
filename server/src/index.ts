@@ -27,6 +27,11 @@ const main = async () => {
 
   const isProduction: boolean = process.env.NODE_ENV === "production"
 
+  app.use(cors(corsOptions))
+  app.use(bodyParser.json())
+  app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(cookieParser(env.COOKIE_SECRET))
+
   app.use(
     session({
       secret: env.SESSION_SECRET,
@@ -46,6 +51,8 @@ const main = async () => {
       contentSecurityPolicy: isProduction,
     })
   )
+
+  routes(app)
 
   const httpServer = http.createServer(app)
 
@@ -73,18 +80,12 @@ const main = async () => {
 
   app.use(
     "/graphql",
-    cors<cors.CorsRequest>(corsOptions),
-    bodyParser.json(),
-    bodyParser.urlencoded({ extended: true }),
-    cookieParser(env.COOKIE_SECRET),
     expressMiddleware(server, {
       context: async ({ req }) => ({
         req,
       }),
     })
   )
-
-  routes(app)
 
   await new Promise<void>((resolve) =>
     httpServer.listen({ port: 4000 }, resolve)

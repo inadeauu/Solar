@@ -1,45 +1,49 @@
 import { createContext } from "react"
 import { ImSpinner11 } from "react-icons/im"
 import { useQuery } from "@tanstack/react-query"
-import { api } from "../utils/axios"
+import { AuthUserQuery } from "../gql/graphql"
+import { graphql } from "../gql"
+import { graphQLClient } from "../utils/graphql"
+
+const authUserQueryDocument = graphql(/* GraphQL */ `
+  query AuthUser {
+    authUser {
+      ... on AuthUserSuccess {
+        successMsg
+        code
+        user {
+          username
+          updated_at
+          provider
+          image
+          id
+          email_verified
+          email
+          created_at
+        }
+      }
+    }
+  }
+`)
+
+export interface AuthContextType {
+  user: AuthUserQuery["authUser"]["user"]
+}
 
 type AuthProviderProps = {
   children: React.ReactNode
 }
 
-type User = {
-  id: string
-  username: string
-  email: string
-  email_verified: boolean
-  provider: string
-  image: string
-  created_at: string
-  updated_at: string
-}
-
-export interface AuthContextType {
-  user: User | null | undefined
-}
-
 export const AuthContext = createContext<AuthContextType>({} as AuthContextType)
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
-  const { isLoading, data } = useQuery<User | null>({
+  const { isLoading, data } = useQuery({
     queryKey: ["user"],
-    queryFn: async () => {
-      const response = await api.get("/auth/user")
-
-      if (response.data.data.user) {
-        return response.data.data.user as User
-      } else {
-        return null
-      }
-    },
+    queryFn: async () => graphQLClient.request(authUserQueryDocument),
   })
 
   const value: AuthContextType = {
-    user: data,
+    user: data?.authUser.user,
   }
 
   return (

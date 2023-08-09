@@ -28,6 +28,8 @@ const Login = () => {
       const response = await api.get(`/auth/${provider}`)
 
       window.location.assign(response.data.data.url)
+
+      queryClient.invalidateQueries({ queryKey: ["user"] })
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         setError(error.response?.data.error.message)

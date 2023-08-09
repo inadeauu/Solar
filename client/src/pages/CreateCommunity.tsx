@@ -57,26 +57,30 @@ const CreateCommunity = () => {
     },
   })
 
-  const validateTitle = AwesomeDebouncePromise(async (title) => {
-    console.log(title)
-    let error
+  const validateTitle = AwesomeDebouncePromise(
+    async (title) => {
+      console.log(title)
+      let error
 
-    if (!title) {
-      error = "Required"
-    } else {
-      const response = await graphQLClient.request(
-        communityTitleExistsDocument,
-        {
-          title,
+      if (!title) {
+        error = "Required"
+      } else {
+        const response = await graphQLClient.request(
+          communityTitleExistsDocument,
+          {
+            title,
+          }
+        )
+
+        if (response.titleExists) {
+          error = "Title in use"
         }
-      )
-
-      if (response.titleExists) {
-        error = "Title in use"
       }
-    }
-    return error
-  }, 500)
+      return error
+    },
+    400,
+    { leading: true }
+  )
 
   return (
     <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border-2 border-black">
@@ -99,6 +103,7 @@ const CreateCommunity = () => {
                   name="title"
                   validate={validateTitle}
                   component={TextInput}
+                  useTouched={false}
                 />
               </label>
               <button

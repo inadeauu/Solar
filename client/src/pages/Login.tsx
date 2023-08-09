@@ -5,19 +5,19 @@ import {
 } from "react-icons/ai"
 import { FcGoogle } from "react-icons/fc"
 import { BsGithub } from "react-icons/bs"
-import { Form, Formik } from "formik"
+import { Field, Form, Formik } from "formik"
 import * as Yup from "yup"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { AxiosError } from "axios"
 import ErrorCard from "../components/ErrorCard"
 import { ImSpinner11 } from "react-icons/im"
-import TextInput from "../components/TextInput"
 import { api } from "../utils/axios"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { graphql } from "../gql"
 import { LoginEmailInput } from "../gql/graphql"
+import TextInput from "../components/TextInput"
 
 const emailLoginDocument = graphql(/* GraphQL */ `
   mutation EmailLogin($input: LoginEmailInput!) {
@@ -131,12 +131,18 @@ const Login = () => {
                 <hr className="grow h-[2px] bg-black" />
               </div>
 
-              <TextInput name="email" type="email" placeholder="Email" />
+              <Field
+                name="email"
+                type="email"
+                placeholder="Email"
+                component={TextInput}
+              />
               <div className="relative">
-                <TextInput
+                <Field
                   name="password"
                   type={showPass ? "text" : "password"}
                   placeholder="Password"
+                  component={TextInput}
                 />
                 <div
                   className="absolute top-0 right-0 translate-x-[115%] translate-y-[15%]"

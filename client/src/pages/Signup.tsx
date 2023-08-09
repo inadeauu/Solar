@@ -5,7 +5,7 @@ import {
 } from "react-icons/ai"
 import { FcGoogle } from "react-icons/fc"
 import { BsGithub } from "react-icons/bs"
-import { Form, Formik } from "formik"
+import { Field, Form, Formik } from "formik"
 import * as Yup from "yup"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
@@ -150,13 +150,24 @@ const Signup = () => {
                 <hr className="grow h-[2px] bg-black" />
               </div>
 
-              <TextInput name="username" type="text" placeholder="Username" />
-              <TextInput name="email" type="email" placeholder="Email" />
+              <Field
+                name="username"
+                type="text"
+                placeholder="Username"
+                component={TextInput}
+              />
+              <Field
+                name="email"
+                type="email"
+                placeholder="Email"
+                component={TextInput}
+              />
               <div className="relative">
-                <TextInput
+                <Field
                   name="password"
                   type={showPass ? "text" : "password"}
                   placeholder="Password"
+                  component={TextInput}
                 />
                 <div
                   className="absolute top-0 right-0 translate-x-[115%] translate-y-[15%]"
@@ -169,10 +180,11 @@ const Signup = () => {
                   )}
                 </div>
               </div>
-              <TextInput
+              <Field
                 name="confirmPassword"
                 type={showPass ? "text" : "password"}
                 placeholder="Confirm Password"
+                component={TextInput}
               />
 
               <button

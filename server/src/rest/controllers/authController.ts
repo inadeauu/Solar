@@ -231,17 +231,3 @@ export const githubCallback = async (
 
   return res.redirect(env.CLIENT_URL)
 }
-
-export const logout = (req: Request, res: Response<ResponseBody>) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res
-        .status(500)
-        .json(errorResponse("Error logging out", 500, req.path))
-    } else {
-      return res
-        .status(200)
-        .json(successResponse(null, "Successfully logged out", 200, req.path))
-    }
-  })
-}

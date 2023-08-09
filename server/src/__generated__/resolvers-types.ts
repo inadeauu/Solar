@@ -92,9 +92,24 @@ export type LoginEmailSuccess = Success & {
   successMsg?: Maybe<Scalars['String']['output']>;
 };
 
+export type LogoutResult = AuthenticationError | LogoutSessionDestroyError | LogoutSuccess;
+
+export type LogoutSessionDestroyError = Error & {
+  __typename?: 'LogoutSessionDestroyError';
+  code: Scalars['Int']['output'];
+  errorMsg: Scalars['String']['output'];
+};
+
+export type LogoutSuccess = Success & {
+  __typename?: 'LogoutSuccess';
+  code: Scalars['Int']['output'];
+  successMsg: Scalars['String']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   loginEmail: LoginEmailResult;
+  logout: LogoutResult;
   registerEmail: RegisterEmailResult;
 };
 
@@ -365,13 +380,14 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversUnionTypes<RefType extends Record<string, unknown>> = ResolversObject<{
   AuthUserResult: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } );
   LoginEmailResult: ( LoginEmailInputError ) | ( LoginEmailSuccess );
+  LogoutResult: ( AuthenticationError ) | ( LogoutSessionDestroyError ) | ( LogoutSuccess );
   RegisterEmailResult: ( DuplicateEmailError ) | ( RegisterEmailInputError ) | ( RegisterEmailSuccess );
 }>;
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
-  Error: ( AuthenticationError ) | ( DuplicateEmailError ) | ( LoginEmailInputError ) | ( RegisterEmailInputError ) | ( UserNotFoundError );
-  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( LoginEmailSuccess ) | ( RegisterEmailSuccess );
+  Error: ( AuthenticationError ) | ( DuplicateEmailError ) | ( LoginEmailInputError ) | ( LogoutSessionDestroyError ) | ( RegisterEmailInputError ) | ( UserNotFoundError );
+  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( LoginEmailSuccess ) | ( LogoutSuccess ) | ( RegisterEmailSuccess );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -393,6 +409,9 @@ export type ResolversTypes = ResolversObject<{
   LoginEmailInputError: ResolverTypeWrapper<LoginEmailInputError>;
   LoginEmailResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['LoginEmailResult']>;
   LoginEmailSuccess: ResolverTypeWrapper<LoginEmailSuccess>;
+  LogoutResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['LogoutResult']>;
+  LogoutSessionDestroyError: ResolverTypeWrapper<LogoutSessionDestroyError>;
+  LogoutSuccess: ResolverTypeWrapper<LogoutSuccess>;
   Mutation: ResolverTypeWrapper<{}>;
   OrderByDir: OrderByDir;
   PageInfo: ResolverTypeWrapper<PageInfo>;
@@ -442,6 +461,9 @@ export type ResolversParentTypes = ResolversObject<{
   LoginEmailInputError: LoginEmailInputError;
   LoginEmailResult: ResolversUnionTypes<ResolversParentTypes>['LoginEmailResult'];
   LoginEmailSuccess: LoginEmailSuccess;
+  LogoutResult: ResolversUnionTypes<ResolversParentTypes>['LogoutResult'];
+  LogoutSessionDestroyError: LogoutSessionDestroyError;
+  LogoutSuccess: LogoutSuccess;
   Mutation: {};
   PageInfo: PageInfo;
   PaginateInput: PaginateInput;
@@ -520,7 +542,7 @@ export type DuplicateEmailErrorResolvers<ContextType = Context, ParentType exten
 }>;
 
 export type ErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthenticationError' | 'DuplicateEmailError' | 'LoginEmailInputError' | 'RegisterEmailInputError' | 'UserNotFoundError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'DuplicateEmailError' | 'LoginEmailInputError' | 'LogoutSessionDestroyError' | 'RegisterEmailInputError' | 'UserNotFoundError', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
@@ -541,8 +563,25 @@ export type LoginEmailSuccessResolvers<ContextType = Context, ParentType extends
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type LogoutResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LogoutResult'] = ResolversParentTypes['LogoutResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'LogoutSessionDestroyError' | 'LogoutSuccess', ParentType, ContextType>;
+}>;
+
+export type LogoutSessionDestroyErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LogoutSessionDestroyError'] = ResolversParentTypes['LogoutSessionDestroyError']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type LogoutSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LogoutSuccess'] = ResolversParentTypes['LogoutSuccess']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  successMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   loginEmail?: Resolver<ResolversTypes['LoginEmailResult'], ParentType, ContextType, RequireFields<MutationLoginEmailArgs, 'input'>>;
+  logout?: Resolver<ResolversTypes['LogoutResult'], ParentType, ContextType>;
   registerEmail?: Resolver<ResolversTypes['RegisterEmailResult'], ParentType, ContextType, RequireFields<MutationRegisterEmailArgs, 'input'>>;
 }>;
 
@@ -607,7 +646,7 @@ export type RegisterEmailSuccessResolvers<ContextType = Context, ParentType exte
 }>;
 
 export type SuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Success'] = ResolversParentTypes['Success']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'LoginEmailSuccess' | 'RegisterEmailSuccess', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'LoginEmailSuccess' | 'LogoutSuccess' | 'RegisterEmailSuccess', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successMsg?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
@@ -658,6 +697,9 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   LoginEmailInputError?: LoginEmailInputErrorResolvers<ContextType>;
   LoginEmailResult?: LoginEmailResultResolvers<ContextType>;
   LoginEmailSuccess?: LoginEmailSuccessResolvers<ContextType>;
+  LogoutResult?: LogoutResultResolvers<ContextType>;
+  LogoutSessionDestroyError?: LogoutSessionDestroyErrorResolvers<ContextType>;
+  LogoutSuccess?: LogoutSuccessResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   PageInfo?: PageInfoResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;

@@ -20,6 +20,7 @@ import { Prisma } from "@prisma/client"
 
 export interface Context {
   req: Request
+  res: Response
 }
 
 const main = async () => {
@@ -81,8 +82,9 @@ const main = async () => {
   app.use(
     "/graphql",
     expressMiddleware(server, {
-      context: async ({ req }) => ({
+      context: async ({ req, res }) => ({
         req,
+        res,
       }),
     })
   )

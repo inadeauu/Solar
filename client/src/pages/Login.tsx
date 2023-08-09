@@ -14,7 +14,27 @@ import ErrorCard from "../components/ErrorCard"
 import { ImSpinner11 } from "react-icons/im"
 import TextInput from "../components/TextInput"
 import { api } from "../utils/axios"
-import { useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { graphQLClient } from "../utils/graphql"
+import { graphql } from "../gql"
+import { LoginEmailInput } from "../gql/graphql"
+
+const emailLoginDocument = graphql(/* GraphQL */ `
+  mutation EmailLogin($input: LoginEmailInput!) {
+    loginEmail(input: $input) {
+      ... on LoginEmailSuccess {
+        __typename
+        successMsg
+        code
+      }
+      ... on LoginEmailInputError {
+        __typename
+        errorMsg
+        code
+      }
+    }
+  }
+`)
 
 const Login = () => {
   const [showPass, setShowPass] = useState<boolean>(false)
@@ -37,20 +57,21 @@ const Login = () => {
     }
   }
 
-  const emailSignIn = async (email: string, password: string) => {
-    try {
-      await api.post("/auth/login", {
-        email,
-        password,
+  const emailSignIn = useMutation({
+    mutationFn: async ({ email, password }: LoginEmailInput) => {
+      return graphQLClient.request(emailLoginDocument, {
+        input: { email, password },
       })
-
-      queryClient.invalidateQueries({ queryKey: ["user"] })
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        setError(error.response?.data.error.message)
+    },
+    onSuccess: (data) => {
+      if (data.loginEmail.__typename == "LoginEmailInputError") {
+        setError(data.loginEmail.errorMsg)
+      } else {
+        queryClient.invalidateQueries({ queryKey: ["user"] })
+        navigate("/")
       }
-    }
-  }
+    },
+  })
 
   const inputStyle =
     "flex justify-center items-center gap-3 border-2 border-neutral-500 rounded-full py-2 font-semibold hover:bg-neutral-100 transition-colors duration-200"
@@ -70,9 +91,11 @@ const Login = () => {
             password: Yup.string().required("Required"),
           })}
           onSubmit={(values, { setSubmitting }) => {
-            emailSignIn(values.email, values.password)
+            emailSignIn.mutate({
+              email: values.email,
+              password: values.password,
+            })
             setSubmitting(false)
-            navigate("/")
           }}
         >
           {({ isSubmitting }) => (

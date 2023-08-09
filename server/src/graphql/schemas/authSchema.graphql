@@ -5,6 +5,7 @@ type Query {
 type Mutation {
   registerEmail(input: RegisterEmailInput!): RegisterEmailResult!
   loginEmail(input: LoginEmailInput!): LoginEmailResult!
+  logout: LogoutResult!
 }
 
 # REGISTEREMAIL MUTATION
@@ -65,4 +66,20 @@ type AuthUserSuccess implements Success {
   successMsg: String
   code: Int!
   user: User
+}
+
+# LOGOUT MUTATION
+union LogoutResult =
+    LogoutSuccess
+  | LogoutSessionDestroyError
+  | AuthenticationError
+
+type LogoutSuccess implements Success {
+  successMsg: String!
+  code: Int!
+}
+
+type LogoutSessionDestroyError implements Error {
+  errorMsg: String!
+  code: Int!
 }

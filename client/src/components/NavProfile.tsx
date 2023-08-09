@@ -4,18 +4,42 @@ import { CiLogout } from "react-icons/ci"
 import useClickOutside from "../utils/useClickOutside"
 import { BsHouseAdd } from "react-icons/bs"
 import { Link } from "react-router-dom"
-import { api } from "../utils/axios"
-import { useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { graphql } from "../gql"
+import { graphQLClient } from "../utils/graphql"
+
+const logoutDocument = graphql(/* GraphQL */ `
+  mutation Logout {
+    logout {
+      ... on LogoutSuccess {
+        __typename
+        successMsg
+        code
+      }
+      ... on Error {
+        __typename
+        errorMsg
+        code
+      }
+    }
+  }
+`)
 
 const NavProfile = () => {
   const menuRef = useRef<HTMLDivElement>(null)
   const [openMenu, setOpenMenu] = useState<boolean>(false)
   const queryClient = useQueryClient()
 
-  const logout = async () => {
-    await api.post("/auth/logout")
-    queryClient.invalidateQueries({ queryKey: ["user"] })
-  }
+  const logout = useMutation({
+    mutationFn: async () => {
+      return graphQLClient.request(logoutDocument)
+    },
+    onSuccess: (data) => {
+      if (data.logout.__typename == "LogoutSuccess") {
+        queryClient.invalidateQueries({ queryKey: ["user"] })
+      }
+    },
+  })
 
   useClickOutside(menuRef, () => {
     if (openMenu) {
@@ -41,7 +65,7 @@ const NavProfile = () => {
           </Link>
           <div
             className="flex items-center gap-2 p-1 rounded-b-md hover:bg-gray-200 hover:cursor-pointer"
-            onClick={() => logout()}
+            onClick={() => logout.mutate()}
           >
             <CiLogout className="h-5 w-5" />
             <span className="text-md">Log out</span>

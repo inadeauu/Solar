@@ -1,5 +1,9 @@
 import prisma from "../../config/prisma"
-import { Resolvers } from "../../__generated__/resolvers-types"
+import {
+  LogoutSessionDestroyError,
+  LogoutSuccess,
+  Resolvers,
+} from "../../__generated__/resolvers-types"
 import { validate } from "email-validator"
 import { Provider } from "@prisma/client"
 import bcrypt from "bcrypt"
@@ -103,6 +107,32 @@ export const resolvers: Resolvers = {
         successMsg: "Successfully logged in",
         code: 200,
       }
+    },
+    logout: async (_0, _1, { req, res }) => {
+      if (!req.session.userId) {
+        return {
+          __typename: "AuthenticationError",
+          errorMsg: "No authenticated user",
+          code: 401,
+        }
+      }
+
+      return new Promise((resolve) =>
+        req.session.destroy((err) => {
+          if (err)
+            resolve({
+              __typename: "LogoutSessionDestroyError",
+              errorMsg: "Error logging out",
+              code: 500,
+            })
+          res.clearCookie("connect.sid")
+          resolve({
+            __typename: "LogoutSuccess",
+            successMsg: "Successfully logged out",
+            code: 200,
+          })
+        })
+      )
     },
   },
 }

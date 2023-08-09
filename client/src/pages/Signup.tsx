@@ -15,7 +15,7 @@ import { ImSpinner11 } from "react-icons/im"
 import TextInput from "../components/TextInput"
 import { api } from "../utils/axios"
 import { graphql } from "../gql"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import request from "graphql-request"
 import { RegisterEmailInput } from "../gql/graphql"
 
@@ -23,10 +23,12 @@ const emailRegisterDocument = graphql(/* GraphQL */ `
   mutation EmailRegister($input: RegisterEmailInput!) {
     registerEmail(input: $input) {
       ... on RegisterEmailSuccess {
+        __typename
         successMsg
         code
       }
       ... on Error {
+        __typename
         errorMsg
         code
       }
@@ -46,18 +48,26 @@ const Signup = () => {
   const [error, setError] = useState<string>("")
 
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const emailRegister = useMutation({
     mutationFn: async ({ username, email, password }: RegisterEmailInput) => {
-      return request("http://localhost:4000/graphql", emailRegisterDocument, {
-        input: { username, email, password },
-      })
+      return await request(
+        "http://localhost:4000/graphql",
+        emailRegisterDocument,
+        {
+          input: { username, email, password },
+        }
+      )
     },
     onSuccess: (data) => {
-      if (data?.registerEmail.__typename == "DuplicateEmailError") {
+      if (
+        data?.registerEmail.__typename == "DuplicateEmailError" ||
+        data?.registerEmail.__typename == "RegisterEmailInputError"
+      ) {
         setError(data.registerEmail.errorMsg)
-      } else if (data?.registerEmail.__typename == "RegisterEmailInputError") {
-        setError(data.registerEmail.errorMsg)
+      } else {
+        navigate("/")
       }
     },
   })
@@ -67,6 +77,8 @@ const Signup = () => {
       const response = await api.get(`/auth/${provider}`)
 
       window.location.assign(response.data.data.url)
+
+      queryClient.invalidateQueries({ queryKey: ["user"] })
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         setError(error.response?.data.error.message)
@@ -107,7 +119,6 @@ const Signup = () => {
               password: values.password,
             })
             setSubmitting(false)
-            navigate("/")
           }}
         >
           {({ isSubmitting }) => (

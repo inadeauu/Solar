@@ -13,8 +13,10 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "\n  mutation Logout {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.LogoutDocument,
     "\n  query AuthUser {\n    authUser {\n      ... on AuthUserSuccess {\n        successMsg\n        code\n        user {\n          username\n          updated_at\n          provider\n          image\n          id\n          email_verified\n          email\n          created_at\n        }\n      }\n    }\n  }\n": types.AuthUserDocument,
-    "\n  mutation EmailRegister($input: RegisterEmailInput!) {\n    registerEmail(input: $input) {\n      ... on RegisterEmailSuccess {\n        successMsg\n        code\n      }\n      ... on Error {\n        errorMsg\n        code\n      }\n      ... on RegisterEmailInputError {\n        inputErrors {\n          email\n          password\n          username\n        }\n      }\n    }\n  }\n": types.EmailRegisterDocument,
+    "\n  mutation EmailLogin($input: LoginEmailInput!) {\n    loginEmail(input: $input) {\n      ... on LoginEmailSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on LoginEmailInputError {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.EmailLoginDocument,
+    "\n  mutation EmailRegister($input: RegisterEmailInput!) {\n    registerEmail(input: $input) {\n      ... on RegisterEmailSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on RegisterEmailInputError {\n        inputErrors {\n          email\n          password\n          username\n        }\n      }\n    }\n  }\n": types.EmailRegisterDocument,
 };
 
 /**
@@ -34,11 +36,19 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  mutation Logout {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation Logout {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  query AuthUser {\n    authUser {\n      ... on AuthUserSuccess {\n        successMsg\n        code\n        user {\n          username\n          updated_at\n          provider\n          image\n          id\n          email_verified\n          email\n          created_at\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query AuthUser {\n    authUser {\n      ... on AuthUserSuccess {\n        successMsg\n        code\n        user {\n          username\n          updated_at\n          provider\n          image\n          id\n          email_verified\n          email\n          created_at\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation EmailRegister($input: RegisterEmailInput!) {\n    registerEmail(input: $input) {\n      ... on RegisterEmailSuccess {\n        successMsg\n        code\n      }\n      ... on Error {\n        errorMsg\n        code\n      }\n      ... on RegisterEmailInputError {\n        inputErrors {\n          email\n          password\n          username\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation EmailRegister($input: RegisterEmailInput!) {\n    registerEmail(input: $input) {\n      ... on RegisterEmailSuccess {\n        successMsg\n        code\n      }\n      ... on Error {\n        errorMsg\n        code\n      }\n      ... on RegisterEmailInputError {\n        inputErrors {\n          email\n          password\n          username\n        }\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  mutation EmailLogin($input: LoginEmailInput!) {\n    loginEmail(input: $input) {\n      ... on LoginEmailSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on LoginEmailInputError {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation EmailLogin($input: LoginEmailInput!) {\n    loginEmail(input: $input) {\n      ... on LoginEmailSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on LoginEmailInputError {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation EmailRegister($input: RegisterEmailInput!) {\n    registerEmail(input: $input) {\n      ... on RegisterEmailSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on RegisterEmailInputError {\n        inputErrors {\n          email\n          password\n          username\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation EmailRegister($input: RegisterEmailInput!) {\n    registerEmail(input: $input) {\n      ... on RegisterEmailSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on RegisterEmailInputError {\n        inputErrors {\n          email\n          password\n          username\n        }\n      }\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

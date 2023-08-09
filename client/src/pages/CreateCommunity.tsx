@@ -6,9 +6,9 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { graphql } from "../gql"
 import { graphQLClient } from "../utils/graphql"
-import { debounce } from "lodash"
 import { useMutation } from "@tanstack/react-query"
 import { CreateCommunityInput } from "../gql/graphql"
+import AwesomeDebouncePromise from "awesome-debounce-promise"
 
 const communityTitleExistsDocument = graphql(/* GraphQL */ `
   query CommunityTitleExists($title: String!) {
@@ -57,34 +57,26 @@ const CreateCommunity = () => {
     },
   })
 
-  const validateTitle = async (title: string) => {
-    return new Promise((resolve) =>
-      debounce(
-        async (title) => {
-          let error
+  const validateTitle = AwesomeDebouncePromise(async (title) => {
+    console.log(title)
+    let error
 
-          if (!title) {
-            error = "Required"
-          } else {
-            const response = await graphQLClient.request(
-              communityTitleExistsDocument,
-              {
-                title,
-              }
-            )
+    if (!title) {
+      error = "Required"
+    } else {
+      const response = await graphQLClient.request(
+        communityTitleExistsDocument,
+        {
+          title,
+        }
+      )
 
-            if (response.titleExists) {
-              error = "Title in use"
-            }
-          }
-
-          resolve(error)
-        },
-        500,
-        { leading: true }
-      )(title)
-    )
-  }
+      if (response.titleExists) {
+        error = "Title in use"
+      }
+    }
+    return error
+  }, 500)
 
   return (
     <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border-2 border-black">

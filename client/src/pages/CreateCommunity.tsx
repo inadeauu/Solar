@@ -59,7 +59,6 @@ const CreateCommunity = () => {
 
   const validateTitle = AwesomeDebouncePromise(
     async (title) => {
-      console.log(title)
       let error
 
       if (!title) {
@@ -104,14 +103,15 @@ const CreateCommunity = () => {
                   validate={validateTitle}
                   component={TextInput}
                   useTouched={false}
+                  useSuccess={true}
                 />
               </label>
               <button
-                className="btn_blue py-2 mt-6 w-[60%] mx-auto"
+                className="btn_blue py-[6px] mt-4 w-[60%] mx-auto"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
-                  <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
+                  <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" />
                 ) : (
                   "Submit"
                 )}

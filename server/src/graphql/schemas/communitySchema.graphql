@@ -1,6 +1,7 @@
 scalar DateTime
 
 type Query {
+  communities(input: CommunitiesInput!): CommunityConnection!
   titleExists(title: String!): Boolean!
 }
 
@@ -13,6 +14,7 @@ type Community {
   title: String!
   created_at: DateTime!
   updated_at: DateTime!
+  memberCount: Int!
 
   owner: User!
   members: [User!]!
@@ -28,6 +30,22 @@ type CommunityEdge {
 type CommunityConnection {
   edges: [CommunityEdge!]!
   pageInfo: PageInfo!
+}
+
+# -- COMMUNITIES QUERY
+input CommunitiesInput {
+  filters: CommunitiesFilters
+  paginate: PaginateInput!
+}
+
+input CommunitiesFilters {
+  titleContains: String
+  orderBy: CommunitiesOrderBy
+}
+
+input CommunitiesOrderBy {
+  type: CommunityOrderByType!
+  dir: OrderByDir!
 }
 
 # -- CREATECOMMUNITY MUTATION
@@ -53,4 +71,9 @@ type CreateCommunityInputError implements Error {
 
 type CreateCommunityInputErrors {
   title: String
+}
+
+# -- ENUMS
+enum CommunityOrderByType {
+  memberCount
 }

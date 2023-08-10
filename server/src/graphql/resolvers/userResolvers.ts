@@ -72,5 +72,14 @@ export const resolvers: Resolvers = {
         pageInfo: results.pageInfo,
       }
     },
+    postsCount: async (user) => {
+      const postsCount =
+        (await prisma.user.findUnique({
+          where: { id: user.id },
+          include: { _count: { select: { posts: true } } },
+        }))!._count.posts + 1
+
+      return postsCount
+    },
   },
 }

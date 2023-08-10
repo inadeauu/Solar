@@ -101,9 +101,14 @@ const Signup = () => {
             confirmPassword: "",
           }}
           validationSchema={Yup.object({
-            username: Yup.string().required("Required"),
+            username: Yup.string()
+              .min(5, "Username must be 5-15 characters long")
+              .max(15, "Username must be 5-15 characters long")
+              .required("Required"),
             email: Yup.string().email("Invalid email").required("Required"),
-            password: Yup.string().required("Required"),
+            password: Yup.string()
+              .min(8, "Password must be at least 8 characters long")
+              .required("Required"),
             confirmPassword: Yup.string()
               .oneOf([Yup.ref("password")], "Passwords do not match")
               .required("Required"),
@@ -118,7 +123,7 @@ const Signup = () => {
           }}
         >
           {({ isSubmitting }) => (
-            <Form className="flex flex-col w-1/2 mx-auto mt-4">
+            <Form className="flex flex-col w-[60%] mx-auto mt-4">
               <h1 className="text-3xl font-bold mb-8">Sign up</h1>
               {error && <ErrorCard error={error} className="mb-4" />}
               <div className="flex flex-col gap-5">

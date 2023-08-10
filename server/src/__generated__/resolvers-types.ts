@@ -39,10 +39,26 @@ export type AuthenticationError = Error & {
   errorMsg: Scalars['String']['output'];
 };
 
+export type CommunitiesFilters = {
+  orderBy?: InputMaybe<CommunitiesOrderBy>;
+  titleContains?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CommunitiesInput = {
+  filters?: InputMaybe<CommunitiesFilters>;
+  paginate: PaginateInput;
+};
+
+export type CommunitiesOrderBy = {
+  dir: OrderByDir;
+  type: CommunityOrderByType;
+};
+
 export type Community = {
   __typename?: 'Community';
   created_at: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
+  memberCount: Scalars['Int']['output'];
   members: Array<User>;
   owner: User;
   posts: Array<Post>;
@@ -62,6 +78,11 @@ export type CommunityEdge = {
   node: Community;
 };
 
+export const CommunityOrderByType = {
+  MemberCount: 'memberCount'
+} as const;
+
+export type CommunityOrderByType = typeof CommunityOrderByType[keyof typeof CommunityOrderByType];
 export type CreateCommunityInput = {
   title: Scalars['String']['input'];
 };
@@ -206,9 +227,15 @@ export type Provider = typeof Provider[keyof typeof Provider];
 export type Query = {
   __typename?: 'Query';
   authUser: AuthUserResult;
+  communities: CommunityConnection;
   titleExists: Scalars['Boolean']['output'];
   user?: Maybe<User>;
   users: UserConnection;
+};
+
+
+export type QueryCommunitiesArgs = {
+  input: CommunitiesInput;
 };
 
 
@@ -269,6 +296,7 @@ export type User = {
   inCommunities: CommunityConnection;
   ownedCommunities: CommunityConnection;
   posts: PostConnection;
+  postsCount: Scalars['Int']['output'];
   provider: Provider;
   updated_at: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
@@ -434,9 +462,13 @@ export type ResolversTypes = ResolversObject<{
   AuthUserSuccess: ResolverTypeWrapper<Omit<AuthUserSuccess, 'user'> & { user?: Maybe<ResolversTypes['User']> }>;
   AuthenticationError: ResolverTypeWrapper<AuthenticationError>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  CommunitiesFilters: CommunitiesFilters;
+  CommunitiesInput: CommunitiesInput;
+  CommunitiesOrderBy: CommunitiesOrderBy;
   Community: ResolverTypeWrapper<CommunityModel>;
   CommunityConnection: ResolverTypeWrapper<Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversTypes['CommunityEdge']> }>;
   CommunityEdge: ResolverTypeWrapper<Omit<CommunityEdge, 'node'> & { node: ResolversTypes['Community'] }>;
+  CommunityOrderByType: CommunityOrderByType;
   CreateCommunityInput: CreateCommunityInput;
   CreateCommunityInputError: ResolverTypeWrapper<CreateCommunityInputError>;
   CreateCommunityInputErrors: ResolverTypeWrapper<CreateCommunityInputErrors>;
@@ -491,6 +523,9 @@ export type ResolversParentTypes = ResolversObject<{
   AuthUserSuccess: Omit<AuthUserSuccess, 'user'> & { user?: Maybe<ResolversParentTypes['User']> };
   AuthenticationError: AuthenticationError;
   Boolean: Scalars['Boolean']['output'];
+  CommunitiesFilters: CommunitiesFilters;
+  CommunitiesInput: CommunitiesInput;
+  CommunitiesOrderBy: CommunitiesOrderBy;
   Community: CommunityModel;
   CommunityConnection: Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversParentTypes['CommunityEdge']> };
   CommunityEdge: Omit<CommunityEdge, 'node'> & { node: ResolversParentTypes['Community'] };
@@ -558,6 +593,7 @@ export type AuthenticationErrorResolvers<ContextType = Context, ParentType exten
 export type CommunityResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Community'] = ResolversParentTypes['Community']> = ResolversObject<{
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  memberCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   members?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   posts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
@@ -687,6 +723,7 @@ export type PostEdgeResolvers<ContextType = Context, ParentType extends Resolver
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   authUser?: Resolver<ResolversTypes['AuthUserResult'], ParentType, ContextType>;
+  communities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<QueryCommunitiesArgs, 'input'>>;
   titleExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<QueryTitleExistsArgs, 'title'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'input'>>;
   users?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, RequireFields<QueryUsersArgs, 'input'>>;
@@ -731,6 +768,7 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
   inCommunities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<UserInCommunitiesArgs, 'input'>>;
   ownedCommunities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<UserOwnedCommunitiesArgs, 'input'>>;
   posts?: Resolver<ResolversTypes['PostConnection'], ParentType, ContextType, RequireFields<UserPostsArgs, 'input'>>;
+  postsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   provider?: Resolver<ResolversTypes['Provider'], ParentType, ContextType>;
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

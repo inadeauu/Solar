@@ -99,7 +99,7 @@ const Login = () => {
           }}
         >
           {({ isSubmitting }) => (
-            <Form className="flex flex-col w-1/2 mx-auto mt-4">
+            <Form className="flex flex-col w-[60%] mx-auto mt-4">
               <h1 className="text-3xl font-bold mb-8">Login</h1>
               {error && <ErrorCard error={error} className="mb-4" />}
               <div className="flex flex-col gap-5">

@@ -1,5 +1,10 @@
-import { Resolvers } from "../../__generated__/resolvers-types"
+import { Community } from "@prisma/client"
+import {
+  CommunityOrderByType,
+  Resolvers,
+} from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
+import { paginate } from "../paginate"
 
 const checkCommunityTitleExists = async (title: string) => {
   const community = await prisma.community.findFirst({
@@ -11,6 +16,35 @@ const checkCommunityTitleExists = async (title: string) => {
 
 export const resolvers: Resolvers = {
   Query: {
+    communities: async (_0, args) => {
+      const filters = args.input?.filters
+      const orderBy = filters?.orderBy
+
+      const results = await paginate<Community>(
+        args.input.paginate,
+        (options) =>
+          prisma.community.findMany({
+            where: {
+              title: {
+                contains: filters?.titleContains ?? undefined,
+              },
+            },
+            orderBy: {
+              id: "asc",
+              ...(orderBy &&
+                orderBy.type == CommunityOrderByType.MemberCount && {
+                  members: { _count: orderBy.dir },
+                }),
+            },
+            ...options,
+          })
+      )
+
+      return {
+        edges: results.edges,
+        pageInfo: results.pageInfo,
+      }
+    },
     titleExists: async (_0, args) => {
       return checkCommunityTitleExists(args.title)
     },
@@ -75,6 +109,15 @@ export const resolvers: Resolvers = {
           .posts()) ?? []
 
       return posts
+    },
+    memberCount: async (community) => {
+      const memberCount =
+        (await prisma.community.findUnique({
+          where: { id: community.id },
+          include: { _count: { select: { members: true } } },
+        }))!._count.members + 1
+
+      return memberCount
     },
   },
 }

@@ -5,11 +5,18 @@ import useClickOutside from "../utils/useClickOutside"
 type DropdownProps = {
   width: string
   items: string[]
-  value: string
+  value?: string
+  constValue?: React.ReactNode
   setValue: (option: string) => void
 }
 
-const Dropdown = ({ width, items, value, setValue }: DropdownProps) => {
+const Dropdown = ({
+  width,
+  items,
+  value,
+  setValue,
+  constValue,
+}: DropdownProps) => {
   const menuRef = useRef<HTMLDivElement>(null)
   const [openMenu, setOpenMenu] = useState<boolean>(false)
 
@@ -26,9 +33,11 @@ const Dropdown = ({ width, items, value, setValue }: DropdownProps) => {
       onClick={() => setOpenMenu((prev) => !prev)}
     >
       <div
-        className={`flex px-2 items-center justify-between cursor-pointer transition-all duration-200 ${width}`}
+        className={`flex gap-1 px-2 items-center justify-between cursor-pointer transition-all duration-200 ${
+          !constValue && width
+        }`}
       >
-        {value}
+        {constValue ? constValue : value}
         <span className="pointer-events-none">
           {openMenu ? <AiOutlineArrowDown /> : <AiOutlineArrowUp />}
         </span>

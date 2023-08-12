@@ -11,6 +11,8 @@ const envSchema = z.object({
   GITHUB_CLIENT_ID: z.string(),
   GITHUB_CLIENT_SECRET: z.string(),
   GITHUB_REDIRECT_URL: z.string(),
+  EMAILER_USER: z.string(),
+  EMAILER_PASSWORD: z.string(),
 })
 
 export const env = envSchema.parse(process.env)

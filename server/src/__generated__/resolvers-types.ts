@@ -107,8 +107,8 @@ export type CreateCommunitySuccess = Success & {
   successMsg: Scalars['String']['output'];
 };
 
-export type DuplicateEmailError = Error & {
-  __typename?: 'DuplicateEmailError';
+export type DuplicateUsernameError = Error & {
+  __typename?: 'DuplicateUsernameError';
   code: Scalars['Int']['output'];
   errorMsg: Scalars['String']['output'];
 };
@@ -118,21 +118,21 @@ export type Error = {
   errorMsg: Scalars['String']['output'];
 };
 
-export type LoginEmailInput = {
-  email: Scalars['String']['input'];
+export type LoginUsernameInput = {
   password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
-export type LoginEmailInputError = Error & {
-  __typename?: 'LoginEmailInputError';
+export type LoginUsernameInputError = Error & {
+  __typename?: 'LoginUsernameInputError';
   code: Scalars['Int']['output'];
   errorMsg: Scalars['String']['output'];
 };
 
-export type LoginEmailResult = LoginEmailInputError | LoginEmailSuccess;
+export type LoginUsernameResult = LoginUsernameInputError | LoginUsernameSuccess;
 
-export type LoginEmailSuccess = Success & {
-  __typename?: 'LoginEmailSuccess';
+export type LoginUsernameSuccess = Success & {
+  __typename?: 'LoginUsernameSuccess';
   code: Scalars['Int']['output'];
   successMsg?: Maybe<Scalars['String']['output']>;
 };
@@ -154,9 +154,9 @@ export type LogoutSuccess = Success & {
 export type Mutation = {
   __typename?: 'Mutation';
   createCommunity: CreateCommunityResult;
-  loginEmail: LoginEmailResult;
+  loginUsername: LoginUsernameResult;
   logout: LogoutResult;
-  registerEmail: RegisterEmailResult;
+  registerUsername: RegisterUsernameResult;
 };
 
 
@@ -165,13 +165,13 @@ export type MutationCreateCommunityArgs = {
 };
 
 
-export type MutationLoginEmailArgs = {
-  input: LoginEmailInput;
+export type MutationLoginUsernameArgs = {
+  input: LoginUsernameInput;
 };
 
 
-export type MutationRegisterEmailArgs = {
-  input: RegisterEmailInput;
+export type MutationRegisterUsernameArgs = {
+  input: RegisterUsernameInput;
 };
 
 export const OrderByDir = {
@@ -218,9 +218,9 @@ export type PostEdge = {
 };
 
 export const Provider = {
-  Email: 'EMAIL',
   Github: 'GITHUB',
-  Google: 'GOOGLE'
+  Google: 'GOOGLE',
+  Username: 'USERNAME'
 } as const;
 
 export type Provider = typeof Provider[keyof typeof Provider];
@@ -253,30 +253,28 @@ export type QueryUsersArgs = {
   input: UsersInput;
 };
 
-export type RegisterEmailInput = {
-  email: Scalars['String']['input'];
+export type RegisterUsernameInput = {
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
 };
 
-export type RegisterEmailInputError = Error & {
-  __typename?: 'RegisterEmailInputError';
+export type RegisterUsernameInputError = Error & {
+  __typename?: 'RegisterUsernameInputError';
   code: Scalars['Int']['output'];
   errorMsg: Scalars['String']['output'];
-  inputErrors: RegisterEmailInputErrors;
+  inputErrors: RegisterUsernameInputErrors;
 };
 
-export type RegisterEmailInputErrors = {
-  __typename?: 'RegisterEmailInputErrors';
-  email?: Maybe<Scalars['String']['output']>;
+export type RegisterUsernameInputErrors = {
+  __typename?: 'RegisterUsernameInputErrors';
   password?: Maybe<Scalars['String']['output']>;
   username?: Maybe<Scalars['String']['output']>;
 };
 
-export type RegisterEmailResult = DuplicateEmailError | RegisterEmailInputError | RegisterEmailSuccess;
+export type RegisterUsernameResult = DuplicateUsernameError | RegisterUsernameInputError | RegisterUsernameSuccess;
 
-export type RegisterEmailSuccess = Success & {
-  __typename?: 'RegisterEmailSuccess';
+export type RegisterUsernameSuccess = Success & {
+  __typename?: 'RegisterUsernameSuccess';
   code: Scalars['Int']['output'];
   successMsg?: Maybe<Scalars['String']['output']>;
 };
@@ -289,10 +287,7 @@ export type Success = {
 export type User = {
   __typename?: 'User';
   created_at: Scalars['DateTime']['output'];
-  email: Scalars['String']['output'];
-  email_verified: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
-  image?: Maybe<Scalars['String']['output']>;
   inCommunities: CommunityConnection;
   ownedCommunities: CommunityConnection;
   posts: PostConnection;
@@ -444,15 +439,15 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversUnionTypes<RefType extends Record<string, unknown>> = ResolversObject<{
   AuthUserResult: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } );
   CreateCommunityResult: ( AuthenticationError ) | ( CreateCommunityInputError ) | ( CreateCommunitySuccess );
-  LoginEmailResult: ( LoginEmailInputError ) | ( LoginEmailSuccess );
+  LoginUsernameResult: ( LoginUsernameInputError ) | ( LoginUsernameSuccess );
   LogoutResult: ( AuthenticationError ) | ( LogoutSessionDestroyError ) | ( LogoutSuccess );
-  RegisterEmailResult: ( DuplicateEmailError ) | ( RegisterEmailInputError ) | ( RegisterEmailSuccess );
+  RegisterUsernameResult: ( DuplicateUsernameError ) | ( RegisterUsernameInputError ) | ( RegisterUsernameSuccess );
 }>;
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
-  Error: ( AuthenticationError ) | ( CreateCommunityInputError ) | ( DuplicateEmailError ) | ( LoginEmailInputError ) | ( LogoutSessionDestroyError ) | ( RegisterEmailInputError ) | ( UserNotFoundError );
-  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( CreateCommunitySuccess ) | ( LoginEmailSuccess ) | ( LogoutSuccess ) | ( RegisterEmailSuccess );
+  Error: ( AuthenticationError ) | ( CreateCommunityInputError ) | ( DuplicateUsernameError ) | ( LoginUsernameInputError ) | ( LogoutSessionDestroyError ) | ( RegisterUsernameInputError ) | ( UserNotFoundError );
+  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( CreateCommunitySuccess ) | ( LoginUsernameSuccess ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -475,14 +470,14 @@ export type ResolversTypes = ResolversObject<{
   CreateCommunityResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreateCommunityResult']>;
   CreateCommunitySuccess: ResolverTypeWrapper<CreateCommunitySuccess>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
-  DuplicateEmailError: ResolverTypeWrapper<DuplicateEmailError>;
+  DuplicateUsernameError: ResolverTypeWrapper<DuplicateUsernameError>;
   Error: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Error']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
-  LoginEmailInput: LoginEmailInput;
-  LoginEmailInputError: ResolverTypeWrapper<LoginEmailInputError>;
-  LoginEmailResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['LoginEmailResult']>;
-  LoginEmailSuccess: ResolverTypeWrapper<LoginEmailSuccess>;
+  LoginUsernameInput: LoginUsernameInput;
+  LoginUsernameInputError: ResolverTypeWrapper<LoginUsernameInputError>;
+  LoginUsernameResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['LoginUsernameResult']>;
+  LoginUsernameSuccess: ResolverTypeWrapper<LoginUsernameSuccess>;
   LogoutResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['LogoutResult']>;
   LogoutSessionDestroyError: ResolverTypeWrapper<LogoutSessionDestroyError>;
   LogoutSuccess: ResolverTypeWrapper<LogoutSuccess>;
@@ -495,11 +490,11 @@ export type ResolversTypes = ResolversObject<{
   PostEdge: ResolverTypeWrapper<Omit<PostEdge, 'node'> & { node: ResolversTypes['Post'] }>;
   Provider: Provider;
   Query: ResolverTypeWrapper<{}>;
-  RegisterEmailInput: RegisterEmailInput;
-  RegisterEmailInputError: ResolverTypeWrapper<RegisterEmailInputError>;
-  RegisterEmailInputErrors: ResolverTypeWrapper<RegisterEmailInputErrors>;
-  RegisterEmailResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['RegisterEmailResult']>;
-  RegisterEmailSuccess: ResolverTypeWrapper<RegisterEmailSuccess>;
+  RegisterUsernameInput: RegisterUsernameInput;
+  RegisterUsernameInputError: ResolverTypeWrapper<RegisterUsernameInputError>;
+  RegisterUsernameInputErrors: ResolverTypeWrapper<RegisterUsernameInputErrors>;
+  RegisterUsernameResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['RegisterUsernameResult']>;
+  RegisterUsernameSuccess: ResolverTypeWrapper<RegisterUsernameSuccess>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Success: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Success']>;
   User: ResolverTypeWrapper<UserModel>;
@@ -535,14 +530,14 @@ export type ResolversParentTypes = ResolversObject<{
   CreateCommunityResult: ResolversUnionTypes<ResolversParentTypes>['CreateCommunityResult'];
   CreateCommunitySuccess: CreateCommunitySuccess;
   DateTime: Scalars['DateTime']['output'];
-  DuplicateEmailError: DuplicateEmailError;
+  DuplicateUsernameError: DuplicateUsernameError;
   Error: ResolversInterfaceTypes<ResolversParentTypes>['Error'];
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
-  LoginEmailInput: LoginEmailInput;
-  LoginEmailInputError: LoginEmailInputError;
-  LoginEmailResult: ResolversUnionTypes<ResolversParentTypes>['LoginEmailResult'];
-  LoginEmailSuccess: LoginEmailSuccess;
+  LoginUsernameInput: LoginUsernameInput;
+  LoginUsernameInputError: LoginUsernameInputError;
+  LoginUsernameResult: ResolversUnionTypes<ResolversParentTypes>['LoginUsernameResult'];
+  LoginUsernameSuccess: LoginUsernameSuccess;
   LogoutResult: ResolversUnionTypes<ResolversParentTypes>['LogoutResult'];
   LogoutSessionDestroyError: LogoutSessionDestroyError;
   LogoutSuccess: LogoutSuccess;
@@ -553,11 +548,11 @@ export type ResolversParentTypes = ResolversObject<{
   PostConnection: Omit<PostConnection, 'edges'> & { edges: Array<ResolversParentTypes['PostEdge']> };
   PostEdge: Omit<PostEdge, 'node'> & { node: ResolversParentTypes['Post'] };
   Query: {};
-  RegisterEmailInput: RegisterEmailInput;
-  RegisterEmailInputError: RegisterEmailInputError;
-  RegisterEmailInputErrors: RegisterEmailInputErrors;
-  RegisterEmailResult: ResolversUnionTypes<ResolversParentTypes>['RegisterEmailResult'];
-  RegisterEmailSuccess: RegisterEmailSuccess;
+  RegisterUsernameInput: RegisterUsernameInput;
+  RegisterUsernameInputError: RegisterUsernameInputError;
+  RegisterUsernameInputErrors: RegisterUsernameInputErrors;
+  RegisterUsernameResult: ResolversUnionTypes<ResolversParentTypes>['RegisterUsernameResult'];
+  RegisterUsernameSuccess: RegisterUsernameSuccess;
   String: Scalars['String']['output'];
   Success: ResolversInterfaceTypes<ResolversParentTypes>['Success'];
   User: UserModel;
@@ -640,29 +635,29 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'DateTime';
 }
 
-export type DuplicateEmailErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['DuplicateEmailError'] = ResolversParentTypes['DuplicateEmailError']> = ResolversObject<{
+export type DuplicateUsernameErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['DuplicateUsernameError'] = ResolversParentTypes['DuplicateUsernameError']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type ErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthenticationError' | 'CreateCommunityInputError' | 'DuplicateEmailError' | 'LoginEmailInputError' | 'LogoutSessionDestroyError' | 'RegisterEmailInputError' | 'UserNotFoundError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'CreateCommunityInputError' | 'DuplicateUsernameError' | 'LoginUsernameInputError' | 'LogoutSessionDestroyError' | 'RegisterUsernameInputError' | 'UserNotFoundError', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
 
-export type LoginEmailInputErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LoginEmailInputError'] = ResolversParentTypes['LoginEmailInputError']> = ResolversObject<{
+export type LoginUsernameInputErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LoginUsernameInputError'] = ResolversParentTypes['LoginUsernameInputError']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type LoginEmailResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LoginEmailResult'] = ResolversParentTypes['LoginEmailResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'LoginEmailInputError' | 'LoginEmailSuccess', ParentType, ContextType>;
+export type LoginUsernameResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LoginUsernameResult'] = ResolversParentTypes['LoginUsernameResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'LoginUsernameInputError' | 'LoginUsernameSuccess', ParentType, ContextType>;
 }>;
 
-export type LoginEmailSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LoginEmailSuccess'] = ResolversParentTypes['LoginEmailSuccess']> = ResolversObject<{
+export type LoginUsernameSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['LoginUsernameSuccess'] = ResolversParentTypes['LoginUsernameSuccess']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successMsg?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -686,9 +681,9 @@ export type LogoutSuccessResolvers<ContextType = Context, ParentType extends Res
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createCommunity?: Resolver<ResolversTypes['CreateCommunityResult'], ParentType, ContextType, RequireFields<MutationCreateCommunityArgs, 'input'>>;
-  loginEmail?: Resolver<ResolversTypes['LoginEmailResult'], ParentType, ContextType, RequireFields<MutationLoginEmailArgs, 'input'>>;
+  loginUsername?: Resolver<ResolversTypes['LoginUsernameResult'], ParentType, ContextType, RequireFields<MutationLoginUsernameArgs, 'input'>>;
   logout?: Resolver<ResolversTypes['LogoutResult'], ParentType, ContextType>;
-  registerEmail?: Resolver<ResolversTypes['RegisterEmailResult'], ParentType, ContextType, RequireFields<MutationRegisterEmailArgs, 'input'>>;
+  registerUsername?: Resolver<ResolversTypes['RegisterUsernameResult'], ParentType, ContextType, RequireFields<MutationRegisterUsernameArgs, 'input'>>;
 }>;
 
 export type PageInfoResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
@@ -729,42 +724,38 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   users?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, RequireFields<QueryUsersArgs, 'input'>>;
 }>;
 
-export type RegisterEmailInputErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RegisterEmailInputError'] = ResolversParentTypes['RegisterEmailInputError']> = ResolversObject<{
+export type RegisterUsernameInputErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RegisterUsernameInputError'] = ResolversParentTypes['RegisterUsernameInputError']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  inputErrors?: Resolver<ResolversTypes['RegisterEmailInputErrors'], ParentType, ContextType>;
+  inputErrors?: Resolver<ResolversTypes['RegisterUsernameInputErrors'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type RegisterEmailInputErrorsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RegisterEmailInputErrors'] = ResolversParentTypes['RegisterEmailInputErrors']> = ResolversObject<{
-  email?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+export type RegisterUsernameInputErrorsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RegisterUsernameInputErrors'] = ResolversParentTypes['RegisterUsernameInputErrors']> = ResolversObject<{
   password?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
-export type RegisterEmailResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RegisterEmailResult'] = ResolversParentTypes['RegisterEmailResult']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'DuplicateEmailError' | 'RegisterEmailInputError' | 'RegisterEmailSuccess', ParentType, ContextType>;
+export type RegisterUsernameResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RegisterUsernameResult'] = ResolversParentTypes['RegisterUsernameResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'DuplicateUsernameError' | 'RegisterUsernameInputError' | 'RegisterUsernameSuccess', ParentType, ContextType>;
 }>;
 
-export type RegisterEmailSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RegisterEmailSuccess'] = ResolversParentTypes['RegisterEmailSuccess']> = ResolversObject<{
+export type RegisterUsernameSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['RegisterUsernameSuccess'] = ResolversParentTypes['RegisterUsernameSuccess']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successMsg?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
 export type SuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Success'] = ResolversParentTypes['Success']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'CreateCommunitySuccess' | 'LoginEmailSuccess' | 'LogoutSuccess' | 'RegisterEmailSuccess', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'CreateCommunitySuccess' | 'LoginUsernameSuccess' | 'LogoutSuccess' | 'RegisterUsernameSuccess', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successMsg?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  email_verified?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
-  image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   inCommunities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<UserInCommunitiesArgs, 'input'>>;
   ownedCommunities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<UserOwnedCommunitiesArgs, 'input'>>;
   posts?: Resolver<ResolversTypes['PostConnection'], ParentType, ContextType, RequireFields<UserPostsArgs, 'input'>>;
@@ -805,11 +796,11 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   CreateCommunityResult?: CreateCommunityResultResolvers<ContextType>;
   CreateCommunitySuccess?: CreateCommunitySuccessResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
-  DuplicateEmailError?: DuplicateEmailErrorResolvers<ContextType>;
+  DuplicateUsernameError?: DuplicateUsernameErrorResolvers<ContextType>;
   Error?: ErrorResolvers<ContextType>;
-  LoginEmailInputError?: LoginEmailInputErrorResolvers<ContextType>;
-  LoginEmailResult?: LoginEmailResultResolvers<ContextType>;
-  LoginEmailSuccess?: LoginEmailSuccessResolvers<ContextType>;
+  LoginUsernameInputError?: LoginUsernameInputErrorResolvers<ContextType>;
+  LoginUsernameResult?: LoginUsernameResultResolvers<ContextType>;
+  LoginUsernameSuccess?: LoginUsernameSuccessResolvers<ContextType>;
   LogoutResult?: LogoutResultResolvers<ContextType>;
   LogoutSessionDestroyError?: LogoutSessionDestroyErrorResolvers<ContextType>;
   LogoutSuccess?: LogoutSuccessResolvers<ContextType>;
@@ -819,10 +810,10 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   PostConnection?: PostConnectionResolvers<ContextType>;
   PostEdge?: PostEdgeResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  RegisterEmailInputError?: RegisterEmailInputErrorResolvers<ContextType>;
-  RegisterEmailInputErrors?: RegisterEmailInputErrorsResolvers<ContextType>;
-  RegisterEmailResult?: RegisterEmailResultResolvers<ContextType>;
-  RegisterEmailSuccess?: RegisterEmailSuccessResolvers<ContextType>;
+  RegisterUsernameInputError?: RegisterUsernameInputErrorResolvers<ContextType>;
+  RegisterUsernameInputErrors?: RegisterUsernameInputErrorsResolvers<ContextType>;
+  RegisterUsernameResult?: RegisterUsernameResultResolvers<ContextType>;
+  RegisterUsernameSuccess?: RegisterUsernameSuccessResolvers<ContextType>;
   Success?: SuccessResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserConnection?: UserConnectionResolvers<ContextType>;

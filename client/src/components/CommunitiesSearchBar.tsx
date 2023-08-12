@@ -41,23 +41,27 @@ const CommunitiesSearchBar = ({ search }: CommunitiesSearchBarProps) => {
         !data?.communities?.edges && "hidden"
       }`}
     >
-      {data?.communities?.edges
-        ? data.communities.edges.length
-          ? data.communities.edges.map((edge, i) => (
-              <Link
-                to="/signup"
-                key={i}
-                className="flex flex-col px-2 py-1 hover:bg-gray-200"
-              >
-                <span className="text-lg">{edge.node.title}</span>
-                <span className="text-xs text-gray-500">
-                  {edge.node.memberCount}{" "}
-                  {pluralize(edge.node.memberCount, "Member")}
-                </span>
-              </Link>
-            ))
-          : "No results"
-        : ""}
+      {data?.communities?.edges ? (
+        data.communities.edges.length ? (
+          data.communities.edges.map((edge, i) => (
+            <Link
+              to="/signup"
+              key={i}
+              className="flex flex-col px-2 py-1 hover:bg-gray-200"
+            >
+              <span className="text-sm">{edge.node.title}</span>
+              <span className="text-xs text-gray-500">
+                {edge.node.memberCount}{" "}
+                {pluralize(edge.node.memberCount, "Member")}
+              </span>
+            </Link>
+          ))
+        ) : (
+          <span className="px-2 py-1">No results</span>
+        )
+      ) : (
+        ""
+      )}
     </div>
   )
 }

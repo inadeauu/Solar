@@ -33,14 +33,14 @@ const TextInput = ({
             errorStatus
               ? "border-red-400 hover:border-red-600 focus:border-red-600"
               : successStatus
-              ? "border-green-500 hover:border-green-700 focus:border-green-700"
+              ? "border-green-400 hover:border-green-600 focus:border-green-600"
               : "hover:border-blue-400 focus:border-blue-400"
           }`}
           {...field}
           {...props}
         />
         <FaCheck
-          className={`h-6 w-6 text-green-500 absolute right-0 top-[6px] transition-all duration-200 opacity-0 pointer-events-none peer-hover:text-green-700 peer-focus:text-green-700 ${
+          className={`h-6 w-6 text-green-400 absolute right-0 top-[6px] transition-all duration-200 opacity-0 pointer-events-none peer-hover:text-green-600 peer-focus:text-green-600 ${
             successStatus && "opacity-100 right-2"
           }`}
         />

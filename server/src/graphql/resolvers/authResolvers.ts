@@ -1,10 +1,5 @@
 import prisma from "../../config/prisma"
-import {
-  LogoutSessionDestroyError,
-  LogoutSuccess,
-  Resolvers,
-} from "../../__generated__/resolvers-types"
-import { validate } from "email-validator"
+import { Resolvers } from "../../__generated__/resolvers-types"
 import { Provider } from "@prisma/client"
 import bcrypt from "bcrypt"
 
@@ -31,21 +26,19 @@ export const resolvers: Resolvers = {
     },
   },
   Mutation: {
-    registerEmail: async (_0, args) => {
+    registerUsername: async (_0, args) => {
       const usernameError =
         args.input.username.length < 5 || args.input.username.length > 15
-      const emailError = !validate(args.input.email)
       const passwordError = args.input.password.length < 8
 
-      if (usernameError || emailError || passwordError) {
+      if (usernameError || passwordError) {
         return {
-          __typename: "RegisterEmailInputError",
+          __typename: "RegisterUsernameInputError",
           errorMsg: "Invalid input",
           inputErrors: {
             username: usernameError
               ? "Username must be between 5 and 15 characters long"
               : null,
-            email: emailError ? "Invalid email" : null,
             password: passwordError
               ? "Password must be at least 8 characters long"
               : null,
@@ -55,13 +48,13 @@ export const resolvers: Resolvers = {
       }
 
       const user = await prisma.user.findFirst({
-        where: { email: args.input.email, provider: Provider.EMAIL },
+        where: { username: args.input.username },
       })
 
       if (user) {
         return {
-          __typename: "DuplicateEmailError",
-          errorMsg: "Email already in use",
+          __typename: "DuplicateUsernameError",
+          errorMsg: "Username already in use",
           code: 400,
         }
       }
@@ -71,22 +64,20 @@ export const resolvers: Resolvers = {
       await prisma.user.create({
         data: {
           username: args.input.username,
-          email: args.input.email,
-          email_verified: false,
           password: passwordHash,
-          provider: Provider.EMAIL,
+          provider: Provider.USERNAME,
         },
       })
 
       return {
-        __typename: "RegisterEmailSuccess",
+        __typename: "RegisterUsernameSuccess",
         successMsg: "Successfully registered",
         code: 200,
       }
     },
-    loginEmail: async (_0, args, { req }) => {
+    loginUsername: async (_0, args, { req }) => {
       const user = await prisma.user.findFirst({
-        where: { email: args.input.email, provider: Provider.EMAIL },
+        where: { username: args.input.username },
       })
 
       if (
@@ -94,8 +85,8 @@ export const resolvers: Resolvers = {
         !(await bcrypt.compare(args.input.password, user.password))
       ) {
         return {
-          __typename: "LoginEmailInputError",
-          errorMsg: "Invalid email and/or password",
+          __typename: "LoginUsernameInputError",
+          errorMsg: "Invalid username and/or password",
           code: 400,
         }
       }
@@ -103,7 +94,7 @@ export const resolvers: Resolvers = {
       req.session.userId = user.id
 
       return {
-        __typename: "LoginEmailSuccess",
+        __typename: "LoginUsernameSuccess",
         successMsg: "Successfully logged in",
         code: 200,
       }

@@ -33,6 +33,7 @@
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.1",
     "moment": "^2.29.4",
+    "nodemailer": "^6.9.4",
     "short-unique-id": "^4.4.4",
     "unique-names-generator": "^4.7.1",
     "zod": "^3.21.4"
@@ -50,6 +51,7 @@
     "@types/express-session": "^1.17.7",
     "@types/gapi": "^0.0.44",
     "@types/jsonwebtoken": "^9.0.2",
+    "@types/nodemailer": "^6.4.9",
     "concurrently": "^8.2.0",
     "nodemon": "^2.0.22",
     "prisma": "^5.0.0",

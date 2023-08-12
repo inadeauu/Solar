@@ -9,16 +9,14 @@ const authUserQueryDocument = graphql(/* GraphQL */ `
   query AuthUser {
     authUser {
       ... on AuthUserSuccess {
+        __typename
         successMsg
         code
         user {
           username
           updated_at
           provider
-          image
           id
-          email_verified
-          email
           created_at
         }
       }

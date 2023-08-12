@@ -3,54 +3,52 @@ type Query {
 }
 
 type Mutation {
-  registerEmail(input: RegisterEmailInput!): RegisterEmailResult!
-  loginEmail(input: LoginEmailInput!): LoginEmailResult!
+  registerUsername(input: RegisterUsernameInput!): RegisterUsernameResult!
+  loginUsername(input: LoginUsernameInput!): LoginUsernameResult!
   logout: LogoutResult!
 }
 
-# -- REGISTEREMAIL MUTATION
-union RegisterEmailResult =
-    RegisterEmailSuccess
-  | RegisterEmailInputError
-  | DuplicateEmailError
+# -- REGISTERUSERNAME MUTATION
+union RegisterUsernameResult =
+    RegisterUsernameSuccess
+  | RegisterUsernameInputError
+  | DuplicateUsernameError
 
-input RegisterEmailInput {
+input RegisterUsernameInput {
   username: String!
-  email: String!
   password: String!
 }
 
-type RegisterEmailSuccess implements Success {
+type RegisterUsernameSuccess implements Success {
   successMsg: String
   code: Int!
 }
 
-type RegisterEmailInputError implements Error {
+type RegisterUsernameInputError implements Error {
   errorMsg: String!
   code: Int!
-  inputErrors: RegisterEmailInputErrors!
+  inputErrors: RegisterUsernameInputErrors!
 }
 
-type RegisterEmailInputErrors {
+type RegisterUsernameInputErrors {
   username: String
-  email: String
   password: String
 }
 
-# -- LOGINEMAIL MUTATION
-union LoginEmailResult = LoginEmailSuccess | LoginEmailInputError
+# -- LOGINUSERNAME MUTATION
+union LoginUsernameResult = LoginUsernameSuccess | LoginUsernameInputError
 
-input LoginEmailInput {
-  email: String!
+input LoginUsernameInput {
+  username: String!
   password: String!
 }
 
-type LoginEmailSuccess implements Success {
+type LoginUsernameSuccess implements Success {
   successMsg: String
   code: Int!
 }
 
-type LoginEmailInputError implements Error {
+type LoginUsernameInputError implements Error {
   errorMsg: String!
   code: Int!
 }

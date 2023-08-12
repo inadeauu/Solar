@@ -4,6 +4,7 @@ import useDebounce from "../utils/useDebounce"
 import useClickOutside from "../utils/useClickOutside"
 import CommunitiesSearchBar from "./CommunitiesSearchBar"
 import UsersSearchBar from "./UsersSearchBar"
+import { PiMagnifyingGlassBold } from "react-icons/pi"
 
 const SearchBar = () => {
   const searchRef = useRef<HTMLDivElement>(null)
@@ -40,9 +41,9 @@ const SearchBar = () => {
           ))}
       </div>
       <Dropdown
-        width="w-[125px]"
+        width="w-[110px]"
         items={["Communities", "Users"]}
-        value={searchType}
+        constValue={<PiMagnifyingGlassBold className="w-5 h-5" />}
         setValue={setSearchType}
       />
     </div>

@@ -1,7 +1,7 @@
 import { useRef, useState } from "react"
 import useClickOutside from "../utils/useClickOutside"
 import { Link } from "react-router-dom"
-import { BsPerson, BsPlusCircle } from "react-icons/bs"
+import { BsPlusCircle } from "react-icons/bs"
 import { CiLogin } from "react-icons/ci"
 
 const NavUnauth = () => {
@@ -20,7 +20,9 @@ const NavUnauth = () => {
       className="relative"
       onClick={() => setOpenMenu((prev) => !prev)}
     >
-      <BsPerson className="h-10 w-10 cursor-pointer" />
+      <Link to="/signup" className="btn_blue p-2">
+        Log In
+      </Link>
       {openMenu && (
         <div className="absolute right-0 top-10 bg-gray-50 w-[150px] outline outline-2 outline-black rounded-md text-md">
           <Link

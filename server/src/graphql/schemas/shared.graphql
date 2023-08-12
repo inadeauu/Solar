@@ -14,7 +14,7 @@ type AuthenticationError implements Error {
   code: Int!
 }
 
-type DuplicateEmailError implements Error {
+type DuplicateUsernameError implements Error {
   errorMsg: String!
   code: Int!
 }

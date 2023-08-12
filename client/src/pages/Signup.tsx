@@ -16,13 +16,13 @@ import TextInput from "../components/TextInput"
 import { api } from "../utils/axios"
 import { graphql } from "../gql"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { RegisterEmailInput } from "../gql/graphql"
 import { graphQLClient } from "../utils/graphql"
+import { RegisterUsernameInput } from "../gql/graphql"
 
-const emailRegisterDocument = graphql(/* GraphQL */ `
-  mutation EmailRegister($input: RegisterEmailInput!) {
-    registerEmail(input: $input) {
-      ... on RegisterEmailSuccess {
+const usernameRegisterDocument = graphql(/* GraphQL */ `
+  mutation RegisterUsername($input: RegisterUsernameInput!) {
+    registerUsername(input: $input) {
+      ... on RegisterUsernameSuccess {
         __typename
         successMsg
         code
@@ -32,9 +32,8 @@ const emailRegisterDocument = graphql(/* GraphQL */ `
         errorMsg
         code
       }
-      ... on RegisterEmailInputError {
+      ... on RegisterUsernameInputError {
         inputErrors {
-          email
           password
           username
         }
@@ -50,18 +49,18 @@ const Signup = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const emailRegister = useMutation({
-    mutationFn: async ({ username, email, password }: RegisterEmailInput) => {
-      return await graphQLClient.request(emailRegisterDocument, {
-        input: { username, email, password },
+  const usernameRegister = useMutation({
+    mutationFn: async ({ username, password }: RegisterUsernameInput) => {
+      return await graphQLClient.request(usernameRegisterDocument, {
+        input: { username, password },
       })
     },
     onSuccess: (data) => {
       if (
-        data?.registerEmail.__typename == "DuplicateEmailError" ||
-        data?.registerEmail.__typename == "RegisterEmailInputError"
+        data?.registerUsername.__typename == "DuplicateUsernameError" ||
+        data?.registerUsername.__typename == "RegisterUsernameInputError"
       ) {
-        setError(data.registerEmail.errorMsg)
+        setError(data.registerUsername.errorMsg)
       } else {
         navigate("/")
       }
@@ -96,7 +95,6 @@ const Signup = () => {
           validateOnChange={false}
           initialValues={{
             username: "",
-            email: "",
             password: "",
             confirmPassword: "",
           }}
@@ -105,7 +103,6 @@ const Signup = () => {
               .min(5, "Username must be 5-15 characters long")
               .max(15, "Username must be 5-15 characters long")
               .required("Required"),
-            email: Yup.string().email("Invalid email").required("Required"),
             password: Yup.string()
               .min(8, "Password must be at least 8 characters long")
               .required("Required"),
@@ -114,9 +111,8 @@ const Signup = () => {
               .required("Required"),
           })}
           onSubmit={(values, { setSubmitting }) => {
-            emailRegister.mutate({
+            usernameRegister.mutate({
               username: values.username,
-              email: values.email,
               password: values.password,
             })
             setSubmitting(false)
@@ -124,7 +120,7 @@ const Signup = () => {
         >
           {({ isSubmitting }) => (
             <Form className="flex flex-col w-[60%] mx-auto mt-4">
-              <h1 className="text-3xl font-bold mb-8">Sign up</h1>
+              <h1 className="text-3xl font-bold mb-8">Sign Up</h1>
               {error && <ErrorCard error={error} className="mb-4" />}
               <div className="flex flex-col gap-5">
                 <button
@@ -133,7 +129,7 @@ const Signup = () => {
                   onClick={() => socialSignUp("google")}
                 >
                   <FcGoogle className="h-5 w-5" />
-                  Sign up with Google
+                  Continue with Google
                 </button>
                 <button
                   type="button"
@@ -141,7 +137,7 @@ const Signup = () => {
                   onClick={() => socialSignUp("github")}
                 >
                   <BsGithub className="h-5 w-5" />
-                  Sign up with Github
+                  Continue with Github
                 </button>
               </div>
 
@@ -159,12 +155,6 @@ const Signup = () => {
                 name="username"
                 type="text"
                 placeholder="Username"
-                component={TextInput}
-              />
-              <Field
-                name="email"
-                type="email"
-                placeholder="Email"
                 component={TextInput}
               />
               <div className="relative">
@@ -191,7 +181,6 @@ const Signup = () => {
                 placeholder="Confirm Password"
                 component={TextInput}
               />
-
               <button
                 className="btn_blue py-2 mt-2 w-[60%] mx-auto"
                 disabled={isSubmitting}
@@ -199,7 +188,7 @@ const Signup = () => {
                 {isSubmitting ? (
                   <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
                 ) : (
-                  "Sign up"
+                  "Sign Up"
                 )}
               </button>
               <p className="text-xs mt-4">
@@ -208,7 +197,7 @@ const Signup = () => {
                   to="/login"
                   className="text-blue-400 font-bold hover:text-blue-300"
                 >
-                  Log in
+                  Log In
                 </Link>
               </p>
             </Form>

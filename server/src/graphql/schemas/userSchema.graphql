@@ -8,10 +8,7 @@ type Query {
 type User {
   id: ID!
   username: String!
-  email: String!
-  email_verified: Boolean!
   provider: Provider!
-  image: String
   created_at: DateTime!
   updated_at: DateTime!
 
@@ -45,7 +42,7 @@ input UserInput {
 
 # -- ENUMS
 enum Provider {
-  EMAIL
+  USERNAME
   GOOGLE
   GITHUB
 }

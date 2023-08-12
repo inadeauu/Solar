@@ -6,33 +6,21 @@ import bcrypt from "bcrypt"
 import { Provider, User } from "@prisma/client"
 import {
   Config,
-  adjectives,
-  animals,
+  NumberDictionary,
   colors,
   uniqueNamesGenerator,
 } from "unique-names-generator"
 import { generate } from "generate-password"
-import { env } from "../utils/env"
+import { env } from "../../config/env"
 import { oauth2Client } from "../utils/google"
 import { errorResponse, successResponse, ResponseBody } from "../utils/response"
 
 type UserInfoGoogle = {
   sub: string
-  name?: string
-  email: string
-  email_verified: boolean
-  picture?: string
 }
 
 type UserInfoGithub = {
-  login: string
   id: number
-  avatar_url: string
-}
-
-type UserEmailGithub = {
-  email: string
-  verified: boolean
 }
 
 type LoginCallbackQuery = {
@@ -40,11 +28,27 @@ type LoginCallbackQuery = {
   code: string
 }
 
+const numberDictionary = NumberDictionary.generate({
+  min: 1000,
+  max: 99999,
+})
+
+const nameConfig: Config = {
+  dictionaries: [colors, numberDictionary],
+}
+
+const generateUsername = async (): Promise<string> => {
+  let username: string = uniqueNamesGenerator(nameConfig)
+
+  while (await prisma.user.findFirst({ where: { username } })) {
+    username = uniqueNamesGenerator(nameConfig)
+  }
+
+  return username
+}
+
 export const googleLogin = (req: Request, res: Response<ResponseBody>) => {
-  const scopes = [
-    "https://www.googleapis.com/auth/userinfo.profile",
-    "https://www.googleapis.com/auth/userinfo.email",
-  ]
+  const scopes = ["https://www.googleapis.com/auth/userinfo.profile"]
 
   const state = generate({ numbers: true, length: 32 })
 
@@ -88,11 +92,7 @@ export const googleCallback = async (
   })
 
   if (!user) {
-    const config: Config = {
-      dictionaries: [adjectives, colors, animals],
-    }
-
-    const username: string = uniqueNamesGenerator(config)
+    const username = await generateUsername()
 
     const passwordHash = await bcrypt.hash(
       generate({ length: 32, numbers: true }),
@@ -101,13 +101,10 @@ export const googleCallback = async (
 
     user = await prisma.user.create({
       data: {
-        username: userInfo.name || username,
-        email: userInfo.email,
-        email_verified: userInfo.email_verified,
+        username,
         password: passwordHash,
         provider: Provider.GOOGLE,
         provider_id: userInfo.sub,
-        image: userInfo.picture,
       },
     })
   }
@@ -176,15 +173,6 @@ export const githubCallback = async (
     { headers: { Accept: "application/json" } }
   )
 
-  const userEmailResponse = await axios.get<UserEmailGithub[]>(
-    "https://api.github.com/user/emails",
-    {
-      headers: {
-        Authorization: `Bearer ${accessResponse.data.access_token}`,
-      },
-    }
-  )
-
   const userInfoResponse = await axios.get<UserInfoGithub>(
     "https://api.github.com/user",
     {
@@ -195,7 +183,6 @@ export const githubCallback = async (
   )
 
   const userInfo = userInfoResponse.data
-  const userEmail = userEmailResponse.data[0]
 
   let user: User | null
 
@@ -204,11 +191,8 @@ export const githubCallback = async (
   })
 
   if (!user) {
-    const config: Config = {
-      dictionaries: [adjectives, colors, animals],
-    }
+    const username = await generateUsername()
 
-    const username: string = uniqueNamesGenerator(config)
     const passwordHash = await bcrypt.hash(
       generate({ length: 32, numbers: true }),
       10
@@ -216,13 +200,10 @@ export const githubCallback = async (
 
     user = await prisma.user.create({
       data: {
-        username: userInfo.login || username,
-        email: userEmail.email,
-        email_verified: userEmail.verified,
+        username,
         password: passwordHash,
         provider: Provider.GITHUB,
         provider_id: userInfo.id.toString(),
-        image: userInfo.avatar_url,
       },
     })
   }

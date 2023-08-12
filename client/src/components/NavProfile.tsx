@@ -1,12 +1,13 @@
 import { useRef, useState } from "react"
-import ProfileImage from "./ProfileImage"
 import { CiLogout } from "react-icons/ci"
 import useClickOutside from "../utils/useClickOutside"
-import { BsHouseAdd } from "react-icons/bs"
+import { BsHouseAdd, BsPerson } from "react-icons/bs"
 import { Link } from "react-router-dom"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphql } from "../gql"
 import { graphQLClient } from "../utils/graphql"
+import { useAuth } from "../utils/useAuth"
+import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/Ri"
 
 const logoutDocument = graphql(/* GraphQL */ `
   mutation Logout {
@@ -26,6 +27,7 @@ const logoutDocument = graphql(/* GraphQL */ `
 `)
 
 const NavProfile = () => {
+  const { user } = useAuth()
   const menuRef = useRef<HTMLDivElement>(null)
   const [openMenu, setOpenMenu] = useState<boolean>(false)
   const queryClient = useQueryClient()
@@ -53,7 +55,19 @@ const NavProfile = () => {
       className="relative"
       onClick={() => setOpenMenu((prev) => !prev)}
     >
-      <ProfileImage className="h-10 w-10 hover:cursor-pointer" />
+      <div className="border-[1px] rounded-lg border-black pl-2 pr-1 py-1 hover:cursor-pointer flex items-center justify-between">
+        <BsPerson className="w-7 h-7 hover:cursor-pointer lg:hidden" />
+        <span className="text-[12px] font-bold lg-max:hidden">
+          {user?.username}
+        </span>
+        <span className="pointer-events-none">
+          {openMenu ? (
+            <RiArrowDropUpLine className="w-6 h-6" />
+          ) : (
+            <RiArrowDropDownLine className="w-6 h-6" />
+          )}
+        </span>
+      </div>
       {openMenu && (
         <div className="absolute right-0 top-10 bg-gray-50 w-[200px] outline outline-2 outline-black rounded-md">
           <Link

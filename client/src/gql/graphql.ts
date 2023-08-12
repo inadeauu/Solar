@@ -272,8 +272,8 @@ export type CreateCommunitySuccess = Success & {
   successMsg: Scalars['String']['output'];
 };
 
-export type DuplicateEmailError = Error & {
-  __typename?: 'DuplicateEmailError';
+export type DuplicateUsernameError = Error & {
+  __typename?: 'DuplicateUsernameError';
   code: Scalars['Int']['output'];
   errorMsg: Scalars['String']['output'];
 };
@@ -283,21 +283,21 @@ export type Error = {
   errorMsg: Scalars['String']['output'];
 };
 
-export type LoginEmailInput = {
-  email: Scalars['String']['input'];
+export type LoginUsernameInput = {
   password: Scalars['String']['input'];
+  username: Scalars['String']['input'];
 };
 
-export type LoginEmailInputError = Error & {
-  __typename?: 'LoginEmailInputError';
+export type LoginUsernameInputError = Error & {
+  __typename?: 'LoginUsernameInputError';
   code: Scalars['Int']['output'];
   errorMsg: Scalars['String']['output'];
 };
 
-export type LoginEmailResult = LoginEmailInputError | LoginEmailSuccess;
+export type LoginUsernameResult = LoginUsernameInputError | LoginUsernameSuccess;
 
-export type LoginEmailSuccess = Success & {
-  __typename?: 'LoginEmailSuccess';
+export type LoginUsernameSuccess = Success & {
+  __typename?: 'LoginUsernameSuccess';
   code: Scalars['Int']['output'];
   successMsg?: Maybe<Scalars['String']['output']>;
 };
@@ -319,9 +319,9 @@ export type LogoutSuccess = Success & {
 export type Mutation = {
   __typename?: 'Mutation';
   createCommunity: CreateCommunityResult;
-  loginEmail: LoginEmailResult;
+  loginUsername: LoginUsernameResult;
   logout: LogoutResult;
-  registerEmail: RegisterEmailResult;
+  registerUsername: RegisterUsernameResult;
 };
 
 
@@ -330,13 +330,13 @@ export type MutationCreateCommunityArgs = {
 };
 
 
-export type MutationLoginEmailArgs = {
-  input: LoginEmailInput;
+export type MutationLoginUsernameArgs = {
+  input: LoginUsernameInput;
 };
 
 
-export type MutationRegisterEmailArgs = {
-  input: RegisterEmailInput;
+export type MutationRegisterUsernameArgs = {
+  input: RegisterUsernameInput;
 };
 
 export enum OrderByDir {
@@ -382,9 +382,9 @@ export type PostEdge = {
 };
 
 export enum Provider {
-  Email = 'EMAIL',
   Github = 'GITHUB',
-  Google = 'GOOGLE'
+  Google = 'GOOGLE',
+  Username = 'USERNAME'
 }
 
 export type Query = {
@@ -416,30 +416,28 @@ export type QueryUsersArgs = {
   input: UsersInput;
 };
 
-export type RegisterEmailInput = {
-  email: Scalars['String']['input'];
+export type RegisterUsernameInput = {
   password: Scalars['String']['input'];
   username: Scalars['String']['input'];
 };
 
-export type RegisterEmailInputError = Error & {
-  __typename?: 'RegisterEmailInputError';
+export type RegisterUsernameInputError = Error & {
+  __typename?: 'RegisterUsernameInputError';
   code: Scalars['Int']['output'];
   errorMsg: Scalars['String']['output'];
-  inputErrors: RegisterEmailInputErrors;
+  inputErrors: RegisterUsernameInputErrors;
 };
 
-export type RegisterEmailInputErrors = {
-  __typename?: 'RegisterEmailInputErrors';
-  email?: Maybe<Scalars['String']['output']>;
+export type RegisterUsernameInputErrors = {
+  __typename?: 'RegisterUsernameInputErrors';
   password?: Maybe<Scalars['String']['output']>;
   username?: Maybe<Scalars['String']['output']>;
 };
 
-export type RegisterEmailResult = DuplicateEmailError | RegisterEmailInputError | RegisterEmailSuccess;
+export type RegisterUsernameResult = DuplicateUsernameError | RegisterUsernameInputError | RegisterUsernameSuccess;
 
-export type RegisterEmailSuccess = Success & {
-  __typename?: 'RegisterEmailSuccess';
+export type RegisterUsernameSuccess = Success & {
+  __typename?: 'RegisterUsernameSuccess';
   code: Scalars['Int']['output'];
   successMsg?: Maybe<Scalars['String']['output']>;
 };
@@ -452,10 +450,7 @@ export type Success = {
 export type User = {
   __typename?: 'User';
   created_at: Scalars['DateTime']['output'];
-  email: Scalars['String']['output'];
-  email_verified: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
-  image?: Maybe<Scalars['String']['output']>;
   inCommunities: CommunityConnection;
   ownedCommunities: CommunityConnection;
   posts: PostConnection;
@@ -556,7 +551,7 @@ export type UsersSearchQuery = { __typename?: 'Query', users: { __typename?: 'Us
 export type AuthUserQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AuthUserQuery = { __typename?: 'Query', authUser: { __typename?: 'AuthUserSuccess', successMsg?: string | null, code: number, user?: { __typename?: 'User', username: string, updated_at: any, provider: Provider, image?: string | null, id: string, email_verified: boolean, email: string, created_at: any } | null } };
+export type AuthUserQuery = { __typename?: 'Query', authUser: { __typename: 'AuthUserSuccess', successMsg?: string | null, code: number, user?: { __typename?: 'User', username: string, updated_at: any, provider: Provider, id: string, created_at: any } | null } };
 
 export type CommunityTitleExistsQueryVariables = Exact<{
   title: Scalars['String']['input'];
@@ -572,26 +567,26 @@ export type CreateCommunityMutationVariables = Exact<{
 
 export type CreateCommunityMutation = { __typename?: 'Mutation', createCommunity: { __typename: 'AuthenticationError', errorMsg: string, code: number } | { __typename: 'CreateCommunityInputError', errorMsg: string, code: number, inputErrors: { __typename?: 'CreateCommunityInputErrors', title?: string | null } } | { __typename: 'CreateCommunitySuccess', successMsg: string, code: number } };
 
-export type EmailLoginMutationVariables = Exact<{
-  input: LoginEmailInput;
+export type LoginUsernameMutationVariables = Exact<{
+  input: LoginUsernameInput;
 }>;
 
 
-export type EmailLoginMutation = { __typename?: 'Mutation', loginEmail: { __typename: 'LoginEmailInputError', errorMsg: string, code: number } | { __typename: 'LoginEmailSuccess', successMsg?: string | null, code: number } };
+export type LoginUsernameMutation = { __typename?: 'Mutation', loginUsername: { __typename: 'LoginUsernameInputError', errorMsg: string, code: number } | { __typename: 'LoginUsernameSuccess', successMsg?: string | null, code: number } };
 
-export type EmailRegisterMutationVariables = Exact<{
-  input: RegisterEmailInput;
+export type RegisterUsernameMutationVariables = Exact<{
+  input: RegisterUsernameInput;
 }>;
 
 
-export type EmailRegisterMutation = { __typename?: 'Mutation', registerEmail: { __typename: 'DuplicateEmailError', errorMsg: string, code: number } | { __typename: 'RegisterEmailInputError', errorMsg: string, code: number, inputErrors: { __typename?: 'RegisterEmailInputErrors', email?: string | null, password?: string | null, username?: string | null } } | { __typename: 'RegisterEmailSuccess', successMsg?: string | null, code: number } };
+export type RegisterUsernameMutation = { __typename?: 'Mutation', registerUsername: { __typename: 'DuplicateUsernameError', errorMsg: string, code: number } | { __typename: 'RegisterUsernameInputError', errorMsg: string, code: number, inputErrors: { __typename?: 'RegisterUsernameInputErrors', password?: string | null, username?: string | null } } | { __typename: 'RegisterUsernameSuccess', successMsg?: string | null, code: number } };
 
 
 export const CommunitiesSearchDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CommunitiesSearch"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CommunitiesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"communities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"memberCount"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"created_at"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CommunitiesSearchQuery, CommunitiesSearchQueryVariables>;
 export const LogoutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Logout"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"logout"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"LogoutSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"successMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"errorMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}}]}}]}}]} as unknown as DocumentNode<LogoutMutation, LogoutMutationVariables>;
 export const UsersSearchDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UsersSearch"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UsersInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"created_at"}},{"kind":"Field","name":{"kind":"Name","value":"postsCount"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UsersSearchQuery, UsersSearchQueryVariables>;
-export const AuthUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AuthUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AuthUserSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"successMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"updated_at"}},{"kind":"Field","name":{"kind":"Name","value":"provider"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email_verified"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"created_at"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AuthUserQuery, AuthUserQueryVariables>;
+export const AuthUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AuthUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"authUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AuthUserSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"successMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"updated_at"}},{"kind":"Field","name":{"kind":"Name","value":"provider"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"created_at"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AuthUserQuery, AuthUserQueryVariables>;
 export const CommunityTitleExistsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CommunityTitleExists"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"title"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"titleExists"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"title"},"value":{"kind":"Variable","name":{"kind":"Name","value":"title"}}}]}]}}]} as unknown as DocumentNode<CommunityTitleExistsQuery, CommunityTitleExistsQueryVariables>;
 export const CreateCommunityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCommunity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCommunityInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCommunity"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCommunitySuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"successMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"errorMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCommunityInputError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inputErrors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CreateCommunityMutation, CreateCommunityMutationVariables>;
-export const EmailLoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"EmailLogin"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginEmailInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"loginEmail"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"LoginEmailSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"successMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"LoginEmailInputError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"errorMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}}]}}]}}]} as unknown as DocumentNode<EmailLoginMutation, EmailLoginMutationVariables>;
-export const EmailRegisterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"EmailRegister"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterEmailInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"registerEmail"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterEmailSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"successMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"errorMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterEmailInputError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inputErrors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"password"}},{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<EmailRegisterMutation, EmailRegisterMutationVariables>;
+export const LoginUsernameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LoginUsername"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginUsernameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"loginUsername"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"LoginUsernameSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"successMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"LoginUsernameInputError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"errorMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}}]}}]}}]} as unknown as DocumentNode<LoginUsernameMutation, LoginUsernameMutationVariables>;
+export const RegisterUsernameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RegisterUsername"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterUsernameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"registerUsername"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterUsernameSuccess"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"successMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"__typename"}},{"kind":"Field","name":{"kind":"Name","value":"errorMsg"}},{"kind":"Field","name":{"kind":"Name","value":"code"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterUsernameInputError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inputErrors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"password"}},{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RegisterUsernameMutation, RegisterUsernameMutationVariables>;

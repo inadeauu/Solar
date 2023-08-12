@@ -16,18 +16,18 @@ import { api } from "../utils/axios"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { graphql } from "../gql"
-import { LoginEmailInput } from "../gql/graphql"
 import TextInput from "../components/TextInput"
+import { LoginUsernameInput } from "../gql/graphql"
 
-const emailLoginDocument = graphql(/* GraphQL */ `
-  mutation EmailLogin($input: LoginEmailInput!) {
-    loginEmail(input: $input) {
-      ... on LoginEmailSuccess {
+const usernameLoginDocument = graphql(/* GraphQL */ `
+  mutation LoginUsername($input: LoginUsernameInput!) {
+    loginUsername(input: $input) {
+      ... on LoginUsernameSuccess {
         __typename
         successMsg
         code
       }
-      ... on LoginEmailInputError {
+      ... on LoginUsernameInputError {
         __typename
         errorMsg
         code
@@ -57,15 +57,15 @@ const Login = () => {
     }
   }
 
-  const emailSignIn = useMutation({
-    mutationFn: async ({ email, password }: LoginEmailInput) => {
-      return graphQLClient.request(emailLoginDocument, {
-        input: { email, password },
+  const usernameSignIn = useMutation({
+    mutationFn: async ({ username, password }: LoginUsernameInput) => {
+      return graphQLClient.request(usernameLoginDocument, {
+        input: { username, password },
       })
     },
     onSuccess: (data) => {
-      if (data.loginEmail.__typename == "LoginEmailInputError") {
-        setError(data.loginEmail.errorMsg)
+      if (data.loginUsername.__typename == "LoginUsernameInputError") {
+        setError(data.loginUsername.errorMsg)
       } else {
         queryClient.invalidateQueries({ queryKey: ["user"] })
         navigate("/")
@@ -85,14 +85,14 @@ const Login = () => {
         </Link>
         <Formik
           validateOnChange={false}
-          initialValues={{ email: "", password: "" }}
+          initialValues={{ username: "", password: "" }}
           validationSchema={Yup.object({
-            email: Yup.string().email("Invalid email").required("Required"),
+            username: Yup.string().required("Required"),
             password: Yup.string().required("Required"),
           })}
           onSubmit={(values, { setSubmitting }) => {
-            emailSignIn.mutate({
-              email: values.email,
+            usernameSignIn.mutate({
+              username: values.username,
               password: values.password,
             })
             setSubmitting(false)
@@ -100,7 +100,7 @@ const Login = () => {
         >
           {({ isSubmitting }) => (
             <Form className="flex flex-col w-[60%] mx-auto mt-4">
-              <h1 className="text-3xl font-bold mb-8">Login</h1>
+              <h1 className="text-3xl font-bold mb-8">Log In</h1>
               {error && <ErrorCard error={error} className="mb-4" />}
               <div className="flex flex-col gap-5">
                 <button
@@ -109,7 +109,7 @@ const Login = () => {
                   onClick={() => socialSignIn("google")}
                 >
                   <FcGoogle className="h-5 w-5" />
-                  Sign in with Google
+                  Continue with Google
                 </button>
                 <button
                   type="button"
@@ -117,7 +117,7 @@ const Login = () => {
                   onClick={() => socialSignIn("github")}
                 >
                   <BsGithub className="h-5 w-5" />
-                  Sign in with Github
+                  Continue with Github
                 </button>
               </div>
 
@@ -132,9 +132,9 @@ const Login = () => {
               </div>
 
               <Field
-                name="email"
-                type="email"
-                placeholder="Email"
+                name="username"
+                type="text"
+                placeholder="Username"
                 component={TextInput}
               />
               <div className="relative">
@@ -163,7 +163,7 @@ const Login = () => {
                 {isSubmitting ? (
                   <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
                 ) : (
-                  "Login"
+                  "Log In"
                 )}
               </button>
               <p className="text-xs mt-4">
@@ -172,7 +172,7 @@ const Login = () => {
                   to="/signup"
                   className="text-blue-400 font-bold hover:text-blue-300"
                 >
-                  Sign up
+                  Sign Up
                 </Link>
               </p>
             </Form>

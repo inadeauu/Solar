@@ -1,8 +1,4 @@
-import {
-  AiOutlineArrowLeft,
-  AiOutlineEye,
-  AiOutlineEyeInvisible,
-} from "react-icons/ai"
+import { AiOutlineArrowLeft } from "react-icons/ai"
 import { FcGoogle } from "react-icons/fc"
 import { BsGithub } from "react-icons/bs"
 import { Field, Form, Formik } from "formik"
@@ -18,6 +14,7 @@ import { graphql } from "../gql"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { RegisterUsernameInput } from "../gql/graphql"
+import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi"
 
 const usernameRegisterDocument = graphql(/* GraphQL */ `
   mutation RegisterUsername($input: RegisterUsernameInput!) {
@@ -82,12 +79,12 @@ const Signup = () => {
   }
 
   const inputStyle =
-    "flex justify-center items-center gap-3 border-2 border-neutral-500 rounded-full py-2 font-semibold hover:bg-neutral-100 transition-colors duration-200"
+    "flex justify-center items-center gap-3 border border-neutral-500 rounded-full py-2 hover:bg-neutral-100 transition-colors duration-200"
 
   return (
     <div className="flex h-screen">
-      <div className="bg-white m-auto rounded-xl max-h-[650px] max-w-[550px] w-[90%] h-[90%] p-4 overflow-scroll border-2 border-black">
-        <Link to="/" className="flex gap-2 items-center">
+      <div className="bg-white m-auto rounded-xl max-h-[650px] max-w-[550px] w-[90%] h-[90%] p-4 overflow-scroll border border-neutral-500">
+        <Link to="/" className="flex gap-2 items-center hover:underline">
           <AiOutlineArrowLeft className="w-4 h-4" />
           <p className="text-sm">Home</p>
         </Link>
@@ -120,7 +117,7 @@ const Signup = () => {
         >
           {({ isSubmitting }) => (
             <Form className="flex flex-col w-[60%] mx-auto mt-4">
-              <h1 className="text-3xl font-bold mb-8">Sign Up</h1>
+              <h1 className="text-3xl font-semibold mb-8">Sign Up</h1>
               {error && <ErrorCard error={error} className="mb-4" />}
               <div className="flex flex-col gap-5">
                 <button
@@ -143,8 +140,8 @@ const Signup = () => {
 
               <div className="flex my-3 items-center">
                 <hr className="grow h-[2px] bg-black" />
-                <div className="rounded-full p-3 border-2 border-black relative">
-                  <p className="absolute translate-x-[-50%] translate-y-[-50%] text-sm">
+                <div className="rounded-full p-3 border border-black relative">
+                  <p className="absolute translate-x-[-50%] translate-y-[-50%] text-sm font-light">
                     or
                   </p>
                 </div>
@@ -156,6 +153,7 @@ const Signup = () => {
                 type="text"
                 placeholder="Username"
                 component={TextInput}
+                useSuccess={true}
               />
               <div className="relative">
                 <Field
@@ -163,15 +161,16 @@ const Signup = () => {
                   type={showPass ? "text" : "password"}
                   placeholder="Password"
                   component={TextInput}
+                  useSuccess={true}
                 />
                 <div
-                  className="absolute top-0 right-0 translate-x-[115%] translate-y-[15%]"
+                  className="absolute top-0 right-0 translate-x-[125%] translate-y-[10%]"
                   onClick={() => setShowPass((prev) => !prev)}
                 >
                   {showPass ? (
-                    <AiOutlineEye className="w-7 h-7 leading-[1px]" />
+                    <PiEyeLight className="w-7 h-7" />
                   ) : (
-                    <AiOutlineEyeInvisible className="w-7 h-7" />
+                    <PiEyeSlashLight className="w-7 h-7" />
                   )}
                 </div>
               </div>
@@ -195,7 +194,7 @@ const Signup = () => {
                 Already have an account?{" "}
                 <Link
                   to="/login"
-                  className="text-blue-400 font-bold hover:text-blue-300"
+                  className="text-blue-600 font-bold hover:underline"
                 >
                   Log In
                 </Link>

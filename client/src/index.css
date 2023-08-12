@@ -7,5 +7,5 @@
 }
 
 .btn_blue {
-  @apply rounded-lg bg-blue-500 text-white font-bold hover:bg-blue-600 transition-colors duration-200;
+  @apply rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600;
 }

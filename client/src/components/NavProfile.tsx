@@ -55,9 +55,13 @@ const NavProfile = () => {
       className="relative"
       onClick={() => setOpenMenu((prev) => !prev)}
     >
-      <div className="border-[1px] rounded-lg border-black pl-2 pr-1 py-1 hover:cursor-pointer flex items-center justify-between">
+      <div
+        className={`border-2 border-gray-300 hover:border-gray-400 rounded-md pl-2 pr-1 py-1 hover:cursor-pointer flex items-center justify-between ${
+          openMenu && "border-gray-400"
+        }`}
+      >
         <BsPerson className="w-7 h-7 hover:cursor-pointer lg:hidden" />
-        <span className="text-[12px] font-bold lg-max:hidden">
+        <span className="text-[12px] font-semibold lg-max:hidden">
           {user?.username}
         </span>
         <span className="pointer-events-none">
@@ -69,20 +73,20 @@ const NavProfile = () => {
         </span>
       </div>
       {openMenu && (
-        <div className="absolute right-0 top-10 bg-gray-50 w-[200px] outline outline-2 outline-black rounded-md">
+        <div className="absolute right-0 top-11 bg-gray-50 w-[200px] border border-gray-300 rounded-md text-sm font-medium">
           <Link
             to="/create-community"
-            className="flex items-center gap-2 p-1 rounded-t-md hover:bg-gray-200 hover:cursor-pointer"
+            className="flex items-center gap-2 p-2 rounded-t-md hover:bg-gray-200 hover:cursor-pointer"
           >
             <BsHouseAdd className="h-5 w-5" />
-            <span className="text-md">Create a Community</span>
+            Create a Community
           </Link>
           <div
-            className="flex items-center gap-2 p-1 rounded-b-md hover:bg-gray-200 hover:cursor-pointer"
+            className="flex items-center gap-2 p-2 rounded-b-md hover:bg-gray-200 hover:cursor-pointer"
             onClick={() => logout.mutate()}
           >
             <CiLogout className="h-5 w-5" />
-            <span className="text-md">Log out</span>
+            Log Out
           </div>
         </div>
       )}

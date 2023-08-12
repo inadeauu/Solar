@@ -37,7 +37,7 @@ const CommunitiesSearchBar = ({ search }: CommunitiesSearchBarProps) => {
 
   return (
     <div
-      className={`absolute top-9 bg-white w-full border-r-2 border-b-2 border-l-2 border-black flex flex-col ${
+      className={`absolute top-9 bg-white w-full border-r-2 border-b-2 border-l-2 border-gray-300 flex flex-col ${
         !data?.communities?.edges && "hidden"
       }`}
     >

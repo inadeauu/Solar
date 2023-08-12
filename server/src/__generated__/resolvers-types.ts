@@ -230,6 +230,7 @@ export type Query = {
   communities: CommunityConnection;
   titleExists: Scalars['Boolean']['output'];
   user?: Maybe<User>;
+  usernameExists: Scalars['Boolean']['output'];
   users: UserConnection;
 };
 
@@ -246,6 +247,11 @@ export type QueryTitleExistsArgs = {
 
 export type QueryUserArgs = {
   input: UserInput;
+};
+
+
+export type QueryUsernameExistsArgs = {
+  username: Scalars['String']['input'];
 };
 
 
@@ -721,6 +727,7 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   communities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<QueryCommunitiesArgs, 'input'>>;
   titleExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<QueryTitleExistsArgs, 'title'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'input'>>;
+  usernameExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<QueryUsernameExistsArgs, 'username'>>;
   users?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, RequireFields<QueryUsersArgs, 'input'>>;
 }>;
 

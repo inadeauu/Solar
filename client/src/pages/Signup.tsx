@@ -2,7 +2,6 @@ import { AiOutlineArrowLeft } from "react-icons/ai"
 import { FcGoogle } from "react-icons/fc"
 import { BsGithub } from "react-icons/bs"
 import { Field, Form, Formik } from "formik"
-import * as Yup from "yup"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { AxiosError } from "axios"
@@ -15,6 +14,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { RegisterUsernameInput } from "../gql/graphql"
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi"
+import AwesomeDebouncePromise from "awesome-debounce-promise"
 
 const usernameRegisterDocument = graphql(/* GraphQL */ `
   mutation RegisterUsername($input: RegisterUsernameInput!) {
@@ -39,12 +39,85 @@ const usernameRegisterDocument = graphql(/* GraphQL */ `
   }
 `)
 
+const usernameExistsDocument = graphql(/* GraphQL */ `
+  query UsernameExists($username: String!) {
+    usernameExists(username: $username)
+  }
+`)
+
 const Signup = () => {
+  const
   const [showPass, setShowPass] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
 
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+
+  const validateUsername = AwesomeDebouncePromise(
+    async (username) => {
+      let error
+
+      if (!username) {
+        error = "Required"
+      } else if (username.length < 5 || username.length > 15) {
+        error = "Username must be 5-15 characters long"
+      } else {
+        const response = await graphQLClient.request(usernameExistsDocument, {
+          username,
+        })
+
+        if (response.usernameExists) {
+          error = "Username in use"
+        }
+      }
+
+      if (!error) {
+        setUsernameFieldSuccess(true)
+      } else if (usernameFieldSuccess) {
+        setUsernameFieldSuccess(false)
+      }
+
+      return error
+    },
+    500,
+    { leading: false }
+  )
+
+  const validatePassword = (password: string) => {
+    let error
+
+    if (!password) {
+      error = "Required"
+    } else if (password.length < 8) {
+      error = "Password must be at least 8 characters long"
+    }
+
+    if (!error) {
+      setPasswordConfFieldSuccess(true)
+    } else if (usernameFieldSuccess) {
+      setPasswordConfFieldSuccess(false)
+    }
+
+    return error
+  }
+
+  const validateConfPassword = (password: string, confPassword: string) => {
+    let error
+
+    if (!confPassword) {
+      error = "Required"
+    } else if (password !== confPassword) {
+      error = "Passwords do not match"
+    }
+
+    if (!error) {
+      setPasswordConfFieldSuccess(true)
+    } else if (usernameFieldSuccess) {
+      setPasswordConfFieldSuccess(false)
+    }
+
+    return error
+  }
 
   const usernameRegister = useMutation({
     mutationFn: async ({ username, password }: RegisterUsernameInput) => {
@@ -83,30 +156,20 @@ const Signup = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="bg-white m-auto rounded-xl max-h-[650px] max-w-[550px] w-[90%] h-[90%] p-4 overflow-scroll border border-neutral-500">
+      <div className="bg-white m-auto rounded-xl max-h-[650px] max-w-[550px] w-[90%] h-[90%] p-4 overflow-scroll border border-black">
         <Link to="/" className="flex gap-2 items-center hover:underline">
           <AiOutlineArrowLeft className="w-4 h-4" />
           <p className="text-sm">Home</p>
         </Link>
         <Formik
           validateOnChange={false}
+          validateOnBlur={false}
+          validationSchema={}
           initialValues={{
             username: "",
             password: "",
             confirmPassword: "",
           }}
-          validationSchema={Yup.object({
-            username: Yup.string()
-              .min(5, "Username must be 5-15 characters long")
-              .max(15, "Username must be 5-15 characters long")
-              .required("Required"),
-            password: Yup.string()
-              .min(8, "Password must be at least 8 characters long")
-              .required("Required"),
-            confirmPassword: Yup.string()
-              .oneOf([Yup.ref("password")], "Passwords do not match")
-              .required("Required"),
-          })}
           onSubmit={(values, { setSubmitting }) => {
             usernameRegister.mutate({
               username: values.username,
@@ -115,7 +178,7 @@ const Signup = () => {
             setSubmitting(false)
           }}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, errors }) => (
             <Form className="flex flex-col w-[60%] mx-auto mt-4">
               <h1 className="text-3xl font-semibold mb-8">Sign Up</h1>
               {error && <ErrorCard error={error} className="mb-4" />}
@@ -153,7 +216,7 @@ const Signup = () => {
                 type="text"
                 placeholder="Username"
                 component={TextInput}
-                useSuccess={true}
+                validate={validateUsername}
               />
               <div className="relative">
                 <Field
@@ -161,7 +224,6 @@ const Signup = () => {
                   type={showPass ? "text" : "password"}
                   placeholder="Password"
                   component={TextInput}
-                  useSuccess={true}
                 />
                 <div
                   className="absolute top-0 right-0 translate-x-[125%] translate-y-[10%]"

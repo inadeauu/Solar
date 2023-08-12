@@ -39,6 +39,7 @@ const createCommunityDocument = graphql(/* GraphQL */ `
 `)
 
 const CreateCommunity = () => {
+  const [titleFieldSuccess, setTitleFieldSuccess] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
   const navigate = useNavigate()
 
@@ -75,14 +76,21 @@ const CreateCommunity = () => {
           error = "Title in use"
         }
       }
+
+      if (!error) {
+        setTitleFieldSuccess(true)
+      } else if (titleFieldSuccess) {
+        setTitleFieldSuccess(false)
+      }
+
       return error
     },
-    400,
-    { leading: true }
+    500,
+    { leading: false }
   )
 
   return (
-    <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border-2 border-black">
+    <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border border-black">
       <Formik
         initialValues={{ title: "" }}
         validateOnBlur={false}
@@ -93,7 +101,7 @@ const CreateCommunity = () => {
       >
         {({ isSubmitting }) => (
           <div className="w-fit mx-auto">
-            <h1 className="text-3xl font-bold mb-6">Create a Community</h1>
+            <h1 className="text-3xl font-semibold mb-6">Create a Community</h1>
             <Form className="flex flex-col">
               {error && <ErrorCard error={error} className="mb-4" />}
               <label className="flex flex-col gap-2">
@@ -103,7 +111,7 @@ const CreateCommunity = () => {
                   validate={validateTitle}
                   component={TextInput}
                   useTouched={false}
-                  useSuccess={true}
+                  success={titleFieldSuccess}
                 />
               </label>
               <button

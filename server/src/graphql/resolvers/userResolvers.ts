@@ -32,6 +32,13 @@ export const resolvers: Resolvers = {
         pageInfo: results.pageInfo,
       }
     },
+    usernameExists: async (_0, args) => {
+      const user = await prisma.user.findFirst({
+        where: { username: args.username },
+      })
+
+      return user ? true : false
+    },
   },
   User: {
     ownedCommunities: async (user, args) => {

@@ -3,6 +3,7 @@ scalar DateTime
 type Query {
   user(input: UserInput!): User
   users(input: UsersInput!): UserConnection!
+  usernameExists(username: String!): Boolean!
 }
 
 type User {

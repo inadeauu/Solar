@@ -81,6 +81,7 @@ const Signup = () => {
   const [fieldStates, setFieldStates] =
     useState<FieldStates>(initialFieldStates)
   const [submitting, setSubmitting] = useState<boolean>(false)
+  const [validatingUsername, setValidatingUsername] = useState<boolean>(false)
 
   const [showPass, setShowPass] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
@@ -155,7 +156,7 @@ const Signup = () => {
           setFieldStateSuccess("username", false, error)
         }
 
-        return error
+        setValidatingUsername(false)
       },
       500,
       { trailing: true }
@@ -183,8 +184,6 @@ const Signup = () => {
     } else {
       setFieldStateSuccess("password", false, error)
     }
-
-    return error
   }
 
   const getConfPasswordError = (confirmPassword: string) => {
@@ -208,8 +207,6 @@ const Signup = () => {
     } else {
       setFieldStateSuccess("confirmPassword", false, error)
     }
-
-    return error
   }
 
   const usernameRegister = useMutation({
@@ -245,6 +242,10 @@ const Signup = () => {
   }
 
   const submitEmailSignUp = async () => {
+    if (validatingUsername) {
+      return
+    }
+
     const usernameSubmitError =
       fieldStates.username.errorMsg == FieldErrorMsgs.USERNAME_TAKEN
         ? FieldErrorMsgs.USERNAME_TAKEN
@@ -329,6 +330,7 @@ const Signup = () => {
             value={fieldStates.username.value}
             onChange={(e) => {
               setFieldStateValue("username", e.target.value)
+              setValidatingUsername(true)
               validateUsername(e.target.value)
             }}
             error={fieldStates.username.error}

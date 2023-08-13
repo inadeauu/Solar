@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo, GraphQLScalarType, GraphQLScalarTypeConfig } from 'graphql';
-import { User as UserModel, Post as PostModel, Community as CommunityModel } from '.prisma/client';
+import { User as UserModel, Post as PostModel, Community as CommunityModel, Comment as CommentModel } from '.prisma/client';
 import { Context } from '../index';
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = undefined | T;
@@ -39,6 +39,53 @@ export type AuthenticationError = Error & {
   errorMsg: Scalars['String']['output'];
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  body: Scalars['String']['output'];
+  children: CommentConnection;
+  created_at: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  owner: User;
+  parent: Comment;
+  post: Post;
+  updated_at: Scalars['DateTime']['output'];
+};
+
+
+export type CommentChildrenArgs = {
+  input: CommentChildrenInput;
+};
+
+export type CommentChildrenInput = {
+  paginate: PaginateInput;
+};
+
+export type CommentConnection = {
+  __typename?: 'CommentConnection';
+  edges: Array<CommentEdge>;
+  pageInfo: PageInfo;
+};
+
+export type CommentEdge = {
+  __typename?: 'CommentEdge';
+  cursor: Scalars['String']['output'];
+  node: Comment;
+};
+
+export type CommentInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type CommentsFilters = {
+  postId?: InputMaybe<Scalars['ID']['input']>;
+  userId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type CommentsInput = {
+  filters?: InputMaybe<CommentsFilters>;
+  paginate: PaginateInput;
+};
+
 export type CommunitiesFilters = {
   orderBy?: InputMaybe<CommunitiesOrderBy>;
   titleContains?: InputMaybe<Scalars['String']['input']>;
@@ -59,11 +106,21 @@ export type Community = {
   created_at: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   memberCount: Scalars['Int']['output'];
-  members: Array<User>;
+  members: UserConnection;
   owner: User;
-  posts: Array<Post>;
+  posts: PostConnection;
   title: Scalars['String']['output'];
   updated_at: Scalars['DateTime']['output'];
+};
+
+
+export type CommunityMembersArgs = {
+  input: CommunityMembersInput;
+};
+
+
+export type CommunityPostsArgs = {
+  input: CommunityPostsInput;
 };
 
 export type CommunityConnection = {
@@ -78,11 +135,19 @@ export type CommunityEdge = {
   node: Community;
 };
 
+export type CommunityMembersInput = {
+  paginate: PaginateInput;
+};
+
 export const CommunityOrderByType = {
   MemberCount: 'memberCount'
 } as const;
 
 export type CommunityOrderByType = typeof CommunityOrderByType[keyof typeof CommunityOrderByType];
+export type CommunityPostsInput = {
+  paginate: PaginateInput;
+};
+
 export type CreateCommunityInput = {
   title: Scalars['String']['input'];
 };
@@ -198,11 +263,22 @@ export type PaginateInput = {
 export type Post = {
   __typename?: 'Post';
   body: Scalars['String']['output'];
+  comments: CommentConnection;
   community: Community;
   created_at: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   owner: User;
+  title: Scalars['String']['output'];
   updated_at: Scalars['DateTime']['output'];
+};
+
+
+export type PostCommentsArgs = {
+  input: PostCommentInput;
+};
+
+export type PostCommentInput = {
+  paginate: PaginateInput;
 };
 
 export type PostConnection = {
@@ -227,11 +303,23 @@ export type Provider = typeof Provider[keyof typeof Provider];
 export type Query = {
   __typename?: 'Query';
   authUser: AuthUserResult;
+  comment?: Maybe<Comment>;
+  comments: CommentConnection;
   communities: CommunityConnection;
   titleExists: Scalars['Boolean']['output'];
   user?: Maybe<User>;
   usernameExists: Scalars['Boolean']['output'];
   users: UserConnection;
+};
+
+
+export type QueryCommentArgs = {
+  input: CommentInput;
+};
+
+
+export type QueryCommentsArgs = {
+  input: CommentsInput;
 };
 
 
@@ -292,6 +380,8 @@ export type Success = {
 
 export type User = {
   __typename?: 'User';
+  comments: CommentConnection;
+  commentsCount: Scalars['Int']['output'];
   created_at: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   inCommunities: CommunityConnection;
@@ -301,6 +391,11 @@ export type User = {
   provider: Provider;
   updated_at: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
+};
+
+
+export type UserCommentsArgs = {
+  input: UserCommentInput;
 };
 
 
@@ -316,6 +411,10 @@ export type UserOwnedCommunitiesArgs = {
 
 export type UserPostsArgs = {
   input: UserPostInput;
+};
+
+export type UserCommentInput = {
+  paginate: PaginateInput;
 };
 
 export type UserConnection = {
@@ -463,13 +562,22 @@ export type ResolversTypes = ResolversObject<{
   AuthUserSuccess: ResolverTypeWrapper<Omit<AuthUserSuccess, 'user'> & { user?: Maybe<ResolversTypes['User']> }>;
   AuthenticationError: ResolverTypeWrapper<AuthenticationError>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  Comment: ResolverTypeWrapper<CommentModel>;
+  CommentChildrenInput: CommentChildrenInput;
+  CommentConnection: ResolverTypeWrapper<Omit<CommentConnection, 'edges'> & { edges: Array<ResolversTypes['CommentEdge']> }>;
+  CommentEdge: ResolverTypeWrapper<Omit<CommentEdge, 'node'> & { node: ResolversTypes['Comment'] }>;
+  CommentInput: CommentInput;
+  CommentsFilters: CommentsFilters;
+  CommentsInput: CommentsInput;
   CommunitiesFilters: CommunitiesFilters;
   CommunitiesInput: CommunitiesInput;
   CommunitiesOrderBy: CommunitiesOrderBy;
   Community: ResolverTypeWrapper<CommunityModel>;
   CommunityConnection: ResolverTypeWrapper<Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversTypes['CommunityEdge']> }>;
   CommunityEdge: ResolverTypeWrapper<Omit<CommunityEdge, 'node'> & { node: ResolversTypes['Community'] }>;
+  CommunityMembersInput: CommunityMembersInput;
   CommunityOrderByType: CommunityOrderByType;
+  CommunityPostsInput: CommunityPostsInput;
   CreateCommunityInput: CreateCommunityInput;
   CreateCommunityInputError: ResolverTypeWrapper<CreateCommunityInputError>;
   CreateCommunityInputErrors: ResolverTypeWrapper<CreateCommunityInputErrors>;
@@ -492,6 +600,7 @@ export type ResolversTypes = ResolversObject<{
   PageInfo: ResolverTypeWrapper<PageInfo>;
   PaginateInput: PaginateInput;
   Post: ResolverTypeWrapper<PostModel>;
+  PostCommentInput: PostCommentInput;
   PostConnection: ResolverTypeWrapper<Omit<PostConnection, 'edges'> & { edges: Array<ResolversTypes['PostEdge']> }>;
   PostEdge: ResolverTypeWrapper<Omit<PostEdge, 'node'> & { node: ResolversTypes['Post'] }>;
   Provider: Provider;
@@ -504,6 +613,7 @@ export type ResolversTypes = ResolversObject<{
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Success: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Success']>;
   User: ResolverTypeWrapper<UserModel>;
+  UserCommentInput: UserCommentInput;
   UserConnection: ResolverTypeWrapper<Omit<UserConnection, 'edges'> & { edges: Array<ResolversTypes['UserEdge']> }>;
   UserEdge: ResolverTypeWrapper<Omit<UserEdge, 'node'> & { node: ResolversTypes['User'] }>;
   UserInCommunitiesInput: UserInCommunitiesInput;
@@ -524,12 +634,21 @@ export type ResolversParentTypes = ResolversObject<{
   AuthUserSuccess: Omit<AuthUserSuccess, 'user'> & { user?: Maybe<ResolversParentTypes['User']> };
   AuthenticationError: AuthenticationError;
   Boolean: Scalars['Boolean']['output'];
+  Comment: CommentModel;
+  CommentChildrenInput: CommentChildrenInput;
+  CommentConnection: Omit<CommentConnection, 'edges'> & { edges: Array<ResolversParentTypes['CommentEdge']> };
+  CommentEdge: Omit<CommentEdge, 'node'> & { node: ResolversParentTypes['Comment'] };
+  CommentInput: CommentInput;
+  CommentsFilters: CommentsFilters;
+  CommentsInput: CommentsInput;
   CommunitiesFilters: CommunitiesFilters;
   CommunitiesInput: CommunitiesInput;
   CommunitiesOrderBy: CommunitiesOrderBy;
   Community: CommunityModel;
   CommunityConnection: Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversParentTypes['CommunityEdge']> };
   CommunityEdge: Omit<CommunityEdge, 'node'> & { node: ResolversParentTypes['Community'] };
+  CommunityMembersInput: CommunityMembersInput;
+  CommunityPostsInput: CommunityPostsInput;
   CreateCommunityInput: CreateCommunityInput;
   CreateCommunityInputError: CreateCommunityInputError;
   CreateCommunityInputErrors: CreateCommunityInputErrors;
@@ -551,6 +670,7 @@ export type ResolversParentTypes = ResolversObject<{
   PageInfo: PageInfo;
   PaginateInput: PaginateInput;
   Post: PostModel;
+  PostCommentInput: PostCommentInput;
   PostConnection: Omit<PostConnection, 'edges'> & { edges: Array<ResolversParentTypes['PostEdge']> };
   PostEdge: Omit<PostEdge, 'node'> & { node: ResolversParentTypes['Post'] };
   Query: {};
@@ -562,6 +682,7 @@ export type ResolversParentTypes = ResolversObject<{
   String: Scalars['String']['output'];
   Success: ResolversInterfaceTypes<ResolversParentTypes>['Success'];
   User: UserModel;
+  UserCommentInput: UserCommentInput;
   UserConnection: Omit<UserConnection, 'edges'> & { edges: Array<ResolversParentTypes['UserEdge']> };
   UserEdge: Omit<UserEdge, 'node'> & { node: ResolversParentTypes['User'] };
   UserInCommunitiesInput: UserInCommunitiesInput;
@@ -591,13 +712,37 @@ export type AuthenticationErrorResolvers<ContextType = Context, ParentType exten
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type CommentResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = ResolversObject<{
+  body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  children?: Resolver<ResolversTypes['CommentConnection'], ParentType, ContextType, RequireFields<CommentChildrenArgs, 'input'>>;
+  created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  parent?: Resolver<ResolversTypes['Comment'], ParentType, ContextType>;
+  post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
+  updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CommentConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CommentConnection'] = ResolversParentTypes['CommentConnection']> = ResolversObject<{
+  edges?: Resolver<Array<ResolversTypes['CommentEdge']>, ParentType, ContextType>;
+  pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CommentEdgeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CommentEdge'] = ResolversParentTypes['CommentEdge']> = ResolversObject<{
+  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  node?: Resolver<ResolversTypes['Comment'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type CommunityResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Community'] = ResolversParentTypes['Community']> = ResolversObject<{
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   memberCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  members?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
+  members?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, RequireFields<CommunityMembersArgs, 'input'>>;
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  posts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
+  posts?: Resolver<ResolversTypes['PostConnection'], ParentType, ContextType, RequireFields<CommunityPostsArgs, 'input'>>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -702,10 +847,12 @@ export type PageInfoResolvers<ContextType = Context, ParentType extends Resolver
 
 export type PostResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = ResolversObject<{
   body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  comments?: Resolver<ResolversTypes['CommentConnection'], ParentType, ContextType, RequireFields<PostCommentsArgs, 'input'>>;
   community?: Resolver<ResolversTypes['Community'], ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -724,6 +871,8 @@ export type PostEdgeResolvers<ContextType = Context, ParentType extends Resolver
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   authUser?: Resolver<ResolversTypes['AuthUserResult'], ParentType, ContextType>;
+  comment?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType, RequireFields<QueryCommentArgs, 'input'>>;
+  comments?: Resolver<ResolversTypes['CommentConnection'], ParentType, ContextType, RequireFields<QueryCommentsArgs, 'input'>>;
   communities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<QueryCommunitiesArgs, 'input'>>;
   titleExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<QueryTitleExistsArgs, 'title'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'input'>>;
@@ -761,6 +910,8 @@ export type SuccessResolvers<ContextType = Context, ParentType extends Resolvers
 }>;
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
+  comments?: Resolver<ResolversTypes['CommentConnection'], ParentType, ContextType, RequireFields<UserCommentsArgs, 'input'>>;
+  commentsCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   inCommunities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<UserInCommunitiesArgs, 'input'>>;
@@ -795,6 +946,9 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   AuthUserResult?: AuthUserResultResolvers<ContextType>;
   AuthUserSuccess?: AuthUserSuccessResolvers<ContextType>;
   AuthenticationError?: AuthenticationErrorResolvers<ContextType>;
+  Comment?: CommentResolvers<ContextType>;
+  CommentConnection?: CommentConnectionResolvers<ContextType>;
+  CommentEdge?: CommentEdgeResolvers<ContextType>;
   Community?: CommunityResolvers<ContextType>;
   CommunityConnection?: CommunityConnectionResolvers<ContextType>;
   CommunityEdge?: CommunityEdgeResolvers<ContextType>;

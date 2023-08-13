@@ -3,8 +3,7 @@ import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
 import useClickOutside from "../utils/useClickOutside"
 
 type DropdownProps = {
-  buttonStyles?: string
-  selectedStyles?: string
+  className?: string
   width: string
   items: string[]
   value?: string
@@ -13,6 +12,7 @@ type DropdownProps = {
 }
 
 const Dropdown = ({
+  className,
   width,
   items,
   value,
@@ -31,7 +31,7 @@ const Dropdown = ({
   return (
     <div
       ref={menuRef}
-      className={`flex items-center gap-1 px-2 text-sm relative rounded-md font-medium bg-gray-50 border-2 border-gray-300 hover:border-gray-400 ${
+      className={`flex items-center gap-1 px-2 text-sm relative rounded-md font-medium bg-gray-50 border-2 border-gray-300 hover:border-gray-400 cursor-pointer ${className} ${
         openMenu && "border-gray-400"
       } ${!constValue && width}`}
       onClick={() => setOpenMenu((prev) => !prev)}

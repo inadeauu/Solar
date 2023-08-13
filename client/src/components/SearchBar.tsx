@@ -1,7 +1,6 @@
 import { useRef, useState } from "react"
 import Dropdown from "./Dropdown"
 import useDebounce from "../utils/useDebounce"
-import useClickOutside from "../utils/useClickOutside"
 import CommunitiesSearchBar from "./CommunitiesSearchBar"
 import UsersSearchBar from "./UsersSearchBar"
 import { PiMagnifyingGlassBold } from "react-icons/pi"
@@ -14,33 +13,36 @@ const SearchBar = () => {
 
   const debouncedSearch = useDebounce(search, 500)
 
-  useClickOutside(searchRef, () => {
-    if (showResults) {
-      setShowResults((prev) => !prev)
-    }
-  })
-
   return (
     <div className="flex items-stretch gap-2 w-[50%] leading-1">
       <div ref={searchRef} className="flex flex-col w-full relative">
         <input
           value={search}
-          placeholder={`Search ${searchType}...`}
-          className={`px-2 py-1 rounded-md border-2 border-gray-300 outline-none bg-gray-50 hover:border-blue-400 focus:border-blue-400 w-full ${
+          placeholder={`Search ${searchType}`}
+          className={`px-2 py-1 rounded-md border-2 border-gray-300 outline-none bg-gray-50 hover:border-blue-400 focus:border-blue-400 w-full placeholder-shown:text-ellipsis ${
             showResults && "rounded-b-none"
           }`}
           onChange={(e) => setSearch(e.target.value)}
-          onFocus={() => setShowResults((prev) => !prev)}
+          onFocus={() => {
+            setShowResults((prev) => !prev)
+          }}
+          onBlur={() => {
+            setShowResults((prev) => !prev)
+          }}
         />
-        {showResults &&
-          debouncedSearch &&
+        {debouncedSearch &&
+          showResults &&
           (searchType == "Communities" ? (
-            <CommunitiesSearchBar search={debouncedSearch} />
+            <CommunitiesSearchBar
+              debouncedSearch={debouncedSearch}
+              search={search}
+            />
           ) : (
-            <UsersSearchBar search={debouncedSearch} />
+            <UsersSearchBar debouncedSearch={debouncedSearch} search={search} />
           ))}
       </div>
       <Dropdown
+        className={`${showResults && "sm-max:hidden"}`}
         width="w-[110px]"
         items={["Communities", "Users"]}
         constValue={<PiMagnifyingGlassBold className="h-5 w-5" />}

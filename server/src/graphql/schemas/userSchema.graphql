@@ -14,10 +14,12 @@ type User {
   updated_at: DateTime!
 
   postsCount: Int!
+  commentsCount: Int!
 
   ownedCommunities(input: UserOwnedCommunitiesInput!): CommunityConnection!
   inCommunities(input: UserInCommunitiesInput!): CommunityConnection!
   posts(input: UserPostInput!): PostConnection!
+  comments(input: UserCommentInput!): CommentConnection!
 }
 
 # -- USERS QUERY
@@ -74,5 +76,9 @@ input UserInCommunitiesInput {
 }
 
 input UserPostInput {
+  paginate: PaginateInput!
+}
+
+input UserCommentInput {
   paginate: PaginateInput!
 }

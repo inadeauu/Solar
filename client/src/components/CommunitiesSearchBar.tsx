@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
 import { graphql } from "../gql"
 import { graphQLClient } from "../utils/graphql"
-import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { pluralize } from "../utils/utils"
+import abbreviate from "number-abbreviate"
+import { AiOutlineSearch } from "react-icons/ai"
 
 type CommunitiesSearchBarProps = {
+  debouncedSearch: string
   search: string
 }
 
@@ -22,13 +25,18 @@ const getCommunitySearchResultsDocument = graphql(/* GraphQL */ `
   }
 `)
 
-const CommunitiesSearchBar = ({ search }: CommunitiesSearchBarProps) => {
+const CommunitiesSearchBar = ({
+  debouncedSearch,
+  search,
+}: CommunitiesSearchBarProps) => {
+  const navigate = useNavigate()
+
   const { data } = useQuery({
-    queryKey: [search],
+    queryKey: [debouncedSearch],
     queryFn: () =>
       graphQLClient.request(getCommunitySearchResultsDocument, {
         input: {
-          filters: { titleContains: search },
+          filters: { titleContains: debouncedSearch },
           paginate: { first: 5 },
         },
       }),
@@ -41,27 +49,32 @@ const CommunitiesSearchBar = ({ search }: CommunitiesSearchBarProps) => {
         !data?.communities?.edges && "hidden"
       }`}
     >
-      {data?.communities?.edges ? (
-        data.communities.edges.length ? (
-          data.communities.edges.map((edge, i) => (
-            <Link
-              to="/signup"
-              key={i}
-              className="flex flex-col px-2 py-1 hover:bg-gray-200"
-            >
-              <span className="text-sm">{edge.node.title}</span>
-              <span className="text-xs text-gray-500">
-                {edge.node.memberCount}{" "}
-                {pluralize(edge.node.memberCount, "Member")}
-              </span>
-            </Link>
-          ))
-        ) : (
-          <span className="px-2 py-1">No results</span>
-        )
+      {data?.communities?.edges && data.communities.edges.length ? (
+        data.communities.edges.map((edge, i) => (
+          <div
+            key={i}
+            className="flex flex-col px-2 py-1 hover:bg-gray-200 cursor-pointer"
+            onMouseDown={() => navigate("/signup")}
+          >
+            <span className="text-sm">{edge.node.title}</span>
+            <span className="text-xs text-gray-500">
+              {abbreviate(edge.node.memberCount, 1)}{" "}
+              {pluralize(edge.node.memberCount, "Member")}
+            </span>
+          </div>
+        ))
       ) : (
-        ""
+        <span className="px-2 py-1 text-sm">No results</span>
       )}
+      <div
+        className={`px-2 py-2 text-sm text-ellipses hover:bg-gray-200 border-t border-gray-300 text-ellipsis whitespace-nowrap overflow-hidden cursor-pointer ${
+          !search && "hidden"
+        }`}
+        onMouseDown={() => navigate("/signup")}
+      >
+        <AiOutlineSearch className="w-4 h-4 inline-block mr-2" />
+        Search for "{search}"
+      </div>
     </div>
   )
 }

@@ -78,14 +78,18 @@ const NavProfile = () => {
             to="/create-community"
             className="flex items-center gap-2 p-2 rounded-t-md hover:bg-gray-200 hover:cursor-pointer"
           >
-            <BsHouseAdd className="h-5 w-5" />
+            <div className="w-[15%]">
+              <BsHouseAdd className="h-5 w-5" />
+            </div>
             Create a Community
           </Link>
           <div
             className="flex items-center gap-2 p-2 rounded-b-md hover:bg-gray-200 hover:cursor-pointer"
             onClick={() => logout.mutate()}
           >
-            <CiLogout className="h-5 w-5" />
+            <div className="w-[15%]">
+              <CiLogout className="h-5 w-5" />
+            </div>
             Log Out
           </div>
         </div>

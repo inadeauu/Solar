@@ -26,6 +26,7 @@ model User {
   ownedCommunities Community[] @relation("UserOwnedCommunities")
   inCommunities    Community[] @relation("UserInCommunities")
   posts            Post[]
+  comments         Comment[]
 }
 
 model Community {
@@ -44,10 +45,28 @@ model Post {
   id          String   @id @default(cuid())
   userId      String
   communityId String
+  title       String
   body        String
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
   owner     User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   community Community @relation(fields: [communityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  comments  Comment[]
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  postId     String
+  userId     String
+  parentId   String
+  body       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  owner User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  post  Post @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  children Comment[] @relation("CommentChildren")
+  parent   Comment?  @relation("CommentChildren", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

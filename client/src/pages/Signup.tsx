@@ -253,7 +253,7 @@ const Signup = () => {
   }
 
   const inputStyle =
-    "flex justify-center items-center gap-3 border border-neutral-500 rounded-full py-2 hover:bg-neutral-100 transition-colors duration-200"
+    "flex justify-center items-center gap-3 border border-neutral-500 rounded-full py-2 hover:bg-neutral-100 transition-colors duration-200 xs-max:text-sm"
 
   return (
     <div className="flex h-screen">
@@ -263,8 +263,10 @@ const Signup = () => {
           <p className="text-sm">Home</p>
         </Link>
 
-        <form className="flex flex-col w-[60%] mx-auto mt-4">
-          <h1 className="text-3xl font-semibold mb-8">Sign Up</h1>
+        <form className="flex flex-col xs:w-[60%] xs-max:w-[80%] mx-auto mt-4">
+          <h1 className="xs:text-3xl xs-max:text-2xl font-semibold xs:mb-8 xs-max:mb-6">
+            Sign Up
+          </h1>
           {error && <ErrorCard error={error} className="mb-4" />}
           <div className="flex flex-col gap-5">
             <button

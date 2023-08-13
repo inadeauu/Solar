@@ -14,11 +14,12 @@ type Community {
   title: String!
   created_at: DateTime!
   updated_at: DateTime!
+
   memberCount: Int!
 
   owner: User!
-  members: [User!]!
-  posts: [Post!]!
+  members(input: CommunityMembersInput!): UserConnection!
+  posts(input: CommunityPostsInput!): PostConnection!
 }
 
 # -- PAGINATION
@@ -76,4 +77,13 @@ type CreateCommunityInputErrors {
 # -- ENUMS
 enum CommunityOrderByType {
   memberCount
+}
+
+# -- RESOLVERS
+input CommunityMembersInput {
+  paginate: PaginateInput!
+}
+
+input CommunityPostsInput {
+  paginate: PaginateInput!
 }

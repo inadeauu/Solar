@@ -1,4 +1,4 @@
-import { Community } from "@prisma/client"
+import { Community, Post, User } from "@prisma/client"
 import {
   CommunityOrderByType,
   Resolvers,
@@ -20,7 +20,7 @@ export const resolvers: Resolvers = {
       const filters = args.input?.filters
       const orderBy = filters?.orderBy
 
-      const results = await paginate<Community>(
+      const communities = await paginate<Community>(
         args.input.paginate,
         (options) =>
           prisma.community.findMany({
@@ -40,10 +40,7 @@ export const resolvers: Resolvers = {
           })
       )
 
-      return {
-        edges: results.edges,
-        pageInfo: results.pageInfo,
-      }
+      return communities
     },
     titleExists: async (_0, args) => {
       return checkCommunityTitleExists(args.title)
@@ -70,6 +67,17 @@ export const resolvers: Resolvers = {
         }
       }
 
+      if (args.input.title.length > 25) {
+        return {
+          __typename: "CreateCommunityInputError",
+          errorMsg: "Input error",
+          code: 400,
+          inputErrors: {
+            title: "Title must be less than 25 characters long",
+          },
+        }
+      }
+
       await prisma.community.create({
         data: {
           title: args.input.title,
@@ -92,21 +100,21 @@ export const resolvers: Resolvers = {
 
       return owner
     },
-    members: async (community) => {
-      const members =
-        (await prisma.community
-          .findUnique({
-            where: { id: community.id },
-          })
-          .members()) ?? []
+    members: async (community, args) => {
+      const members = await paginate<User>(args.input.paginate, (options) =>
+        prisma.community
+          .findUnique({ where: { id: community.id } })
+          .members({ orderBy: { id: "asc" }, ...options })
+      )
 
       return members
     },
-    posts: async (community) => {
-      const posts =
-        (await prisma.community
+    posts: async (community, args) => {
+      const posts = await paginate<Post>(args.input.paginate, (options) =>
+        prisma.community
           .findUnique({ where: { id: community.id } })
-          .posts()) ?? []
+          .posts({ orderBy: { id: "asc" }, ...options })
+      )
 
       return posts
     },

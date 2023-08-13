@@ -15,7 +15,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "\n  query CommunitiesSearch($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          memberCount\n          title\n          created_at\n        }\n      }\n    }\n  }\n": types.CommunitiesSearchDocument,
     "\n  mutation Logout {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.LogoutDocument,
-    "\n  query UsersSearch($input: UsersInput!) {\n    users(input: $input) {\n      edges {\n        node {\n          username\n          created_at\n          postsCount\n        }\n      }\n    }\n  }\n": types.UsersSearchDocument,
+    "\n  query UsersSearch($input: UsersInput!) {\n    users(input: $input) {\n      edges {\n        node {\n          username\n          created_at\n          postsCount\n          commentsCount\n        }\n      }\n    }\n  }\n": types.UsersSearchDocument,
     "\n  query AuthUser {\n    authUser {\n      ... on AuthUserSuccess {\n        __typename\n        successMsg\n        code\n        user {\n          username\n          updated_at\n          provider\n          id\n          created_at\n        }\n      }\n    }\n  }\n": types.AuthUserDocument,
     "\n  query CommunityTitleExists($title: String!) {\n    titleExists(title: $title)\n  }\n": types.CommunityTitleExistsDocument,
     "\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on CreateCommunityInputError {\n        inputErrors {\n          title\n        }\n      }\n    }\n  }\n": types.CreateCommunityDocument,
@@ -49,7 +49,7 @@ export function graphql(source: "\n  mutation Logout {\n    logout {\n      ... 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query UsersSearch($input: UsersInput!) {\n    users(input: $input) {\n      edges {\n        node {\n          username\n          created_at\n          postsCount\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query UsersSearch($input: UsersInput!) {\n    users(input: $input) {\n      edges {\n        node {\n          username\n          created_at\n          postsCount\n        }\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  query UsersSearch($input: UsersInput!) {\n    users(input: $input) {\n      edges {\n        node {\n          username\n          created_at\n          postsCount\n          commentsCount\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query UsersSearch($input: UsersInput!) {\n    users(input: $input) {\n      edges {\n        node {\n          username\n          created_at\n          postsCount\n          commentsCount\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

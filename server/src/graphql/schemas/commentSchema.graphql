@@ -1,0 +1,50 @@
+scalar DateTime
+
+type Query {
+  comment(input: CommentInput!): Comment
+  comments(input: CommentsInput!): CommentConnection!
+}
+
+type Comment {
+  id: ID!
+  body: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+
+  owner: User!
+  post: Post!
+  children(input: CommentChildrenInput!): CommentConnection!
+  parent: Comment!
+}
+
+# -- COMMENT QUERY
+input CommentInput {
+  id: ID!
+}
+
+# -- COMMENTS QUERY
+input CommentsInput {
+  filters: CommentsFilters
+  paginate: PaginateInput!
+}
+
+input CommentsFilters {
+  userId: ID
+  postId: ID
+}
+
+# -- PAGINATION
+type CommentEdge {
+  node: Comment!
+  cursor: String!
+}
+
+type CommentConnection {
+  edges: [CommentEdge!]!
+  pageInfo: PageInfo!
+}
+
+# -- RESOLVERS
+input CommentChildrenInput {
+  paginate: PaginateInput!
+}

@@ -20,6 +20,8 @@ const documents = {
     "\n  query CommunityTitleExists($title: String!) {\n    titleExists(title: $title)\n  }\n": types.CommunityTitleExistsDocument,
     "\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on CreateCommunityInputError {\n        inputErrors {\n          title\n        }\n      }\n    }\n  }\n": types.CreateCommunityDocument,
     "\n  mutation LoginUsername($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on LoginUsernameInputError {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.LoginUsernameDocument,
+    "\n  mutation RegisterUsername($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on RegisterUsernameInputError {\n        inputErrors {\n          password\n          username\n        }\n      }\n    }\n  }\n": types.RegisterUsernameDocument,
+    "\n  query UsernameExists($username: String!) {\n    usernameExists(username: $username)\n  }\n": types.UsernameExistsDocument,
 };
 
 /**
@@ -64,6 +66,14 @@ export function graphql(source: "\n  mutation CreateCommunity($input: CreateComm
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  mutation LoginUsername($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on LoginUsernameInputError {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation LoginUsername($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on LoginUsernameInputError {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RegisterUsername($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on RegisterUsernameInputError {\n        inputErrors {\n          password\n          username\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RegisterUsername($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n      ... on RegisterUsernameInputError {\n        inputErrors {\n          password\n          username\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query UsernameExists($username: String!) {\n    usernameExists(username: $username)\n  }\n"): (typeof documents)["\n  query UsernameExists($username: String!) {\n    usernameExists(username: $username)\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

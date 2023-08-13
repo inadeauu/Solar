@@ -1,7 +1,6 @@
 import { AiOutlineArrowLeft } from "react-icons/ai"
 import { FcGoogle } from "react-icons/fc"
 import { BsGithub } from "react-icons/bs"
-import { Field, Form, Formik } from "formik"
 import * as Yup from "yup"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"

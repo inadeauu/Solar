@@ -12,9 +12,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^4.32.0",
-    "awesome-debounce-promise": "^2.1.0",
     "axios": "^1.4.0",
-    "formik": "^2.4.2",
     "graphql": "^16.7.1",
     "graphql-request": "^6.1.0",
     "lodash": "^4.17.21",

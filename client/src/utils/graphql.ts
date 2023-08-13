@@ -4,6 +4,6 @@ export const graphQLClient = new GraphQLClient(
   "http://localhost:4000/graphql",
   {
     credentials: "include",
-    mode: `cors`,
+    mode: "cors",
   }
 )

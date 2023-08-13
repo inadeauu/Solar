@@ -14,6 +14,8 @@ import { graphQLClient } from "../utils/graphql"
 import { RegisterUsernameInput } from "../gql/graphql"
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi"
 import { debounce } from "lodash"
+import { FieldState, FieldStates, initialFieldState } from "../types/shared"
+import { setFieldStateSuccess, setFieldStateValue } from "../utils/form"
 
 const usernameRegisterDocument = graphql(/* GraphQL */ `
   mutation RegisterUsername($input: RegisterUsernameInput!) {
@@ -44,26 +46,13 @@ const usernameExistsDocument = graphql(/* GraphQL */ `
   }
 `)
 
-type FieldState = {
-  value: string
-  success: boolean
-  error: boolean
-  errorMsg?: string
-}
-
-type FieldStates = {
+interface FormFieldStates extends FieldStates {
   username: FieldState
   password: FieldState
   confirmPassword: FieldState
 }
 
-const initialFieldState: FieldState = {
-  value: "",
-  success: false,
-  error: false,
-}
-
-const initialFieldStates: FieldStates = {
+const initialFieldStates: FormFieldStates = {
   username: initialFieldState,
   password: initialFieldState,
   confirmPassword: initialFieldState,
@@ -79,51 +68,15 @@ enum FieldErrorMsgs {
 
 const Signup = () => {
   const [fieldStates, setFieldStates] =
-    useState<FieldStates>(initialFieldStates)
-  const [submitting, setSubmitting] = useState<boolean>(false)
+    useState<FormFieldStates>(initialFieldStates)
   const [validatingUsername, setValidatingUsername] = useState<boolean>(false)
+  const [submitting, setSubmitting] = useState<boolean>(false)
 
   const [showPass, setShowPass] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
 
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-
-  const setFieldStateSuccess = (
-    key: keyof FieldStates,
-    success: boolean,
-    errorMsg?: string
-  ) => {
-    if (success) {
-      setFieldStates((prev) => {
-        return {
-          ...prev,
-          [key]: {
-            ...prev[key],
-            success,
-            error: !success,
-            errorMsg: undefined,
-          },
-        }
-      })
-    } else {
-      setFieldStates((prev) => {
-        return {
-          ...prev,
-          [key]: { ...prev[key], success, error: !success, errorMsg },
-        }
-      })
-    }
-  }
-
-  const setFieldStateValue = (key: keyof FieldStates, value: string) => {
-    setFieldStates((prev) => {
-      return {
-        ...prev,
-        [key]: { ...prev[key], value },
-      }
-    })
-  }
 
   const getUsernameError = async (username: string) => {
     let error: string | undefined
@@ -148,12 +101,14 @@ const Signup = () => {
   const validateUsername = useCallback(
     debounce(
       async (username: string) => {
+        setValidatingUsername(true)
+
         const error = await getUsernameError(username)
 
         if (!error) {
-          setFieldStateSuccess("username", true)
+          setFieldStateSuccess(setFieldStates, "username", true)
         } else {
-          setFieldStateSuccess("username", false, error)
+          setFieldStateSuccess(setFieldStates, "username", false, error)
         }
 
         setValidatingUsername(false)
@@ -180,9 +135,9 @@ const Signup = () => {
     const error = getPasswordError(password)
 
     if (!error) {
-      setFieldStateSuccess("password", true)
+      setFieldStateSuccess(setFieldStates, "password", true)
     } else {
-      setFieldStateSuccess("password", false, error)
+      setFieldStateSuccess(setFieldStates, "password", false, error)
     }
   }
 
@@ -203,9 +158,9 @@ const Signup = () => {
     const error = getConfPasswordError(confirmPassword)
 
     if (!error) {
-      setFieldStateSuccess("confirmPassword", true)
+      setFieldStateSuccess(setFieldStates, "confirmPassword", true)
     } else {
-      setFieldStateSuccess("confirmPassword", false, error)
+      setFieldStateSuccess(setFieldStates, "confirmPassword", false, error)
     }
   }
 
@@ -241,7 +196,9 @@ const Signup = () => {
     }
   }
 
-  const submitEmailSignUp = async () => {
+  const submitUsernameSignUp = async () => {
+    setSubmitting(true)
+
     if (validatingUsername) {
       return
     }
@@ -262,11 +219,28 @@ const Signup = () => {
       : fieldStates.confirmPassword.errorMsg
 
     usernameSubmitError !== fieldStates.username.errorMsg &&
-      setFieldStateSuccess("username", false, usernameSubmitError)
+      setFieldStateSuccess(
+        setFieldStates,
+        "username",
+        false,
+        usernameSubmitError
+      )
+
     passwordSubmitError !== fieldStates.password.errorMsg &&
-      setFieldStateSuccess("password", false, passwordSubmitError)
+      setFieldStateSuccess(
+        setFieldStates,
+        "password",
+        false,
+        passwordSubmitError
+      )
+
     confPasswordSubmitError !== fieldStates.confirmPassword.errorMsg &&
-      setFieldStateSuccess("confirmPassword", false, confPasswordSubmitError)
+      setFieldStateSuccess(
+        setFieldStates,
+        "confirmPassword",
+        false,
+        confPasswordSubmitError
+      )
 
     if (usernameSubmitError || passwordSubmitError || confPasswordSubmitError) {
       return
@@ -276,8 +250,6 @@ const Signup = () => {
       username: fieldStates.username.value,
       password: fieldStates.password.value,
     })
-
-    setSubmitting(false)
   }
 
   const inputStyle =
@@ -329,9 +301,18 @@ const Signup = () => {
             placeholder="Username"
             value={fieldStates.username.value}
             onChange={(e) => {
-              setFieldStateValue("username", e.target.value)
-              setValidatingUsername(true)
+              setFieldStateValue(setFieldStates, "username", e.target.value)
               validateUsername(e.target.value)
+            }}
+            onBlur={(e) => {
+              if (!e.target.value) {
+                setFieldStateSuccess(
+                  setFieldStates,
+                  "username",
+                  false,
+                  FieldErrorMsgs.REQUIRED
+                )
+              }
             }}
             error={fieldStates.username.error}
             errorMsg={fieldStates.username.errorMsg}
@@ -343,7 +324,9 @@ const Signup = () => {
               type={showPass ? "text" : "password"}
               placeholder="Password"
               value={fieldStates.password.value}
-              onChange={(e) => setFieldStateValue("password", e.target.value)}
+              onChange={(e) =>
+                setFieldStateValue(setFieldStates, "password", e.target.value)
+              }
               onBlur={(e) => validatePassword(e.target.value)}
               error={fieldStates.password.error}
               errorMsg={fieldStates.password.errorMsg}
@@ -366,7 +349,11 @@ const Signup = () => {
             placeholder="Confirm Password"
             value={fieldStates.confirmPassword.value}
             onChange={(e) =>
-              setFieldStateValue("confirmPassword", e.target.value)
+              setFieldStateValue(
+                setFieldStates,
+                "confirmPassword",
+                e.target.value
+              )
             }
             onBlur={(e) => validateConfPassword(e.target.value)}
             error={fieldStates.confirmPassword.error}
@@ -375,7 +362,10 @@ const Signup = () => {
           />
           <button
             type="button"
-            onClick={() => submitEmailSignUp()}
+            onClick={() => {
+              submitUsernameSignUp()
+              setSubmitting(false)
+            }}
             className="btn_blue py-2 mt-2 w-[60%] mx-auto disabled:bg-blue-300"
             disabled={submitting}
           >

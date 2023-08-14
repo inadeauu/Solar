@@ -14,7 +14,7 @@ const SearchBar = () => {
   const debouncedSearch = useDebounce(search, 500)
 
   return (
-    <div className="flex items-stretch gap-2 w-[50%] leading-1">
+    <div className="flex items-stretch gap-2 w-[50%] h-[60%] leading-1">
       <div ref={searchRef} className="flex flex-col w-full relative">
         <input
           value={search}

@@ -52,13 +52,13 @@ const UsersSearchBar = ({ debouncedSearch, search }: UsersSearchBarProps) => {
           data.users.edges.map((edge, i) => (
             <div
               key={i}
-              className="flex flex-col px-2 py-1 hover:bg-gray-200 cursor-pointer"
+              className="flex flex-col px-2 py-1 hover:bg-gray-200 cursor-pointer overflow-auto"
               onMouseDown={() => navigate("/signup")}
             >
               <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
                 {edge.node.username}
               </span>
-              <p className="flex items-center gap-1 text-gray-500 text-xs overflow-hidden">
+              <p className="flex items-center gap-1 text-gray-500 xs-max:text-[10px] xs:text-xs">
                 {abbreviate(edge.node.postsCount, 1)}{" "}
                 {pluralize(edge.node.postsCount, "Post")} •{" "}
                 {abbreviate(edge.node.commentsCount, 1)}{" "}

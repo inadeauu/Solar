@@ -53,11 +53,13 @@ const CommunitiesSearchBar = ({
         data.communities.edges.map((edge, i) => (
           <div
             key={i}
-            className="flex flex-col px-2 py-1 hover:bg-gray-200 cursor-pointer"
+            className="flex flex-col px-2 py-1 hover:bg-gray-200 cursor-pointer overflow-auto"
             onMouseDown={() => navigate("/signup")}
           >
-            <span className="text-sm">{edge.node.title}</span>
-            <span className="text-xs text-gray-500">
+            <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
+              {edge.node.title}
+            </span>
+            <span className="text-xs text-gray-500 xs-max:text-[10px] xs:text-xs">
               {abbreviate(edge.node.memberCount, 1)}{" "}
               {pluralize(edge.node.memberCount, "Member")}
             </span>

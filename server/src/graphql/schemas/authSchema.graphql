@@ -1,11 +1,13 @@
 type Query {
-  authUser: AuthUserResult!
+  authUser: AuthUserResult! @rateLimit(limit: 2000, duration: 300)
 }
 
 type Mutation {
   registerUsername(input: RegisterUsernameInput!): RegisterUsernameResult!
+    @rateLimit(limit: 3, duration: 600)
   loginUsername(input: LoginUsernameInput!): LoginUsernameResult!
-  logout: LogoutResult!
+    @rateLimit(limit: 60, duration: 3600)
+  logout: LogoutResult! @rateLimit(limit: 60, duration: 3600)
 }
 
 # -- REGISTERUSERNAME MUTATION

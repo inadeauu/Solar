@@ -105,6 +105,7 @@ export type Community = {
   __typename?: 'Community';
   created_at: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
+  inCommunity: Scalars['Boolean']['output'];
   memberCount: Scalars['Int']['output'];
   members: UserConnection;
   owner: User;
@@ -177,6 +178,34 @@ export type CreateCommunitySuccess = Success & {
   successMsg: Scalars['String']['output'];
 };
 
+export type CreatePostInput = {
+  body?: InputMaybe<Scalars['String']['input']>;
+  communityId: Scalars['ID']['input'];
+  title: Scalars['String']['input'];
+};
+
+export type CreatePostInputError = Error & {
+  __typename?: 'CreatePostInputError';
+  code: Scalars['Int']['output'];
+  errorMsg: Scalars['String']['output'];
+  inputErrors: CreatePostInputErrors;
+};
+
+export type CreatePostInputErrors = {
+  __typename?: 'CreatePostInputErrors';
+  body?: Maybe<Scalars['String']['output']>;
+  communityId?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type CreatePostResult = AuthenticationError | CreatePostInputError | CreatePostSuccess;
+
+export type CreatePostSuccess = Success & {
+  __typename?: 'CreatePostSuccess';
+  code: Scalars['Int']['output'];
+  successMsg: Scalars['String']['output'];
+};
+
 export type DuplicateUsernameError = Error & {
   __typename?: 'DuplicateUsernameError';
   code: Scalars['Int']['output'];
@@ -224,14 +253,21 @@ export type LogoutSuccess = Success & {
 export type Mutation = {
   __typename?: 'Mutation';
   createCommunity: CreateCommunityResult;
+  createPost: CreatePostResult;
   loginUsername: LoginUsernameResult;
   logout: LogoutResult;
   registerUsername: RegisterUsernameResult;
+  userJoinCommunity: UserJoinCommunityResult;
 };
 
 
 export type MutationCreateCommunityArgs = {
   input: CreateCommunityInput;
+};
+
+
+export type MutationCreatePostArgs = {
+  input: CreatePostInput;
 };
 
 
@@ -242,6 +278,11 @@ export type MutationLoginUsernameArgs = {
 
 export type MutationRegisterUsernameArgs = {
   input: RegisterUsernameInput;
+};
+
+
+export type MutationUserJoinCommunityArgs = {
+  input: UserJoinCommunityInput;
 };
 
 export const OrderByDir = {
@@ -298,6 +339,27 @@ export type PostEdge = {
   node: Post;
 };
 
+export const PostOrderByType = {
+  Recent: 'recent'
+} as const;
+
+export type PostOrderByType = typeof PostOrderByType[keyof typeof PostOrderByType];
+export type PostsFilters = {
+  communityId?: InputMaybe<Scalars['ID']['input']>;
+  orderBy?: InputMaybe<PostsOrderBy>;
+  userId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type PostsInput = {
+  filters?: InputMaybe<PostsFilters>;
+  paginate: PaginateInput;
+};
+
+export type PostsOrderBy = {
+  dir: OrderByDir;
+  type: PostOrderByType;
+};
+
 export const Provider = {
   Github: 'GITHUB',
   Google: 'GOOGLE',
@@ -312,6 +374,7 @@ export type Query = {
   comments: CommentConnection;
   communities: CommunityConnection;
   community?: Maybe<Community>;
+  posts: PostConnection;
   titleExists: Scalars['Boolean']['output'];
   user?: Maybe<User>;
   usernameExists: Scalars['Boolean']['output'];
@@ -336,6 +399,11 @@ export type QueryCommunitiesArgs = {
 
 export type QueryCommunityArgs = {
   input: CommunityInput;
+};
+
+
+export type QueryPostsArgs = {
+  input: PostsInput;
 };
 
 
@@ -448,6 +516,31 @@ export type UserInput = {
   id: Scalars['ID']['input'];
 };
 
+export type UserJoinCommunityInput = {
+  communityId: Scalars['String']['input'];
+};
+
+export type UserJoinCommunityInputError = Error & {
+  __typename?: 'UserJoinCommunityInputError';
+  code: Scalars['Int']['output'];
+  errorMsg: Scalars['String']['output'];
+  inputErrors: UserJoinCommunityInputErrors;
+};
+
+export type UserJoinCommunityInputErrors = {
+  __typename?: 'UserJoinCommunityInputErrors';
+  communityId?: Maybe<Scalars['String']['output']>;
+};
+
+export type UserJoinCommunityResult = AuthenticationError | UserJoinCommunityInputError | UserJoinCommunitySuccess;
+
+export type UserJoinCommunitySuccess = Success & {
+  __typename?: 'UserJoinCommunitySuccess';
+  code: Scalars['Int']['output'];
+  inCommunity: Scalars['Boolean']['output'];
+  successMsg: Scalars['String']['output'];
+};
+
 export type UserNotFoundError = Error & {
   __typename?: 'UserNotFoundError';
   code: Scalars['Int']['output'];
@@ -555,15 +648,17 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversUnionTypes<RefType extends Record<string, unknown>> = ResolversObject<{
   AuthUserResult: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } );
   CreateCommunityResult: ( AuthenticationError ) | ( CreateCommunityInputError ) | ( CreateCommunitySuccess );
+  CreatePostResult: ( AuthenticationError ) | ( CreatePostInputError ) | ( CreatePostSuccess );
   LoginUsernameResult: ( LoginUsernameInputError ) | ( LoginUsernameSuccess );
   LogoutResult: ( AuthenticationError ) | ( LogoutSessionDestroyError ) | ( LogoutSuccess );
   RegisterUsernameResult: ( DuplicateUsernameError ) | ( RegisterUsernameInputError ) | ( RegisterUsernameSuccess );
+  UserJoinCommunityResult: ( AuthenticationError ) | ( UserJoinCommunityInputError ) | ( UserJoinCommunitySuccess );
 }>;
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
-  Error: ( AuthenticationError ) | ( CreateCommunityInputError ) | ( DuplicateUsernameError ) | ( LoginUsernameInputError ) | ( LogoutSessionDestroyError ) | ( RegisterUsernameInputError ) | ( UserNotFoundError );
-  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( CreateCommunitySuccess ) | ( LoginUsernameSuccess ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess );
+  Error: ( AuthenticationError ) | ( CreateCommunityInputError ) | ( CreatePostInputError ) | ( DuplicateUsernameError ) | ( LoginUsernameInputError ) | ( LogoutSessionDestroyError ) | ( RegisterUsernameInputError ) | ( UserJoinCommunityInputError ) | ( UserNotFoundError );
+  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( CreateCommunitySuccess ) | ( CreatePostSuccess ) | ( LoginUsernameSuccess ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( UserJoinCommunitySuccess );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -595,6 +690,11 @@ export type ResolversTypes = ResolversObject<{
   CreateCommunityInputErrors: ResolverTypeWrapper<CreateCommunityInputErrors>;
   CreateCommunityResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreateCommunityResult']>;
   CreateCommunitySuccess: ResolverTypeWrapper<CreateCommunitySuccess>;
+  CreatePostInput: CreatePostInput;
+  CreatePostInputError: ResolverTypeWrapper<CreatePostInputError>;
+  CreatePostInputErrors: ResolverTypeWrapper<CreatePostInputErrors>;
+  CreatePostResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreatePostResult']>;
+  CreatePostSuccess: ResolverTypeWrapper<CreatePostSuccess>;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   DuplicateUsernameError: ResolverTypeWrapper<DuplicateUsernameError>;
   Error: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Error']>;
@@ -615,6 +715,10 @@ export type ResolversTypes = ResolversObject<{
   PostCommentInput: PostCommentInput;
   PostConnection: ResolverTypeWrapper<Omit<PostConnection, 'edges'> & { edges: Array<ResolversTypes['PostEdge']> }>;
   PostEdge: ResolverTypeWrapper<Omit<PostEdge, 'node'> & { node: ResolversTypes['Post'] }>;
+  PostOrderByType: PostOrderByType;
+  PostsFilters: PostsFilters;
+  PostsInput: PostsInput;
+  PostsOrderBy: PostsOrderBy;
   Provider: Provider;
   Query: ResolverTypeWrapper<{}>;
   RegisterUsernameInput: RegisterUsernameInput;
@@ -630,6 +734,11 @@ export type ResolversTypes = ResolversObject<{
   UserEdge: ResolverTypeWrapper<Omit<UserEdge, 'node'> & { node: ResolversTypes['User'] }>;
   UserInCommunitiesInput: UserInCommunitiesInput;
   UserInput: UserInput;
+  UserJoinCommunityInput: UserJoinCommunityInput;
+  UserJoinCommunityInputError: ResolverTypeWrapper<UserJoinCommunityInputError>;
+  UserJoinCommunityInputErrors: ResolverTypeWrapper<UserJoinCommunityInputErrors>;
+  UserJoinCommunityResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['UserJoinCommunityResult']>;
+  UserJoinCommunitySuccess: ResolverTypeWrapper<UserJoinCommunitySuccess>;
   UserNotFoundError: ResolverTypeWrapper<UserNotFoundError>;
   UserOrderByType: UserOrderByType;
   UserOwnedCommunitiesInput: UserOwnedCommunitiesInput;
@@ -667,6 +776,11 @@ export type ResolversParentTypes = ResolversObject<{
   CreateCommunityInputErrors: CreateCommunityInputErrors;
   CreateCommunityResult: ResolversUnionTypes<ResolversParentTypes>['CreateCommunityResult'];
   CreateCommunitySuccess: CreateCommunitySuccess;
+  CreatePostInput: CreatePostInput;
+  CreatePostInputError: CreatePostInputError;
+  CreatePostInputErrors: CreatePostInputErrors;
+  CreatePostResult: ResolversUnionTypes<ResolversParentTypes>['CreatePostResult'];
+  CreatePostSuccess: CreatePostSuccess;
   DateTime: Scalars['DateTime']['output'];
   DuplicateUsernameError: DuplicateUsernameError;
   Error: ResolversInterfaceTypes<ResolversParentTypes>['Error'];
@@ -686,6 +800,9 @@ export type ResolversParentTypes = ResolversObject<{
   PostCommentInput: PostCommentInput;
   PostConnection: Omit<PostConnection, 'edges'> & { edges: Array<ResolversParentTypes['PostEdge']> };
   PostEdge: Omit<PostEdge, 'node'> & { node: ResolversParentTypes['Post'] };
+  PostsFilters: PostsFilters;
+  PostsInput: PostsInput;
+  PostsOrderBy: PostsOrderBy;
   Query: {};
   RegisterUsernameInput: RegisterUsernameInput;
   RegisterUsernameInputError: RegisterUsernameInputError;
@@ -700,6 +817,11 @@ export type ResolversParentTypes = ResolversObject<{
   UserEdge: Omit<UserEdge, 'node'> & { node: ResolversParentTypes['User'] };
   UserInCommunitiesInput: UserInCommunitiesInput;
   UserInput: UserInput;
+  UserJoinCommunityInput: UserJoinCommunityInput;
+  UserJoinCommunityInputError: UserJoinCommunityInputError;
+  UserJoinCommunityInputErrors: UserJoinCommunityInputErrors;
+  UserJoinCommunityResult: ResolversUnionTypes<ResolversParentTypes>['UserJoinCommunityResult'];
+  UserJoinCommunitySuccess: UserJoinCommunitySuccess;
   UserNotFoundError: UserNotFoundError;
   UserOwnedCommunitiesInput: UserOwnedCommunitiesInput;
   UserPostInput: UserPostInput;
@@ -752,6 +874,7 @@ export type CommentEdgeResolvers<ContextType = Context, ParentType extends Resol
 export type CommunityResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Community'] = ResolversParentTypes['Community']> = ResolversObject<{
   created_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  inCommunity?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   memberCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   members?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, RequireFields<CommunityMembersArgs, 'input'>>;
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
@@ -796,6 +919,30 @@ export type CreateCommunitySuccessResolvers<ContextType = Context, ParentType ex
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type CreatePostInputErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CreatePostInputError'] = ResolversParentTypes['CreatePostInputError']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  inputErrors?: Resolver<ResolversTypes['CreatePostInputErrors'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CreatePostInputErrorsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CreatePostInputErrors'] = ResolversParentTypes['CreatePostInputErrors']> = ResolversObject<{
+  body?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  communityId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type CreatePostResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CreatePostResult'] = ResolversParentTypes['CreatePostResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'CreatePostInputError' | 'CreatePostSuccess', ParentType, ContextType>;
+}>;
+
+export type CreatePostSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CreatePostSuccess'] = ResolversParentTypes['CreatePostSuccess']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  successMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
   name: 'DateTime';
 }
@@ -807,7 +954,7 @@ export type DuplicateUsernameErrorResolvers<ContextType = Context, ParentType ex
 }>;
 
 export type ErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthenticationError' | 'CreateCommunityInputError' | 'DuplicateUsernameError' | 'LoginUsernameInputError' | 'LogoutSessionDestroyError' | 'RegisterUsernameInputError' | 'UserNotFoundError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'CreateCommunityInputError' | 'CreatePostInputError' | 'DuplicateUsernameError' | 'LoginUsernameInputError' | 'LogoutSessionDestroyError' | 'RegisterUsernameInputError' | 'UserJoinCommunityInputError' | 'UserNotFoundError', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
@@ -846,9 +993,11 @@ export type LogoutSuccessResolvers<ContextType = Context, ParentType extends Res
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createCommunity?: Resolver<ResolversTypes['CreateCommunityResult'], ParentType, ContextType, RequireFields<MutationCreateCommunityArgs, 'input'>>;
+  createPost?: Resolver<ResolversTypes['CreatePostResult'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'input'>>;
   loginUsername?: Resolver<ResolversTypes['LoginUsernameResult'], ParentType, ContextType, RequireFields<MutationLoginUsernameArgs, 'input'>>;
   logout?: Resolver<ResolversTypes['LogoutResult'], ParentType, ContextType>;
   registerUsername?: Resolver<ResolversTypes['RegisterUsernameResult'], ParentType, ContextType, RequireFields<MutationRegisterUsernameArgs, 'input'>>;
+  userJoinCommunity?: Resolver<ResolversTypes['UserJoinCommunityResult'], ParentType, ContextType, RequireFields<MutationUserJoinCommunityArgs, 'input'>>;
 }>;
 
 export type PageInfoResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
@@ -889,6 +1038,7 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   comments?: Resolver<ResolversTypes['CommentConnection'], ParentType, ContextType, RequireFields<QueryCommentsArgs, 'input'>>;
   communities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<QueryCommunitiesArgs, 'input'>>;
   community?: Resolver<Maybe<ResolversTypes['Community']>, ParentType, ContextType, RequireFields<QueryCommunityArgs, 'input'>>;
+  posts?: Resolver<ResolversTypes['PostConnection'], ParentType, ContextType, RequireFields<QueryPostsArgs, 'input'>>;
   titleExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<QueryTitleExistsArgs, 'title'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'input'>>;
   usernameExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<QueryUsernameExistsArgs, 'username'>>;
@@ -919,7 +1069,7 @@ export type RegisterUsernameSuccessResolvers<ContextType = Context, ParentType e
 }>;
 
 export type SuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Success'] = ResolversParentTypes['Success']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'CreateCommunitySuccess' | 'LoginUsernameSuccess' | 'LogoutSuccess' | 'RegisterUsernameSuccess', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'CreateCommunitySuccess' | 'CreatePostSuccess' | 'LoginUsernameSuccess' | 'LogoutSuccess' | 'RegisterUsernameSuccess' | 'UserJoinCommunitySuccess', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successMsg?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
@@ -951,6 +1101,29 @@ export type UserEdgeResolvers<ContextType = Context, ParentType extends Resolver
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type UserJoinCommunityInputErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserJoinCommunityInputError'] = ResolversParentTypes['UserJoinCommunityInputError']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  inputErrors?: Resolver<ResolversTypes['UserJoinCommunityInputErrors'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserJoinCommunityInputErrorsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserJoinCommunityInputErrors'] = ResolversParentTypes['UserJoinCommunityInputErrors']> = ResolversObject<{
+  communityId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type UserJoinCommunityResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserJoinCommunityResult'] = ResolversParentTypes['UserJoinCommunityResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'AuthenticationError' | 'UserJoinCommunityInputError' | 'UserJoinCommunitySuccess', ParentType, ContextType>;
+}>;
+
+export type UserJoinCommunitySuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserJoinCommunitySuccess'] = ResolversParentTypes['UserJoinCommunitySuccess']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  inCommunity?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  successMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export type UserNotFoundErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserNotFoundError'] = ResolversParentTypes['UserNotFoundError']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -971,6 +1144,10 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   CreateCommunityInputErrors?: CreateCommunityInputErrorsResolvers<ContextType>;
   CreateCommunityResult?: CreateCommunityResultResolvers<ContextType>;
   CreateCommunitySuccess?: CreateCommunitySuccessResolvers<ContextType>;
+  CreatePostInputError?: CreatePostInputErrorResolvers<ContextType>;
+  CreatePostInputErrors?: CreatePostInputErrorsResolvers<ContextType>;
+  CreatePostResult?: CreatePostResultResolvers<ContextType>;
+  CreatePostSuccess?: CreatePostSuccessResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
   DuplicateUsernameError?: DuplicateUsernameErrorResolvers<ContextType>;
   Error?: ErrorResolvers<ContextType>;
@@ -994,6 +1171,10 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   User?: UserResolvers<ContextType>;
   UserConnection?: UserConnectionResolvers<ContextType>;
   UserEdge?: UserEdgeResolvers<ContextType>;
+  UserJoinCommunityInputError?: UserJoinCommunityInputErrorResolvers<ContextType>;
+  UserJoinCommunityInputErrors?: UserJoinCommunityInputErrorsResolvers<ContextType>;
+  UserJoinCommunityResult?: UserJoinCommunityResultResolvers<ContextType>;
+  UserJoinCommunitySuccess?: UserJoinCommunitySuccessResolvers<ContextType>;
   UserNotFoundError?: UserNotFoundErrorResolvers<ContextType>;
 }>;
 

@@ -17,6 +17,7 @@ import { ApolloServer } from "@apollo/server"
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer"
 import { unwrapResolverError } from "@apollo/server/errors"
 import { Prisma } from "@prisma/client"
+import { ApolloArmor } from "@escape.tech/graphql-armor"
 
 export interface Context {
   req: Request
@@ -56,9 +57,11 @@ const main = async () => {
   routes(app)
 
   const httpServer = http.createServer(app)
+  const armor = new ApolloArmor()
 
   const server = new ApolloServer<Context>({
     schema,
+    ...armor.protect(),
     csrfPrevention: true,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     formatError: (formattedError, error) => {

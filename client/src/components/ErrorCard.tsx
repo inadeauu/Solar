@@ -8,7 +8,7 @@ const ErrorCard = ({ error, className }: ErrorCardProps) => {
     <div
       className={`bg-red-400 text-white rounded-lg p-1 font-bold text-center text-sm ${className}`}
     >
-      {error}
+      Error: {error}
     </div>
   )
 }

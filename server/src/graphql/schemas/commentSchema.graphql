@@ -1,6 +1,6 @@
 scalar DateTime
 
-type Query {
+type Query @rateLimit(limit: 120, duration: 60) {
   comment(input: CommentInput!): Comment
   comments(input: CommentsInput!): CommentConnection!
 }

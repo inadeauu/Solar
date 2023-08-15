@@ -46,7 +46,7 @@ model Post {
   userId      String
   communityId String
   title       String
-  body        String
+  body        String?
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 

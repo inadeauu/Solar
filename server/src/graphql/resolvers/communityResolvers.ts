@@ -98,6 +98,77 @@ export const resolvers: Resolvers = {
         code: 200,
       }
     },
+    userJoinCommunity: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        return {
+          __typename: "AuthenticationError",
+          errorMsg: "No authenticated user",
+          code: 200,
+        }
+      }
+
+      const community = await prisma.community.findUnique({
+        where: { id: args.input.communityId },
+        include: {
+          members: {
+            where: {
+              id: req.session.userId,
+            },
+          },
+        },
+      })
+
+      if (!community) {
+        return {
+          __typename: "UserJoinCommunityInputError",
+          errorMsg: "Invalid input",
+          code: 400,
+          inputErrors: {
+            communityId: "Invalid community id",
+          },
+        }
+      }
+
+      let successMsg: string
+      let inCommunity: boolean
+
+      if (!community.members.length) {
+        await prisma.community.update({
+          where: { id: community.id },
+          data: {
+            members: {
+              connect: {
+                id: req.session.userId,
+              },
+            },
+          },
+        })
+
+        successMsg = "Successfully joined community"
+        inCommunity = true
+      } else {
+        await prisma.community.update({
+          where: { id: community.id },
+          data: {
+            members: {
+              disconnect: {
+                id: req.session.userId,
+              },
+            },
+          },
+        })
+
+        successMsg = "Successfully left community"
+        inCommunity = false
+      }
+
+      return {
+        __typename: "UserJoinCommunitySuccess",
+        successMsg,
+        code: 200,
+        inCommunity,
+      }
+    },
   },
   Community: {
     owner: async (community) => {
@@ -141,6 +212,19 @@ export const resolvers: Resolvers = {
       }))!._count.posts
 
       return postCount
+    },
+    inCommunity: async (community, _0, { req }) => {
+      if (!req.session.userId) return false
+
+      const inCommunity = await prisma.community
+        .findUnique({
+          where: {
+            id: community.id,
+          },
+        })
+        .members({ where: { id: req.session.userId } })
+
+      return inCommunity?.length ? true : false
     },
   },
 }

@@ -114,5 +114,13 @@ export const checkPaginationArgs = (paginateArgs: PaginateArgs): void => {
     throw new GraphQLError("Last must be greater than 0", {
       extensions: { code: "PAGINATION_ERROR" },
     })
+  } else if (paginateArgs.first && paginateArgs.first > 100) {
+    throw new GraphQLError("First must be 100 or less", {
+      extensions: { code: "PAGINATION_ERROR" },
+    })
+  } else if (paginateArgs.last && paginateArgs.last > 100) {
+    throw new GraphQLError("Last must be 100 or less", {
+      extensions: { code: "PAGINATION_ERROR" },
+    })
   }
 }

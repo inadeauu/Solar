@@ -1,5 +1,14 @@
 scalar DateTime
 
+type Query @rateLimit(limit: 120, duration: 60) {
+  posts(input: PostsInput!): PostConnection!
+}
+
+type Mutation {
+  createPost(input: CreatePostInput!): CreatePostResult!
+    @rateLimit(limit: 5, duration: 60)
+}
+
 type Post {
   id: ID!
   title: String!
@@ -21,6 +30,57 @@ type PostEdge {
 type PostConnection {
   edges: [PostEdge!]!
   pageInfo: PageInfo!
+}
+
+# -- POSTS QUERY
+input PostsInput {
+  filters: PostsFilters
+  paginate: PaginateInput!
+}
+
+input PostsFilters {
+  userId: ID
+  communityId: ID
+  orderBy: PostsOrderBy
+}
+
+input PostsOrderBy {
+  type: PostOrderByType!
+  dir: OrderByDir!
+}
+
+# -- CREATEPOST MUTATION
+union CreatePostResult =
+    CreatePostSuccess
+  | CreatePostInputError
+  | AuthenticationError
+
+input CreatePostInput {
+  title: String!
+  body: String
+  communityId: ID!
+}
+
+type CreatePostSuccess implements Success {
+  successMsg: String!
+  code: Int!
+}
+
+type CreatePostInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: CreatePostInputErrors!
+}
+
+type CreatePostInputErrors {
+  title: String
+  body: String
+  communityId: String
+}
+
+# -- ENUMS
+enum PostOrderByType {
+  recent
 }
 
 # -- RESOLVERS

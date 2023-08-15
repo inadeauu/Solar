@@ -1,13 +1,16 @@
 scalar DateTime
 
-type Query {
+type Query @rateLimit(limit: 120, duration: 60) {
   community(input: CommunityInput!): Community
   communities(input: CommunitiesInput!): CommunityConnection!
-  titleExists(title: String!): Boolean!
+  titleExists(title: String!): Boolean! @rateLimit(limit: 200, duration: 60)
 }
 
 type Mutation {
   createCommunity(input: CreateCommunityInput!): CreateCommunityResult!
+    @rateLimit(limit: 5, duration: 60)
+  userJoinCommunity(input: UserJoinCommunityInput!): UserJoinCommunityResult!
+    @rateLimit(limit: 20, duration: 60)
 }
 
 type Community {
@@ -16,6 +19,7 @@ type Community {
   created_at: DateTime!
   updated_at: DateTime!
 
+  inCommunity: Boolean!
   memberCount: Int!
   postCount: Int!
 
@@ -79,6 +83,32 @@ type CreateCommunityInputError implements Error {
 
 type CreateCommunityInputErrors {
   title: String
+}
+
+# -- USERJOINCOMMUNITY MUTATION
+union UserJoinCommunityResult =
+    UserJoinCommunitySuccess
+  | UserJoinCommunityInputError
+  | AuthenticationError
+
+input UserJoinCommunityInput {
+  communityId: String!
+}
+
+type UserJoinCommunitySuccess implements Success {
+  successMsg: String!
+  code: Int!
+  inCommunity: Boolean!
+}
+
+type UserJoinCommunityInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: UserJoinCommunityInputErrors!
+}
+
+type UserJoinCommunityInputErrors {
+  communityId: String
 }
 
 # -- ENUMS

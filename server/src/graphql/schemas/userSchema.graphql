@@ -1,9 +1,10 @@
 scalar DateTime
 
-type Query {
+type Query @rateLimit(limit: 120, duration: 60) {
   user(input: UserInput!): User
   users(input: UsersInput!): UserConnection!
   usernameExists(username: String!): Boolean!
+    @rateLimit(limit: 200, duration: 60)
 }
 
 type User {

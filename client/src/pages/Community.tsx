@@ -12,8 +12,10 @@ import CommunityPostFeed from "../components/CommunityPostFeed"
 const getCommunityDocument = graphql(/* GraphQL */ `
   query Community($input: CommunityInput!) {
     community(input: $input) {
+      id
       memberCount
       postCount
+      inCommunity
       owner {
         id
         username
@@ -29,14 +31,13 @@ const Community = () => {
   const uuid = translator.toUUID(id!)
 
   const { data, isLoading } = useQuery({
-    queryKey: [id],
+    queryKey: [uuid],
     queryFn: () =>
       graphQLClient.request(getCommunityDocument, {
         input: {
           id: uuid,
         },
       }),
-    keepPreviousData: true,
   })
 
   if (isLoading) {
@@ -71,8 +72,8 @@ const Community = () => {
             </span>
           </span>
         </div>
-        <CommunityCreatePost />
-        <CommunityPostFeed />
+        <CommunityCreatePost community={data.community} />
+        <CommunityPostFeed community={data.community} />
       </div>
       <CommunitySidebar community={data.community} />
     </section>

@@ -148,9 +148,9 @@ const CreateCommunity = () => {
   }
 
   return (
-    <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border border-black">
+    <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border border-black overflow-auto">
       <div className="w-fit mx-auto">
-        <h1 className="text-3xl font-semibold mb-6">Create a Community</h1>
+        <h1 className="text-2xl font-semibold mb-6">Create a Community</h1>
         <form className="flex flex-col">
           {error && <ErrorCard error={error} className="mb-4" />}
           <label className="flex flex-col gap-2">
@@ -160,8 +160,12 @@ const CreateCommunity = () => {
               type="text"
               value={fieldStates.title.value}
               onChange={(e) => {
-                setFieldStateValue(setFieldStates, "title", e.target.value)
-                validateTitle(e.target.value)
+                setFieldStateValue(
+                  setFieldStates,
+                  "title",
+                  e.target.value.trim()
+                )
+                validateTitle(e.target.value.trim())
               }}
               onBlur={(e) => {
                 if (!e.target.value) {

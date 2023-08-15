@@ -14,12 +14,12 @@ const SearchBar = () => {
   const debouncedSearch = useDebounce(search, 500)
 
   return (
-    <div className="flex items-stretch gap-2 w-[50%] h-[60%] leading-1">
+    <div className="flex items-stretch gap-2 w-[50%]">
       <div ref={searchRef} className="flex flex-col w-full relative">
         <input
           value={search}
           placeholder={`Search ${searchType}`}
-          className={`px-2 py-1 rounded-md border-2 border-gray-300 outline-none bg-gray-50 hover:border-blue-400 focus:border-blue-400 w-full placeholder-shown:text-ellipsis ${
+          className={`px-2 py-1 rounded-md border-2 border-gray-300 outline-none bg-gray-50 hover:border-blue-400 focus:border-blue-400 w-full xs-max:placeholder:text-xs placeholder-shown:text-ellipsis ${
             showResults && "rounded-b-none"
           }`}
           onChange={(e) => setSearch(e.target.value)}

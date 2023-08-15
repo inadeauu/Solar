@@ -1,6 +1,7 @@
 scalar DateTime
 
 type Query {
+  community(input: CommunityInput!): Community
   communities(input: CommunitiesInput!): CommunityConnection!
   titleExists(title: String!): Boolean!
 }
@@ -16,6 +17,7 @@ type Community {
   updated_at: DateTime!
 
   memberCount: Int!
+  postCount: Int!
 
   owner: User!
   members(input: CommunityMembersInput!): UserConnection!
@@ -31,6 +33,11 @@ type CommunityEdge {
 type CommunityConnection {
   edges: [CommunityEdge!]!
   pageInfo: PageInfo!
+}
+
+# -- COMMUNITY QUERY
+input CommunityInput {
+  id: ID!
 }
 
 # -- COMMUNITIES QUERY

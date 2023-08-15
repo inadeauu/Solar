@@ -16,6 +16,13 @@ const checkCommunityTitleExists = async (title: string) => {
 
 export const resolvers: Resolvers = {
   Query: {
+    community: async (_0, args) => {
+      const community = await prisma.community.findUnique({
+        where: { id: args.input.id },
+      })
+
+      return community
+    },
     communities: async (_0, args) => {
       const filters = args.input?.filters
       const orderBy = filters?.orderBy
@@ -126,6 +133,14 @@ export const resolvers: Resolvers = {
         }))!._count.members + 1
 
       return memberCount
+    },
+    postCount: async (community) => {
+      const postCount = (await prisma.community.findUnique({
+        where: { id: community.id },
+        include: { _count: { select: { posts: true } } },
+      }))!._count.posts
+
+      return postCount
     },
   },
 }

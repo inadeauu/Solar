@@ -60,8 +60,8 @@ const NavProfile = () => {
           openMenu && "border-gray-400"
         }`}
       >
-        <BsPerson className="w-7 h-7 hover:cursor-pointer lg:hidden" />
-        <span className="text-[12px] font-semibold lg-max:hidden">
+        <BsPerson className="w-7 h-7 hover:cursor-pointer sm:hidden" />
+        <span className="text-[12px] font-semibold sm-max:hidden">
           {user?.username}
         </span>
         <span className="pointer-events-none">

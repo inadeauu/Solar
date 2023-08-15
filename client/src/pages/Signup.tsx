@@ -303,8 +303,12 @@ const Signup = () => {
             placeholder="Username"
             value={fieldStates.username.value}
             onChange={(e) => {
-              setFieldStateValue(setFieldStates, "username", e.target.value)
-              validateUsername(e.target.value)
+              setFieldStateValue(
+                setFieldStates,
+                "username",
+                e.target.value.trim()
+              )
+              validateUsername(e.target.value.trim())
             }}
             onBlur={(e) => {
               if (!e.target.value) {

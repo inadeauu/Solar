@@ -15,7 +15,7 @@ const TextInput = ({ error, success, errorMsg, ...rest }: TextInputProps) => {
     <div className={`flex flex-col gap-1 ${error ? "mb-2" : "mb-4"}`}>
       <div className="relative">
         <input
-          className={`rounded-lg border w-full px-2 py-1 outline-none transition-all duration-200 peer placeholder:font-light ${
+          className={`rounded-lg border w-full pl-2 pr-8 py-1 outline-none transition-all duration-200 peer placeholder:font-light ${
             error
               ? "border-red-400 hover:border-red-600 focus:border-red-600"
               : success

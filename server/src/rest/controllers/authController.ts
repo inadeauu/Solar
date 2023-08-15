@@ -28,22 +28,23 @@ type LoginCallbackQuery = {
   code: string
 }
 
-const numberDictionary = NumberDictionary.generate({
-  min: 1000,
-  max: 99999,
-})
-
 const nameConfig: Config = {
-  dictionaries: [colors, numberDictionary],
+  dictionaries: [colors],
 }
 
 const generateUsername = async (): Promise<string> => {
-  let username: string = uniqueNamesGenerator(nameConfig)
+  let username: string = getNewUsername()
 
   while (await prisma.user.findFirst({ where: { username } })) {
-    username = uniqueNamesGenerator(nameConfig)
+    username = getNewUsername()
   }
 
+  return username
+}
+
+const getNewUsername = (): string => {
+  let username: string = uniqueNamesGenerator(nameConfig)
+  username += Math.floor(Math.random() * (100000 - 1 + 1) + 1)
   return username
 }
 

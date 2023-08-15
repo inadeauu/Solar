@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { pluralize } from "../utils/utils"
 import abbreviate from "number-abbreviate"
 import { AiOutlineSearch } from "react-icons/ai"
+import { translator } from "../utils/uuid"
 
 type CommunitiesSearchBarProps = {
   debouncedSearch: string
@@ -16,6 +17,7 @@ const getCommunitySearchResultsDocument = graphql(/* GraphQL */ `
     communities(input: $input) {
       edges {
         node {
+          id
           memberCount
           title
           created_at
@@ -50,21 +52,27 @@ const CommunitiesSearchBar = ({
       }`}
     >
       {data?.communities?.edges && data.communities.edges.length ? (
-        data.communities.edges.map((edge, i) => (
-          <div
-            key={i}
-            className="flex flex-col px-2 py-1 hover:bg-gray-200 cursor-pointer overflow-auto"
-            onMouseDown={() => navigate("/signup")}
-          >
-            <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
-              {edge.node.title}
-            </span>
-            <span className="text-xs text-gray-500 xs-max:text-[10px] xs:text-xs">
-              {abbreviate(edge.node.memberCount, 1)}{" "}
-              {pluralize(edge.node.memberCount, "Member")}
-            </span>
-          </div>
-        ))
+        data.communities.edges.map((edge) => {
+          const id: string = translator.fromUUID(edge.node.id)
+
+          return (
+            <div
+              key={edge.node.id}
+              className="flex flex-col px-2 py-1 hover:bg-gray-200 cursor-pointer overflow-auto"
+              onMouseDown={() => {
+                navigate(`/communities/${edge.node.title}/${id}`)
+              }}
+            >
+              <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
+                {edge.node.title}
+              </span>
+              <span className="text-xs text-gray-500 xs-max:text-[10px] xs:text-xs">
+                {abbreviate(edge.node.memberCount, 1)}{" "}
+                {pluralize(edge.node.memberCount, "Member")}
+              </span>
+            </div>
+          )
+        })
       ) : (
         <span className="px-2 py-1 text-sm">No results</span>
       )}

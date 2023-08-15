@@ -5,6 +5,8 @@ import Signup from "./pages/Signup"
 import Layout from "./components/Layout"
 import CreateCommunity from "./pages/CreateCommunity"
 import ProtectedRoute from "./components/ProtectedRoute"
+import Community from "./pages/Community"
+import NotFound from "./pages/NotFound"
 
 const App = () => {
   return (
@@ -14,6 +16,8 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="create-community" element={<CreateCommunity />} />
         </Route>
+        <Route path="communities/:title/:id" element={<Community />} />
+        <Route path="*" element={<NotFound />} />
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />

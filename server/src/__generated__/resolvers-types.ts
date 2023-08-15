@@ -108,6 +108,7 @@ export type Community = {
   memberCount: Scalars['Int']['output'];
   members: UserConnection;
   owner: User;
+  postCount: Scalars['Int']['output'];
   posts: PostConnection;
   title: Scalars['String']['output'];
   updated_at: Scalars['DateTime']['output'];
@@ -133,6 +134,10 @@ export type CommunityEdge = {
   __typename?: 'CommunityEdge';
   cursor: Scalars['String']['output'];
   node: Community;
+};
+
+export type CommunityInput = {
+  id: Scalars['ID']['input'];
 };
 
 export type CommunityMembersInput = {
@@ -306,6 +311,7 @@ export type Query = {
   comment?: Maybe<Comment>;
   comments: CommentConnection;
   communities: CommunityConnection;
+  community?: Maybe<Community>;
   titleExists: Scalars['Boolean']['output'];
   user?: Maybe<User>;
   usernameExists: Scalars['Boolean']['output'];
@@ -325,6 +331,11 @@ export type QueryCommentsArgs = {
 
 export type QueryCommunitiesArgs = {
   input: CommunitiesInput;
+};
+
+
+export type QueryCommunityArgs = {
+  input: CommunityInput;
 };
 
 
@@ -575,6 +586,7 @@ export type ResolversTypes = ResolversObject<{
   Community: ResolverTypeWrapper<CommunityModel>;
   CommunityConnection: ResolverTypeWrapper<Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversTypes['CommunityEdge']> }>;
   CommunityEdge: ResolverTypeWrapper<Omit<CommunityEdge, 'node'> & { node: ResolversTypes['Community'] }>;
+  CommunityInput: CommunityInput;
   CommunityMembersInput: CommunityMembersInput;
   CommunityOrderByType: CommunityOrderByType;
   CommunityPostsInput: CommunityPostsInput;
@@ -647,6 +659,7 @@ export type ResolversParentTypes = ResolversObject<{
   Community: CommunityModel;
   CommunityConnection: Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversParentTypes['CommunityEdge']> };
   CommunityEdge: Omit<CommunityEdge, 'node'> & { node: ResolversParentTypes['Community'] };
+  CommunityInput: CommunityInput;
   CommunityMembersInput: CommunityMembersInput;
   CommunityPostsInput: CommunityPostsInput;
   CreateCommunityInput: CreateCommunityInput;
@@ -742,6 +755,7 @@ export type CommunityResolvers<ContextType = Context, ParentType extends Resolve
   memberCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   members?: Resolver<ResolversTypes['UserConnection'], ParentType, ContextType, RequireFields<CommunityMembersArgs, 'input'>>;
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  postCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   posts?: Resolver<ResolversTypes['PostConnection'], ParentType, ContextType, RequireFields<CommunityPostsArgs, 'input'>>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
@@ -874,6 +888,7 @@ export type QueryResolvers<ContextType = Context, ParentType extends ResolversPa
   comment?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType, RequireFields<QueryCommentArgs, 'input'>>;
   comments?: Resolver<ResolversTypes['CommentConnection'], ParentType, ContextType, RequireFields<QueryCommentsArgs, 'input'>>;
   communities?: Resolver<ResolversTypes['CommunityConnection'], ParentType, ContextType, RequireFields<QueryCommunitiesArgs, 'input'>>;
+  community?: Resolver<Maybe<ResolversTypes['Community']>, ParentType, ContextType, RequireFields<QueryCommunityArgs, 'input'>>;
   titleExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<QueryTitleExistsArgs, 'title'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'input'>>;
   usernameExists?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<QueryUsernameExistsArgs, 'username'>>;

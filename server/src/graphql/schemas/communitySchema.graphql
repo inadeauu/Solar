@@ -28,17 +28,6 @@ type Community {
   posts(input: CommunityPostsInput!): PostConnection!
 }
 
-# -- PAGINATION
-type CommunityEdge {
-  node: Community!
-  cursor: String!
-}
-
-type CommunityConnection {
-  edges: [CommunityEdge!]!
-  pageInfo: PageInfo!
-}
-
 # -- COMMUNITY QUERY
 input CommunityInput {
   id: ID!
@@ -61,10 +50,7 @@ input CommunitiesOrderBy {
 }
 
 # -- CREATECOMMUNITY MUTATION
-union CreateCommunityResult =
-    CreateCommunitySuccess
-  | CreateCommunityInputError
-  | AuthenticationError
+union CreateCommunityResult = CreateCommunitySuccess | CreateCommunityInputError
 
 input CreateCommunityInput {
   title: String!
@@ -86,10 +72,7 @@ type CreateCommunityInputErrors {
 }
 
 # -- USERJOINCOMMUNITY MUTATION
-union UserJoinCommunityResult =
-    UserJoinCommunitySuccess
-  | UserJoinCommunityInputError
-  | AuthenticationError
+union UserJoinCommunityResult = UserJoinCommunitySuccess
 
 input UserJoinCommunityInput {
   communityId: String!
@@ -99,16 +82,6 @@ type UserJoinCommunitySuccess implements Success {
   successMsg: String!
   code: Int!
   inCommunity: Boolean!
-}
-
-type UserJoinCommunityInputError implements Error {
-  errorMsg: String!
-  code: Int!
-  inputErrors: UserJoinCommunityInputErrors!
-}
-
-type UserJoinCommunityInputErrors {
-  communityId: String
 }
 
 # -- ENUMS

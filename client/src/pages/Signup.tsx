@@ -16,6 +16,7 @@ import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi"
 import { debounce } from "lodash"
 import { FieldState, FieldStates, initialFieldState } from "../types/shared"
 import { setFieldStateSuccess, setFieldStateValue } from "../utils/form"
+import { toast } from "react-toastify"
 
 const usernameRegisterDocument = graphql(/* GraphQL */ `
   mutation RegisterUsername($input: RegisterUsernameInput!) {
@@ -24,17 +25,6 @@ const usernameRegisterDocument = graphql(/* GraphQL */ `
         __typename
         successMsg
         code
-      }
-      ... on Error {
-        __typename
-        errorMsg
-        code
-      }
-      ... on RegisterUsernameInputError {
-        inputErrors {
-          password
-          username
-        }
       }
     }
   }
@@ -171,12 +161,11 @@ const Signup = () => {
       })
     },
     onSuccess: (data) => {
-      if (
-        data?.registerUsername.__typename == "DuplicateUsernameError" ||
-        data?.registerUsername.__typename == "RegisterUsernameInputError"
-      ) {
-        setError(data.registerUsername.errorMsg)
-      } else {
+      if (data.registerUsername.__typename == "RegisterUsernameSuccess") {
+        toast.success("Successfully registered", {
+          toastId: "register",
+        })
+
         navigate("/")
       }
     },
@@ -191,7 +180,7 @@ const Signup = () => {
       queryClient.invalidateQueries({ queryKey: ["user"] })
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        setError(error.response?.data.error.message)
+        setError("Error signing in")
       }
     }
   }

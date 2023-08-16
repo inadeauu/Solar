@@ -5,7 +5,6 @@ import { CommunityQuery, CreatePostInput } from "../gql/graphql"
 import { graphql } from "../gql"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
-import ErrorCard from "./ErrorCard"
 import { ImSpinner11 } from "react-icons/im"
 
 type CommunityCreatePostProps = {
@@ -20,18 +19,6 @@ const createCommunityPostDocument = graphql(/* GraphQL */ `
         successMsg
         code
       }
-      ... on Error {
-        __typename
-        errorMsg
-        code
-      }
-      ... on CreatePostInputError {
-        inputErrors {
-          body
-          communityId
-          title
-        }
-      }
     }
   }
 `)
@@ -40,7 +27,6 @@ const CommunityCreatePost = ({ community }: CommunityCreatePostProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
-  const [error, setError] = useState<string>("")
   const [submitting, setSubmitting] = useState<boolean>(false)
 
   const [openEditor, setOpenEditor] = useState<boolean>(false)
@@ -56,16 +42,7 @@ const CommunityCreatePost = ({ community }: CommunityCreatePostProps) => {
       })
     },
     onSuccess: (data) => {
-      if (
-        data.createPost.__typename == "CreatePostInputError" ||
-        data.createPost.__typename == "AuthenticationError"
-      ) {
-        setError(data.createPost.errorMsg)
-      } else if (data.createPost.__typename == "CreatePostSuccess") {
-        if (error) {
-          setError("")
-        }
-
+      if (data.createPost.__typename == "CreatePostSuccess") {
         queryClient.setQueryData<CommunityQuery>([community.id], (oldData) =>
           oldData
             ? {
@@ -125,18 +102,12 @@ const CommunityCreatePost = ({ community }: CommunityCreatePostProps) => {
         <div className="flex flex-col gap-4">
           <button
             onClick={() => {
-              if (error) {
-                setError("")
-              }
               setOpenEditor((prev) => !prev)
             }}
             className="btn_red py-1 px-3 text-sm self-start"
           >
             Close
           </button>
-          {error && (
-            <ErrorCard className="w-fit self-center px-6" error={error} />
-          )}
           <form className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
               <input

@@ -71,8 +71,11 @@ const main = async () => {
       ) {
         return {
           ...formattedError,
-          message: "Database error",
-          extensions: { ...formattedError?.extensions, code: "DATABASE_ERROR" },
+          message: "Request failed",
+          extensions: {
+            ...formattedError?.extensions,
+            code: "INTERNAL_SERVER_ERROR",
+          },
         }
       }
 

@@ -2,6 +2,7 @@ import prisma from "../../config/prisma"
 import { Resolvers } from "../../__generated__/resolvers-types"
 import { Provider } from "@prisma/client"
 import bcrypt from "bcrypt"
+import { GraphQLError } from "graphql"
 
 export const resolvers: Resolvers = {
   Query: {
@@ -53,8 +54,11 @@ export const resolvers: Resolvers = {
 
       if (user) {
         return {
-          __typename: "DuplicateUsernameError",
-          errorMsg: "Username already in use",
+          __typename: "RegisterUsernameInputError",
+          errorMsg: "Invalid input",
+          inputErrors: {
+            username: "Username already in use",
+          },
           code: 400,
         }
       }
@@ -101,20 +105,16 @@ export const resolvers: Resolvers = {
     },
     logout: async (_0, _1, { req, res }) => {
       if (!req.session.userId) {
-        return {
-          __typename: "AuthenticationError",
-          errorMsg: "No authenticated user",
-          code: 401,
-        }
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
       }
 
       return new Promise((resolve) =>
         req.session.destroy((err) => {
           if (err)
-            resolve({
-              __typename: "LogoutSessionDestroyError",
-              errorMsg: "Error logging out",
-              code: 500,
+            throw new GraphQLError("Request failed", {
+              extensions: { code: "INTERNAL_SERVER_ERROR" },
             })
           res.clearCookie("connect.sid")
           resolve({

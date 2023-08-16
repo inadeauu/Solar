@@ -8,38 +8,3 @@ interface Success {
   successMsg: String
   code: Int!
 }
-
-type AuthenticationError implements Error {
-  errorMsg: String!
-  code: Int!
-}
-
-type DuplicateUsernameError implements Error {
-  errorMsg: String!
-  code: Int!
-}
-
-type UserNotFoundError implements Error {
-  errorMsg: String!
-  code: Int!
-}
-
-# -- FILTER/PAGINATION
-type PageInfo {
-  endCursor: String
-  hasNextPage: Boolean!
-  startCursor: String
-  hasPreviousPage: Boolean!
-}
-
-input PaginateInput {
-  first: Int
-  after: String
-  last: Int
-  before: String
-}
-
-enum OrderByDir {
-  asc
-  desc
-}

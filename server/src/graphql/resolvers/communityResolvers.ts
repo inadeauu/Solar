@@ -5,6 +5,7 @@ import {
 } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
 import { paginate } from "../paginate"
+import { GraphQLError } from "graphql"
 
 const checkCommunityTitleExists = async (title: string) => {
   const community = await prisma.community.findFirst({
@@ -56,11 +57,9 @@ export const resolvers: Resolvers = {
   Mutation: {
     createCommunity: async (_0, args, { req }) => {
       if (!req.session.userId) {
-        return {
-          __typename: "AuthenticationError",
-          errorMsg: "No authenticated user",
-          code: 401,
-        }
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
       }
 
       if (await checkCommunityTitleExists(args.input.title)) {
@@ -100,11 +99,9 @@ export const resolvers: Resolvers = {
     },
     userJoinCommunity: async (_0, args, { req }) => {
       if (!req.session.userId) {
-        return {
-          __typename: "AuthenticationError",
-          errorMsg: "No authenticated user",
-          code: 200,
-        }
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
       }
 
       const community = await prisma.community.findUnique({
@@ -119,14 +116,9 @@ export const resolvers: Resolvers = {
       })
 
       if (!community) {
-        return {
-          __typename: "UserJoinCommunityInputError",
-          errorMsg: "Invalid input",
-          code: 400,
-          inputErrors: {
-            communityId: "Invalid community id",
-          },
-        }
+        throw new GraphQLError("Request failed", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        })
       }
 
       let successMsg: string

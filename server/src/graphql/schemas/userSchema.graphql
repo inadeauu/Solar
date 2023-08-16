@@ -56,17 +56,6 @@ enum UserOrderByType {
   postCount
 }
 
-# -- PAGINATION
-type UserEdge {
-  node: User!
-  cursor: String!
-}
-
-type UserConnection {
-  edges: [UserEdge!]!
-  pageInfo: PageInfo!
-}
-
 # -- RESOLVERS
 input UserOwnedCommunitiesInput {
   paginate: PaginateInput!

@@ -21,17 +21,6 @@ type Post {
   comments(input: PostCommentInput!): CommentConnection!
 }
 
-# -- PAGINATION
-type PostEdge {
-  node: Post!
-  cursor: String!
-}
-
-type PostConnection {
-  edges: [PostEdge!]!
-  pageInfo: PageInfo!
-}
-
 # -- POSTS QUERY
 input PostsInput {
   filters: PostsFilters
@@ -50,10 +39,7 @@ input PostsOrderBy {
 }
 
 # -- CREATEPOST MUTATION
-union CreatePostResult =
-    CreatePostSuccess
-  | CreatePostInputError
-  | AuthenticationError
+union CreatePostResult = CreatePostSuccess | CreatePostInputError
 
 input CreatePostInput {
   title: String!

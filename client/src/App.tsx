@@ -7,21 +7,38 @@ import CreateCommunity from "./pages/CreateCommunity"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Community from "./pages/Community"
 import NotFound from "./pages/NotFound"
+import { ToastContainer, Zoom } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="create-community" element={<CreateCommunity />} />
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover={false}
+        theme="light"
+        transition={Zoom}
+      />
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="create-community" element={<CreateCommunity />} />
+          </Route>
+          <Route path="communities/:title/:id" element={<Community />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
-        <Route path="communities/:title/:id" element={<Community />} />
-        <Route path="*" element={<NotFound />} />
-      </Route>
-      <Route path="/login" element={<Login />} />
-      <Route path="/signup" element={<Signup />} />
-    </Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </>
   )
 }
 

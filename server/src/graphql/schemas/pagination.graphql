@@ -1,0 +1,63 @@
+# -- GENERAL
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  startCursor: String
+  hasPreviousPage: Boolean!
+}
+
+input PaginateInput {
+  first: Int
+  after: String
+  last: Int
+  before: String
+}
+
+enum OrderByDir {
+  asc
+  desc
+}
+
+# -- USER
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+type UserConnection {
+  edges: [UserEdge!]!
+  pageInfo: PageInfo!
+}
+
+# -- POST
+type PostEdge {
+  node: Post!
+  cursor: String!
+}
+
+type PostConnection {
+  edges: [PostEdge!]!
+  pageInfo: PageInfo!
+}
+
+# -- COMMUNITY
+type CommunityEdge {
+  node: Community!
+  cursor: String!
+}
+
+type CommunityConnection {
+  edges: [CommunityEdge!]!
+  pageInfo: PageInfo!
+}
+
+# -- COMMENT
+type CommentEdge {
+  node: Comment!
+  cursor: String!
+}
+
+type CommentConnection {
+  edges: [CommentEdge!]!
+  pageInfo: PageInfo!
+}

@@ -6,6 +6,7 @@ import {
 } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
 import { paginate } from "../paginate"
+import { GraphQLError } from "graphql"
 
 export const resolvers: Resolvers = {
   Query: {
@@ -42,11 +43,9 @@ export const resolvers: Resolvers = {
   Mutation: {
     createPost: async (_0, args, { req }) => {
       if (!req.session.userId) {
-        return {
-          __typename: "AuthenticationError",
-          errorMsg: "No authenticated user",
-          code: 401,
-        }
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
       }
 
       const titleError =

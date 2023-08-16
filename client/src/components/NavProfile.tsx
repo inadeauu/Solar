@@ -17,11 +17,6 @@ const logoutDocument = graphql(/* GraphQL */ `
         successMsg
         code
       }
-      ... on Error {
-        __typename
-        errorMsg
-        code
-      }
     }
   }
 `)

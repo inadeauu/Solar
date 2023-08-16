@@ -14,7 +14,6 @@ type Mutation {
 union RegisterUsernameResult =
     RegisterUsernameSuccess
   | RegisterUsernameInputError
-  | DuplicateUsernameError
 
 input RegisterUsernameInput {
   username: String!
@@ -69,17 +68,9 @@ type AuthUserSuccess implements Success {
 }
 
 # -- LOGOUT MUTATION
-union LogoutResult =
-    LogoutSuccess
-  | LogoutSessionDestroyError
-  | AuthenticationError
+union LogoutResult = LogoutSuccess
 
 type LogoutSuccess implements Success {
   successMsg: String!
-  code: Int!
-}
-
-type LogoutSessionDestroyError implements Error {
-  errorMsg: String!
   code: Int!
 }

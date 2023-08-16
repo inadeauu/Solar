@@ -33,17 +33,6 @@ input CommentsFilters {
   postId: ID
 }
 
-# -- PAGINATION
-type CommentEdge {
-  node: Comment!
-  cursor: String!
-}
-
-type CommentConnection {
-  edges: [CommentEdge!]!
-  pageInfo: PageInfo!
-}
-
 # -- RESOLVERS
 input CommentChildrenInput {
   paginate: PaginateInput!

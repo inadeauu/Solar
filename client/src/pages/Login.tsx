@@ -24,11 +24,6 @@ const usernameLoginDocument = graphql(/* GraphQL */ `
         successMsg
         code
       }
-      ... on LoginUsernameInputError {
-        __typename
-        errorMsg
-        code
-      }
     }
   }
 `)
@@ -107,7 +102,7 @@ const Login = () => {
       queryClient.invalidateQueries({ queryKey: ["user"] })
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        setError(error.response?.data.error.message)
+        setError("Error logging in")
       }
     }
   }
@@ -119,9 +114,7 @@ const Login = () => {
       })
     },
     onSuccess: (data) => {
-      if (data.loginUsername.__typename == "LoginUsernameInputError") {
-        setError(data.loginUsername.errorMsg)
-      } else {
+      if (data.loginUsername.__typename == "LoginUsernameSuccess") {
         queryClient.invalidateQueries({ queryKey: ["user"] })
         navigate("/")
       }

@@ -104,9 +104,9 @@ export const resolvers: Resolvers = {
         })
       }
 
-      await new Promise((resolve) => setTimeout(resolve, Math.random() * 5000))
+      await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000))
 
-      if (Math.random() < 0.5) {
+      if (Math.random() < 0.9) {
         throw new GraphQLError("whoops")
       }
 

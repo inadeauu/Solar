@@ -45,6 +45,7 @@ const Community = () => {
   if (isLoading) {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
   } else if (!data?.community || data.community.title !== title) {
+    console.log(data)
     return <Navigate to="/404-not-found" />
   }
 

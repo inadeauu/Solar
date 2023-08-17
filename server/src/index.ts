@@ -76,6 +76,7 @@ const main = async () => {
             ...formattedError?.extensions,
             code: "INTERNAL_SERVER_ERROR",
           },
+          status: 500,
         }
       }
 

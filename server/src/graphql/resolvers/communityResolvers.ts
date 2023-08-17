@@ -104,12 +104,6 @@ export const resolvers: Resolvers = {
         })
       }
 
-      await new Promise((resolve) => setTimeout(resolve, Math.random() * 2000))
-
-      if (Math.random() < 0.9) {
-        throw new GraphQLError("whoops")
-      }
-
       const community = await prisma.community.findUnique({
         where: { id: args.input.communityId },
         include: {

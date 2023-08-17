@@ -6,11 +6,11 @@ type Query @rateLimit(limit: 120, duration: 60) {
   titleExists(title: String!): Boolean! @rateLimit(limit: 200, duration: 60)
 }
 
-# @rateLimit(limit: 20, duration: 60)
 type Mutation {
   createCommunity(input: CreateCommunityInput!): CreateCommunityResult!
     @rateLimit(limit: 5, duration: 60)
   userJoinCommunity(input: UserJoinCommunityInput!): UserJoinCommunityResult!
+    @rateLimit(limit: 20, duration: 60)
 }
 
 type Community {

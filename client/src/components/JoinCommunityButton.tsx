@@ -5,7 +5,6 @@ import { graphql } from "../gql"
 import { CommunityQuery, UserJoinCommunityInput } from "../gql/graphql"
 import { graphQLClient } from "../utils/graphql"
 import { useRef } from "react"
-import { ClientError } from "graphql-request"
 import { toast } from "react-toastify"
 
 const userJoinCommunityDocument = graphql(/* GraphQL */ `
@@ -42,14 +41,10 @@ const JoinCommunityButton = ({ community }: JoinCommunityButtonProps) => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const previous_success = useRef<CommunityQuery["community"]>(community)
-  const request_returns = useRef<
-    Array<NonNullable<CommunityQuery["community"]> | null>
-  >([])
-  const server_error = useRef<ClientError | null>(null)
+  const rollback = useRef<CommunityQuery["community"] | null>(null)
+  const error = useRef<boolean>(false)
   const sent_requests = useRef<number>(0)
-  const last_success = useRef<number>(-1)
-  const last_error = useRef<number>(-1)
+  const last_updated = useRef<string>("")
 
   const joinCommunityMutation = useMutation({
     mutationFn: async ({ communityId }: UserJoinCommunityInput) => {
@@ -59,6 +54,10 @@ const JoinCommunityButton = ({ community }: JoinCommunityButtonProps) => {
     },
     onMutate: async (input) => {
       await queryClient.cancelQueries({ queryKey: [input.communityId] })
+
+      const previous_community = queryClient.getQueryData<CommunityQuery>([
+        input.communityId,
+      ])
 
       queryClient.setQueryData<CommunityQuery>([input.communityId], (oldData) =>
         oldData
@@ -74,56 +73,36 @@ const JoinCommunityButton = ({ community }: JoinCommunityButtonProps) => {
             }
           : oldData
       )
+
+      return { previous_community, updated_at: new Date().toISOString() }
     },
-    onSettled: async (data, error, input) => {
-      if (data?.userJoinCommunity.community) {
-        request_returns.current.push(data.userJoinCommunity.community)
-        last_success.current = request_returns.current.length
-      } else {
-        request_returns.current.push(null)
-        last_error.current = request_returns.current.length
-        if (error instanceof ClientError) {
-          server_error.current = error
-        }
+    onError: async (_0, input, context) => {
+      if (!error.current) error.current = true
+
+      if (last_updated.current <= context!.updated_at && !rollback.current) {
+        console.log("here")
+        queryClient.setQueryData(
+          [input.communityId],
+          context!.previous_community
+        )
+      } else if (sent_requests.current == 1 && rollback.current) {
+        queryClient.invalidateQueries([input.communityId])
       }
+    },
+    onSuccess: async (data, input, context) => {
+      toast.success(data.userJoinCommunity.successMsg)
+      rollback.current = data.userJoinCommunity.community
 
-      console.log()
-
-      if (
-        sent_requests.current == 1 &&
-        last_success.current == request_returns.current.length
-      ) {
-        queryClient.invalidateQueries({ queryKey: [input.communityId] })
-      } else if (
-        sent_requests.current == 1 &&
-        last_error.current == request_returns.current.length &&
-        last_success.current >= 0
-      ) {
-        queryClient.invalidateQueries({ queryKey: [input.communityId] })
-      } else if (
-        sent_requests.current == 1 &&
-        last_error.current == request_returns.current.length &&
-        last_success.current < 0
-      ) {
-        server_error.current?.response.errors?.forEach(({ message, path }) => {
-          toast.error(message, { toastId: path?.toString() })
-        })
-
-        queryClient.setQueriesData([input.communityId], {
-          community: previous_success.current,
-        })
+      if (last_updated.current <= context!.updated_at) {
+        queryClient.invalidateQueries([input.communityId])
+      } else if (sent_requests.current == 1 && error.current) {
+        queryClient.invalidateQueries([input.communityId])
       }
-
+    },
+    onSettled: async () => {
       if (sent_requests.current == 1) {
-        if (last_success.current >= 0) {
-          previous_success.current =
-            request_returns.current[last_success.current - 1]
-        }
-
-        request_returns.current = []
-        server_error.current = null
-        last_success.current = -1
-        last_error.current = -1
+        rollback.current = null
+        error.current = false
       }
 
       sent_requests.current--
@@ -139,6 +118,7 @@ const JoinCommunityButton = ({ community }: JoinCommunityButtonProps) => {
           return
         }
 
+        last_updated.current = new Date().toISOString()
         sent_requests.current++
 
         joinCommunityMutation.mutate({

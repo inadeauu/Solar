@@ -30,12 +30,10 @@ const mutationCache = new MutationCache({
       toast.error("Invalid input", { toastId: data.errorMsg })
     }
   },
-  onError: (error, _0, _1, mutation) => {
-    if (mutation.options.onError || mutation.options.onSettled) return
-
+  onError: (error) => {
     if (error instanceof ClientError) {
-      error.response.errors?.forEach(({ message, path }) => {
-        toast.error(message, { toastId: path?.toString() })
+      error.response.errors?.forEach(({ message }) => {
+        toast.error(message)
       })
     }
   },

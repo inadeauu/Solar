@@ -23,6 +23,7 @@ const getCommunityDocument = graphql(/* GraphQL */ `
       }
       title
       created_at
+      updated_at
     }
   }
 `)

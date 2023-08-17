@@ -507,7 +507,7 @@ export type UserJoinCommunityResult = UserJoinCommunitySuccess;
 export type UserJoinCommunitySuccess = Success & {
   __typename?: 'UserJoinCommunitySuccess';
   code: Scalars['Int']['output'];
-  inCommunity: Scalars['Boolean']['output'];
+  community: Community;
   successMsg: Scalars['String']['output'];
 };
 
@@ -616,13 +616,13 @@ export type ResolversUnionTypes<RefType extends Record<string, unknown>> = Resol
   LoginUsernameResult: ( LoginUsernameInputError ) | ( LoginUsernameSuccess );
   LogoutResult: ( LogoutSuccess );
   RegisterUsernameResult: ( RegisterUsernameInputError ) | ( RegisterUsernameSuccess );
-  UserJoinCommunityResult: ( UserJoinCommunitySuccess );
+  UserJoinCommunityResult: ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } );
 }>;
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
   Error: ( CreateCommunityInputError ) | ( CreatePostInputError ) | ( LoginUsernameInputError ) | ( RegisterUsernameInputError );
-  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( CreateCommunitySuccess ) | ( CreatePostSuccess ) | ( LoginUsernameSuccess ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( UserJoinCommunitySuccess );
+  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( CreateCommunitySuccess ) | ( CreatePostSuccess ) | ( LoginUsernameSuccess ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -697,7 +697,7 @@ export type ResolversTypes = ResolversObject<{
   UserInput: UserInput;
   UserJoinCommunityInput: UserJoinCommunityInput;
   UserJoinCommunityResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['UserJoinCommunityResult']>;
-  UserJoinCommunitySuccess: ResolverTypeWrapper<UserJoinCommunitySuccess>;
+  UserJoinCommunitySuccess: ResolverTypeWrapper<Omit<UserJoinCommunitySuccess, 'community'> & { community: ResolversTypes['Community'] }>;
   UserOrderByType: UserOrderByType;
   UserOwnedCommunitiesInput: UserOwnedCommunitiesInput;
   UserPostInput: UserPostInput;
@@ -774,7 +774,7 @@ export type ResolversParentTypes = ResolversObject<{
   UserInput: UserInput;
   UserJoinCommunityInput: UserJoinCommunityInput;
   UserJoinCommunityResult: ResolversUnionTypes<ResolversParentTypes>['UserJoinCommunityResult'];
-  UserJoinCommunitySuccess: UserJoinCommunitySuccess;
+  UserJoinCommunitySuccess: Omit<UserJoinCommunitySuccess, 'community'> & { community: ResolversParentTypes['Community'] };
   UserOwnedCommunitiesInput: UserOwnedCommunitiesInput;
   UserPostInput: UserPostInput;
   UsersFilters: UsersFilters;
@@ -1041,7 +1041,7 @@ export type UserJoinCommunityResultResolvers<ContextType = Context, ParentType e
 
 export type UserJoinCommunitySuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserJoinCommunitySuccess'] = ResolversParentTypes['UserJoinCommunitySuccess']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
-  inCommunity?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  community?: Resolver<ResolversTypes['Community'], ParentType, ContextType>;
   successMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

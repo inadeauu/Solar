@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphql } from "../gql"
 import { CommunityQuery, UserJoinCommunityInput } from "../gql/graphql"
 import { graphQLClient } from "../utils/graphql"
+import { useRef } from "react"
 
 const userJoinCommunityDocument = graphql(/* GraphQL */ `
   mutation UserJoinCommunity($input: UserJoinCommunityInput!) {
@@ -12,7 +13,6 @@ const userJoinCommunityDocument = graphql(/* GraphQL */ `
         __typename
         successMsg
         code
-        inCommunity
       }
     }
   }
@@ -25,33 +25,58 @@ type JoinCommunityButtonProps = {
 const JoinCommunityButton = ({ community }: JoinCommunityButtonProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
-
   const queryClient = useQueryClient()
 
-  const joinCommunity = useMutation({
+  const last_updated = useRef<string>("")
+  const joinError = useRef<boolean>(false)
+
+  const joinCommunityMutation = useMutation({
     mutationFn: async ({ communityId }: UserJoinCommunityInput) => {
       return await graphQLClient.request(userJoinCommunityDocument, {
         input: { communityId },
       })
     },
-    onSuccess: (data) => {
-      if (data.userJoinCommunity.__typename == "UserJoinCommunitySuccess") {
-        const inCommunity = data.userJoinCommunity.inCommunity
+    onMutate: async (input) => {
+      await queryClient.cancelQueries({ queryKey: [input.communityId] })
 
-        queryClient.setQueryData<CommunityQuery>([community.id], (oldData) =>
-          oldData
-            ? {
-                ...oldData,
-                community: {
-                  ...community,
-                  memberCount: inCommunity
-                    ? oldData.community!.memberCount + 1
-                    : oldData.community!.memberCount - 1,
-                  inCommunity,
-                },
-              }
-            : oldData
+      const previousCommunity = queryClient.getQueryData<CommunityQuery>([
+        input.communityId,
+      ])
+
+      queryClient.setQueryData<CommunityQuery>([input.communityId], (oldData) =>
+        oldData
+          ? {
+              ...oldData,
+              community: {
+                ...community,
+                memberCount: !oldData.community?.inCommunity
+                  ? oldData.community!.memberCount + 1
+                  : oldData.community!.memberCount - 1,
+                inCommunity: !oldData.community?.inCommunity,
+              },
+            }
+          : oldData
+      )
+
+      return { previousCommunity, updated_at: new Date().toISOString() }
+    },
+    onError: (_0, input, context) => {
+      if (last_updated.current <= context!.updated_at) {
+        queryClient.setQueryData(
+          [input.communityId],
+          context?.previousCommunity
         )
+      } else {
+        joinError.current = true
+      }
+    },
+    onSettled: (_0, _1, input, context) => {
+      if (last_updated.current <= context!.updated_at) {
+        queryClient.invalidateQueries({ queryKey: [input.communityId] })
+
+        if (joinError) {
+          joinError.current = false
+        }
       }
     },
   })
@@ -64,8 +89,13 @@ const JoinCommunityButton = ({ community }: JoinCommunityButtonProps) => {
           navigate("/login")
         }
 
-        joinCommunity.mutate({ communityId: community.id })
+        last_updated.current = new Date().toISOString()
+
+        joinCommunityMutation.mutate({
+          communityId: community.id,
+        })
       }}
+      disabled={joinError.current}
     >
       {!community.inCommunity ? "Join" : "Joined"}
     </button>

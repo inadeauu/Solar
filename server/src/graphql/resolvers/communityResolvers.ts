@@ -104,6 +104,12 @@ export const resolvers: Resolvers = {
         })
       }
 
+      await new Promise((resolve) => setTimeout(resolve, Math.random() * 5000))
+
+      if (Math.random() < 0.5) {
+        throw new GraphQLError("whoops")
+      }
+
       const community = await prisma.community.findUnique({
         where: { id: args.input.communityId },
         include: {
@@ -122,10 +128,10 @@ export const resolvers: Resolvers = {
       }
 
       let successMsg: string
-      let inCommunity: boolean
+      let updatedCommunity: Community
 
       if (!community.members.length) {
-        await prisma.community.update({
+        updatedCommunity = await prisma.community.update({
           where: { id: community.id },
           data: {
             members: {
@@ -137,9 +143,8 @@ export const resolvers: Resolvers = {
         })
 
         successMsg = "Successfully joined community"
-        inCommunity = true
       } else {
-        await prisma.community.update({
+        updatedCommunity = await prisma.community.update({
           where: { id: community.id },
           data: {
             members: {
@@ -151,14 +156,13 @@ export const resolvers: Resolvers = {
         })
 
         successMsg = "Successfully left community"
-        inCommunity = false
       }
 
       return {
         __typename: "UserJoinCommunitySuccess",
         successMsg,
         code: 200,
-        inCommunity,
+        community: updatedCommunity,
       }
     },
   },

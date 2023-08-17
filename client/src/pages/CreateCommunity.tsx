@@ -1,5 +1,5 @@
 import { ImSpinner11 } from "react-icons/im"
-import TextInput from "../components/TextInput"
+import TextInput from "../components/misc/TextInput"
 import { useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { graphql } from "../gql"
@@ -10,6 +10,7 @@ import { debounce } from "lodash"
 import { FieldState, FieldStates, initialFieldState } from "../types/shared"
 import { setFieldStateSuccess, setFieldStateValue } from "../utils/form"
 import { toast } from "react-toastify"
+import ErrorCard from "../components/misc/ErrorCard"
 
 const communityTitleExistsDocument = graphql(/* GraphQL */ `
   query CommunityTitleExists($title: String!) {
@@ -23,6 +24,11 @@ const createCommunityDocument = graphql(/* GraphQL */ `
       ... on CreateCommunitySuccess {
         __typename
         successMsg
+        code
+      }
+      ... on Error {
+        __typename
+        errorMsg
         code
       }
     }
@@ -49,6 +55,8 @@ const CreateCommunity = () => {
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [validatingTitle, setValidatingTitle] = useState<boolean>(false)
 
+  const [error, setError] = useState<string>("")
+
   const navigate = useNavigate()
 
   const createCommunity = useMutation({
@@ -59,10 +67,13 @@ const CreateCommunity = () => {
     },
     onSuccess: (data) => {
       if (data.createCommunity.__typename == "CreateCommunitySuccess") {
-        toast.success("Successfully created community.", {
-          toastId: "register",
-        })
+        toast.success("Successfully created community")
+        if (error) setError("")
         navigate("/")
+      } else if (
+        data.createCommunity.__typename == "CreateCommunityInputError"
+      ) {
+        setError(data.createCommunity.errorMsg)
       }
     },
   })
@@ -142,6 +153,7 @@ const CreateCommunity = () => {
       <div className="w-fit mx-auto">
         <h1 className="text-2xl font-semibold mb-6">Create a Community</h1>
         <form className="flex flex-col">
+          {error && <ErrorCard error={error} className="mb-4" />}
           <label className="flex flex-col gap-2">
             <p className="text-xl">Title</p>
             <TextInput

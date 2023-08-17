@@ -1,16 +1,16 @@
-import { AiOutlineArrowLeft } from "react-icons/ai"
+import { AiOutlineHome } from "react-icons/ai"
 import { FcGoogle } from "react-icons/fc"
 import { BsGithub } from "react-icons/bs"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { AxiosError } from "axios"
-import ErrorCard from "../components/ErrorCard"
+import ErrorCard from "../components/misc/ErrorCard"
 import { ImSpinner11 } from "react-icons/im"
 import { api } from "../utils/axios"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { graphql } from "../gql"
-import TextInput from "../components/TextInput"
+import TextInput from "../components/misc/TextInput"
 import { LoginUsernameInput } from "../gql/graphql"
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi"
 import { FieldState, FieldStates, initialFieldState } from "../types/shared"
@@ -22,6 +22,11 @@ const usernameLoginDocument = graphql(/* GraphQL */ `
       ... on LoginUsernameSuccess {
         __typename
         successMsg
+        code
+      }
+      ... on Error {
+        __typename
+        errorMsg
         code
       }
     }
@@ -96,10 +101,10 @@ const Login = () => {
   const socialSignIn = async (provider: string) => {
     try {
       const response = await api.get(`/auth/${provider}`)
-
       window.location.assign(response.data.data.url)
-
       queryClient.invalidateQueries({ queryKey: ["user"] })
+      if (error) setError("")
+      navigate(-1)
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         setError("Error logging in")
@@ -116,7 +121,10 @@ const Login = () => {
     onSuccess: (data) => {
       if (data.loginUsername.__typename == "LoginUsernameSuccess") {
         queryClient.invalidateQueries({ queryKey: ["user"] })
-        navigate("/")
+        if (error) setError("")
+        navigate(-1)
+      } else if (data.loginUsername.__typename == "LoginUsernameInputError") {
+        setError(data.loginUsername.errorMsg)
       }
     },
   })
@@ -164,9 +172,9 @@ const Login = () => {
   return (
     <div className="flex h-screen">
       <div className="bg-white m-auto rounded-xl max-h-[550px] max-w-[550px] w-[90%] h-[90%] p-4 overflow-scroll border border-black">
-        <Link to="/" className="flex gap-2 items-center hover:underline">
-          <AiOutlineArrowLeft className="w-4 h-4" />
-          <p className="text-sm">Home</p>
+        <Link to="/" className="flex gap-2 hover:underline">
+          <AiOutlineHome className="w-5 h-5" />
+          <p className="text-sm mt-[1px]">Home</p>
         </Link>
         <form className="flex flex-col xs:w-[60%] xs-max:w-[80%] mx-auto mt-4">
           <h1 className="xs:text-3xl xs-max:text-2xl font-semibold xs:mb-8 xs-max:mb-6">

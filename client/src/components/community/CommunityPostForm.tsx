@@ -1,13 +1,14 @@
 import { useLayoutEffect, useRef, useState } from "react"
-import { useAuth } from "../utils/useAuth"
+import { useAuth } from "../../utils/useAuth"
 import { useNavigate } from "react-router-dom"
-import { CommunityQuery, CreatePostInput } from "../gql/graphql"
-import { graphql } from "../gql"
+import { CommunityQuery, CreatePostInput } from "../../gql/graphql"
+import { graphql } from "../../gql"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { graphQLClient } from "../utils/graphql"
+import { graphQLClient } from "../../utils/graphql"
 import { ImSpinner11 } from "react-icons/im"
+import ErrorCard from "../misc/ErrorCard"
 
-type CommunityCreatePostProps = {
+type CommunityPostFormProps = {
   community: NonNullable<CommunityQuery["community"]>
 }
 
@@ -19,15 +20,22 @@ const createCommunityPostDocument = graphql(/* GraphQL */ `
         successMsg
         code
       }
+      ... on Error {
+        __typename
+        errorMsg
+        code
+      }
     }
   }
 `)
 
-const CommunityCreatePost = ({ community }: CommunityCreatePostProps) => {
+const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
   const [submitting, setSubmitting] = useState<boolean>(false)
+
+  const [error, setError] = useState<string>("")
 
   const [openEditor, setOpenEditor] = useState<boolean>(false)
   const [title, setTitle] = useState<string>("")
@@ -61,7 +69,11 @@ const CommunityCreatePost = ({ community }: CommunityCreatePostProps) => {
           setBody("")
         }
 
+        if (error) setError("")
+
         setOpenEditor(false)
+      } else if (data.createPost.__typename == "CreatePostInputError") {
+        setError(data.createPost.errorMsg)
       }
     },
   })
@@ -109,6 +121,7 @@ const CommunityCreatePost = ({ community }: CommunityCreatePostProps) => {
             Close
           </button>
           <form className="flex flex-col gap-3">
+            {error && <ErrorCard error={error} className="mb-4" />}
             <div className="flex flex-col gap-1">
               <input
                 name="title"
@@ -173,4 +186,4 @@ const CommunityCreatePost = ({ community }: CommunityCreatePostProps) => {
   )
 }
 
-export default CommunityCreatePost
+export default CommunityPostForm

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
-import { pluralize } from "../utils/utils"
-import { CommunityQuery } from "../gql/graphql"
-import JoinCommunityButton from "./JoinCommunityButton"
+import { pluralize } from "../../utils/utils"
+import { CommunityQuery } from "../../gql/graphql"
+import JoinCommunityButton from "./CommunityJoinButton"
 
 type CommunitySidebarProps = {
   community: NonNullable<CommunityQuery["community"]>
@@ -9,7 +9,7 @@ type CommunitySidebarProps = {
 
 const CommunitySidebar = ({ community }: CommunitySidebarProps) => {
   return (
-    <aside className="p-4 sticky bg-gray-100 w-[300px] h-fit rounded-lg border border-gray-300 md-max:hidden">
+    <aside className="p-4 sticky top-[80px] bg-gray-100 w-[300px] h-fit rounded-lg border border-gray-300 md-max:hidden">
       <div className="flex gap-4 items-center justify-between mb-2">
         <h1 className="font-semibold text-ellipsis whitespace-nowrap overflow-hidden">
           {community.title}

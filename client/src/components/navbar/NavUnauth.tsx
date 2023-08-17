@@ -3,7 +3,7 @@ import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/Ri"
 import { BsPerson, BsPersonPlus } from "react-icons/bs"
 import { FiLogIn } from "react-icons/fi"
 import { Link } from "react-router-dom"
-import useClickOutside from "../utils/useClickOutside"
+import useClickOutside from "../../utils/useClickOutside"
 
 const NavUnauth = () => {
   const [openMenu, setOpenMenu] = useState<boolean>(false)

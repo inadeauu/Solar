@@ -65,7 +65,7 @@ export const resolvers: Resolvers = {
       if (await checkCommunityTitleExists(args.input.title)) {
         return {
           __typename: "CreateCommunityInputError",
-          errorMsg: "Input error",
+          errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
             title: "Title already in use",
@@ -76,7 +76,7 @@ export const resolvers: Resolvers = {
       if (args.input.title.length > 25) {
         return {
           __typename: "CreateCommunityInputError",
-          errorMsg: "Input error",
+          errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
             title: "Title must be less than 25 characters long",

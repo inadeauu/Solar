@@ -4,10 +4,10 @@ type Query {
 
 type Mutation {
   registerUsername(input: RegisterUsernameInput!): RegisterUsernameResult!
-    @rateLimit(limit: 3, duration: 600)
+    @rateLimit(limit: 10, duration: 600)
   loginUsername(input: LoginUsernameInput!): LoginUsernameResult!
-    @rateLimit(limit: 60, duration: 3600)
-  logout: LogoutResult! @rateLimit(limit: 60, duration: 3600)
+    @rateLimit(limit: 200, duration: 3600)
+  logout: LogoutResult! @rateLimit(limit: 200, duration: 3600)
 }
 
 # -- REGISTERUSERNAME MUTATION

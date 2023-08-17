@@ -17,19 +17,14 @@ import { ClientError } from "graphql-request"
 const queryCache = new QueryCache({
   onError: (error) => {
     if (error instanceof ClientError) {
-      error.response.errors?.forEach(({ message, path }) => {
-        toast.error(message, { toastId: path?.toString() })
+      error.response.errors?.forEach(({ message }) => {
+        toast.error(message)
       })
     }
   },
 })
 
 const mutationCache = new MutationCache({
-  onSuccess: (data: any) => {
-    if ("errorMsg" in data && "inputErrors" in data) {
-      toast.error("Invalid input", { toastId: data.errorMsg })
-    }
-  },
   onError: (error) => {
     if (error instanceof ClientError) {
       error.response.errors?.forEach(({ message }) => {

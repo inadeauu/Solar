@@ -1,6 +1,6 @@
 scalar DateTime
 
-type Query @rateLimit(limit: 120, duration: 60) {
+type Query @rateLimit(limit: 180, duration: 60) {
   posts(input: PostsInput!): PostConnection!
 }
 

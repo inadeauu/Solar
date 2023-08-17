@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
 import { AiOutlineArrowDown, AiOutlineArrowUp } from "react-icons/ai"
-import useClickOutside from "../utils/useClickOutside"
+import useClickOutside from "../../utils/useClickOutside"
 
 type DropdownProps = {
   className?: string

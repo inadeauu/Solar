@@ -1,12 +1,12 @@
 import { useRef, useState } from "react"
 import { CiLogout } from "react-icons/ci"
-import useClickOutside from "../utils/useClickOutside"
+import useClickOutside from "../../utils/useClickOutside"
 import { BsHouseAdd, BsPerson } from "react-icons/bs"
 import { Link } from "react-router-dom"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { graphql } from "../gql"
-import { graphQLClient } from "../utils/graphql"
-import { useAuth } from "../utils/useAuth"
+import { useMutation } from "@tanstack/react-query"
+import { graphql } from "../../gql"
+import { graphQLClient } from "../../utils/graphql"
+import { useAuth } from "../../utils/useAuth"
 import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/Ri"
 
 const logoutDocument = graphql(/* GraphQL */ `
@@ -25,7 +25,6 @@ const NavProfile = () => {
   const { user } = useAuth()
   const menuRef = useRef<HTMLDivElement>(null)
   const [openMenu, setOpenMenu] = useState<boolean>(false)
-  const queryClient = useQueryClient()
 
   const logout = useMutation({
     mutationFn: async () => {
@@ -33,7 +32,7 @@ const NavProfile = () => {
     },
     onSuccess: (data) => {
       if (data.logout.__typename == "LogoutSuccess") {
-        queryClient.invalidateQueries({ queryKey: ["user"] })
+        window.location.reload()
       }
     },
   })

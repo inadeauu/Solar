@@ -1,6 +1,6 @@
 import { useRef, useState } from "react"
-import Dropdown from "./Dropdown"
-import useDebounce from "../utils/useDebounce"
+import Dropdown from "../misc/Dropdown"
+import useDebounce from "../../utils/useDebounce"
 import CommunitiesSearchBar from "./CommunitiesSearchBar"
 import UsersSearchBar from "./UsersSearchBar"
 import { PiMagnifyingGlassBold } from "react-icons/pi"

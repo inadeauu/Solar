@@ -13,17 +13,18 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query CommunitiesSearch($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          id\n          memberCount\n          title\n          created_at\n        }\n      }\n    }\n  }\n": types.CommunitiesSearchDocument,
-    "\n  mutation CreateCommunityPost($input: CreatePostInput!) {\n    createPost(input: $input) {\n      ... on CreatePostSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.CreateCommunityPostDocument,
     "\n  mutation UserJoinCommunity($input: UserJoinCommunityInput!) {\n    userJoinCommunity(input: $input) {\n      ... on UserJoinCommunitySuccess {\n        __typename\n        successMsg\n        code\n        community {\n          id\n          memberCount\n          postCount\n          inCommunity\n          owner {\n            id\n            username\n          }\n          title\n          created_at\n          updated_at\n        }\n      }\n    }\n  }\n": types.UserJoinCommunityDocument,
+    "\n  query PostFeed($input: PostsInput!) {\n    posts(input: $input) {\n      edges {\n        node {\n          body\n          community {\n            id\n            title\n          }\n          created_at\n          id\n          owner {\n            id\n            username\n          }\n          title\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n": types.PostFeedDocument,
+    "\n  mutation CreateCommunityPost($input: CreatePostInput!) {\n    createPost(input: $input) {\n      ... on CreatePostSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.CreateCommunityPostDocument,
     "\n  mutation Logout {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.LogoutDocument,
+    "\n  query CommunitiesSearch($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          id\n          memberCount\n          title\n          created_at\n        }\n      }\n    }\n  }\n": types.CommunitiesSearchDocument,
     "\n  query UsersSearch($input: UsersInput!) {\n    users(input: $input) {\n      edges {\n        node {\n          username\n          created_at\n          postsCount\n          commentsCount\n        }\n      }\n    }\n  }\n": types.UsersSearchDocument,
     "\n  query AuthUser {\n    authUser {\n      ... on AuthUserSuccess {\n        __typename\n        successMsg\n        code\n        user {\n          username\n          updated_at\n          provider\n          id\n          created_at\n        }\n      }\n    }\n  }\n": types.AuthUserDocument,
     "\n  query Community($input: CommunityInput!) {\n    community(input: $input) {\n      id\n      memberCount\n      postCount\n      inCommunity\n      owner {\n        id\n        username\n      }\n      title\n      created_at\n      updated_at\n    }\n  }\n": types.CommunityDocument,
     "\n  query CommunityTitleExists($title: String!) {\n    titleExists(title: $title)\n  }\n": types.CommunityTitleExistsDocument,
-    "\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.CreateCommunityDocument,
-    "\n  mutation LoginUsername($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.LoginUsernameDocument,
-    "\n  mutation RegisterUsername($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.RegisterUsernameDocument,
+    "\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.CreateCommunityDocument,
+    "\n  mutation LoginUsername($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.LoginUsernameDocument,
+    "\n  mutation RegisterUsername($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.RegisterUsernameDocument,
     "\n  query UsernameExists($username: String!) {\n    usernameExists(username: $username)\n  }\n": types.UsernameExistsDocument,
 };
 
@@ -44,19 +45,23 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query CommunitiesSearch($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          id\n          memberCount\n          title\n          created_at\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query CommunitiesSearch($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          id\n          memberCount\n          title\n          created_at\n        }\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  mutation CreateCommunityPost($input: CreatePostInput!) {\n    createPost(input: $input) {\n      ... on CreatePostSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CreateCommunityPost($input: CreatePostInput!) {\n    createPost(input: $input) {\n      ... on CreatePostSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function graphql(source: "\n  mutation UserJoinCommunity($input: UserJoinCommunityInput!) {\n    userJoinCommunity(input: $input) {\n      ... on UserJoinCommunitySuccess {\n        __typename\n        successMsg\n        code\n        community {\n          id\n          memberCount\n          postCount\n          inCommunity\n          owner {\n            id\n            username\n          }\n          title\n          created_at\n          updated_at\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation UserJoinCommunity($input: UserJoinCommunityInput!) {\n    userJoinCommunity(input: $input) {\n      ... on UserJoinCommunitySuccess {\n        __typename\n        successMsg\n        code\n        community {\n          id\n          memberCount\n          postCount\n          inCommunity\n          owner {\n            id\n            username\n          }\n          title\n          created_at\n          updated_at\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  query PostFeed($input: PostsInput!) {\n    posts(input: $input) {\n      edges {\n        node {\n          body\n          community {\n            id\n            title\n          }\n          created_at\n          id\n          owner {\n            id\n            username\n          }\n          title\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n"): (typeof documents)["\n  query PostFeed($input: PostsInput!) {\n    posts(input: $input) {\n      edges {\n        node {\n          body\n          community {\n            id\n            title\n          }\n          created_at\n          id\n          owner {\n            id\n            username\n          }\n          title\n        }\n      }\n      pageInfo {\n        endCursor\n        hasNextPage\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreateCommunityPost($input: CreatePostInput!) {\n    createPost(input: $input) {\n      ... on CreatePostSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CreateCommunityPost($input: CreatePostInput!) {\n    createPost(input: $input) {\n      ... on CreatePostSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation Logout {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation Logout {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CommunitiesSearch($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          id\n          memberCount\n          title\n          created_at\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query CommunitiesSearch($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          id\n          memberCount\n          title\n          created_at\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -76,15 +81,15 @@ export function graphql(source: "\n  query CommunityTitleExists($title: String!)
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CreateCommunity($input: CreateCommunityInput!) {\n    createCommunity(input: $input) {\n      ... on CreateCommunitySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation LoginUsername($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation LoginUsername($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  mutation LoginUsername($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation LoginUsername($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  mutation RegisterUsername($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RegisterUsername($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"];
+export function graphql(source: "\n  mutation RegisterUsername($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RegisterUsername($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

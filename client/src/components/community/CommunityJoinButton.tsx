@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../utils/useAuth"
+import { useAuth } from "../../utils/useAuth"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { graphql } from "../gql"
-import { CommunityQuery, UserJoinCommunityInput } from "../gql/graphql"
-import { graphQLClient } from "../utils/graphql"
+import { graphql } from "../../gql"
+import { CommunityQuery, UserJoinCommunityInput } from "../../gql/graphql"
+import { graphQLClient } from "../../utils/graphql"
 import { useRef } from "react"
 import { toast } from "react-toastify"
 
@@ -32,11 +32,11 @@ const userJoinCommunityDocument = graphql(/* GraphQL */ `
   }
 `)
 
-type JoinCommunityButtonProps = {
+type CommunityJoinButtonProps = {
   community: NonNullable<CommunityQuery["community"]>
 }
 
-const JoinCommunityButton = ({ community }: JoinCommunityButtonProps) => {
+const CommunityJoinButton = ({ community }: CommunityJoinButtonProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -80,7 +80,6 @@ const JoinCommunityButton = ({ community }: JoinCommunityButtonProps) => {
       if (!error.current) error.current = true
 
       if (last_updated.current <= context!.updated_at && !rollback.current) {
-        console.log("here")
         queryClient.setQueryData(
           [input.communityId],
           context!.previous_community
@@ -131,4 +130,4 @@ const JoinCommunityButton = ({ community }: JoinCommunityButtonProps) => {
   )
 }
 
-export default JoinCommunityButton
+export default CommunityJoinButton

@@ -1,5 +1,5 @@
-import AuthProvider from "../contexts/AuthContext"
-import Navbar from "./Navbar"
+import AuthProvider from "../../contexts/AuthContext"
+import Navbar from "../navbar/Navbar"
 import { Outlet } from "react-router-dom"
 
 const Layout = () => {

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
-import { graphQLClient } from "../utils/graphql"
-import { graphql } from "../gql"
+import { graphQLClient } from "../../utils/graphql"
+import { graphql } from "../../gql"
 import { useNavigate } from "react-router-dom"
-import { pluralize } from "../utils/utils"
+import { pluralize } from "../../utils/utils"
 import abbreviate from "number-abbreviate"
 import { AiOutlineSearch } from "react-icons/ai"
 

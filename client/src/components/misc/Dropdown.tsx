@@ -31,8 +31,8 @@ const Dropdown = ({
   return (
     <div
       ref={menuRef}
-      className={`flex items-center gap-1 px-2 text-sm relative rounded-md font-medium bg-gray-50 border-2 border-gray-300 hover:border-gray-400 cursor-pointer ${className} ${
-        openMenu && "border-gray-400"
+      className={`flex items-center gap-1 px-2 text-sm relative rounded-md font-medium bg-white border-2 border-neutral-300 hover:border-neutral-400 cursor-pointer ${className} ${
+        openMenu && "border-neutral-400"
       } ${!constValue && width}`}
       onClick={() => setOpenMenu((prev) => !prev)}
     >
@@ -42,12 +42,12 @@ const Dropdown = ({
       </span>
       {openMenu && (
         <ul
-          className={`absolute top-10 left-0 bg-gray-50 rounded-md outline outline-1 outline-gray-300 ${width}`}
+          className={`absolute top-10 left-0 bg-white rounded-md outline outline-1 outline-neutral-300 ${width}`}
         >
           {items.map((item, i) => (
             <li
               key={item}
-              className={`cursor-pointer p-2 hover:bg-gray-200 ${
+              className={`cursor-pointer p-2 hover:bg-neutral-200 ${
                 i == 0 && items.length == 1
                   ? "rounded-md"
                   : i == 0

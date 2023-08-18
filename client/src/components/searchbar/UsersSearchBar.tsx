@@ -43,7 +43,7 @@ const UsersSearchBar = ({ debouncedSearch, search }: UsersSearchBarProps) => {
 
   return (
     <div
-      className={`absolute top-9 bg-white w-full border-r-2 border-b-2 border-l-2 border-gray-300 flex flex-col ${
+      className={`absolute top-9 bg-white w-full border-r-2 border-b-2 border-l-2 border-neutral-300 flex flex-col ${
         !data?.users?.edges && "hidden"
       }`}
     >
@@ -52,13 +52,13 @@ const UsersSearchBar = ({ debouncedSearch, search }: UsersSearchBarProps) => {
           data.users.edges.map((edge, i) => (
             <div
               key={i}
-              className="flex flex-col px-2 py-1 hover:bg-gray-200 cursor-pointer overflow-auto"
+              className="flex flex-col px-2 py-1 hover:bg-neutral-200 cursor-pointer overflow-auto"
               onMouseDown={() => navigate("/signup")}
             >
               <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
                 {edge.node.username}
               </span>
-              <p className="flex items-center gap-1 text-gray-500 xs-max:text-[10px] xs:text-xs">
+              <p className="flex items-center gap-1 text-neutral-500 xs-max:text-[10px] xs:text-xs">
                 {abbreviate(edge.node.postsCount, 1)}{" "}
                 {pluralize(edge.node.postsCount, "Post")} •{" "}
                 {abbreviate(edge.node.commentsCount, 1)}{" "}
@@ -70,7 +70,7 @@ const UsersSearchBar = ({ debouncedSearch, search }: UsersSearchBarProps) => {
           <span className="px-2 py-1 text-sm">No results</span>
         ))}
       <div
-        className={`px-2 py-2 text-sm text-ellipses hover:bg-gray-200 border-t border-gray-300 text-ellipsis whitespace-nowrap overflow-hidden cursor-pointer ${
+        className={`px-2 py-2 text-sm text-ellipses hover:bg-neutral-200 border-t border-neutral-300 text-ellipsis whitespace-nowrap overflow-hidden cursor-pointer ${
           !search && "hidden"
         }`}
         onMouseDown={() => navigate("/signup")}

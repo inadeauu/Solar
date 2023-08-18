@@ -47,7 +47,7 @@ const CommunitiesSearchBar = ({
 
   return (
     <div
-      className={`absolute top-9 bg-white w-full border-r-2 border-b-2 border-l-2 border-gray-300 flex flex-col ${
+      className={`absolute top-9 bg-white w-full border-r-2 border-b-2 border-l-2 border-neutral-300 flex flex-col ${
         !data?.communities?.edges && "hidden"
       }`}
     >
@@ -58,7 +58,7 @@ const CommunitiesSearchBar = ({
           return (
             <div
               key={edge.node.id}
-              className="flex flex-col px-2 py-1 hover:bg-gray-200 cursor-pointer overflow-auto"
+              className="flex flex-col px-2 py-1 hover:bg-neutral-200 cursor-pointer overflow-auto"
               onMouseDown={() => {
                 navigate(`/communities/${edge.node.title}/${id}`)
               }}
@@ -66,7 +66,7 @@ const CommunitiesSearchBar = ({
               <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
                 {edge.node.title}
               </span>
-              <span className="text-xs text-gray-500 xs-max:text-[10px] xs:text-xs">
+              <span className="text-xs text-neutral-500 xs-max:text-[10px] xs:text-xs">
                 {abbreviate(edge.node.memberCount, 1)}{" "}
                 {pluralize(edge.node.memberCount, "Member")}
               </span>
@@ -77,7 +77,7 @@ const CommunitiesSearchBar = ({
         <span className="px-2 py-1 text-sm">No results</span>
       )}
       <div
-        className={`px-2 py-2 text-sm text-ellipses hover:bg-gray-200 border-t border-gray-300 text-ellipsis whitespace-nowrap overflow-hidden cursor-pointer ${
+        className={`px-2 py-2 text-sm text-ellipses hover:bg-neutral-200 border-t border-neutral-300 text-ellipsis whitespace-nowrap overflow-hidden cursor-pointer ${
           !search && "hidden"
         }`}
         onMouseDown={() => navigate("/signup")}

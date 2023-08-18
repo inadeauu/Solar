@@ -97,7 +97,7 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
   }
 
   return (
-    <div className="bg-gray-100 border border-gray-300 rounded-lg p-4">
+    <div className="bg-white border border-neutral-300 rounded-lg p-4">
       {!openEditor ? (
         <button
           onClick={() => {

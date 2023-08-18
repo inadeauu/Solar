@@ -58,7 +58,10 @@ export const paginate = async <Node extends { id: string }>(
     hasPreviousPage = !!paginateArgs.after
     hasNextPage = nodes.length > paginateArgs.first
 
-    if (hasNextPage) edges.pop()
+    if (hasNextPage) {
+      edges.pop()
+      nodes.pop()
+    }
   } else {
     const cursor = paginateArgs.before ? { id: paginateArgs.before } : undefined
     const take = -(paginateArgs.last! + 1)
@@ -73,7 +76,10 @@ export const paginate = async <Node extends { id: string }>(
     hasPreviousPage = nodes.length > paginateArgs.last!
     hasNextPage = !!paginateArgs.before
 
-    if (hasPreviousPage) edges.shift()
+    if (hasPreviousPage) {
+      edges.shift()
+      nodes.shift()
+    }
   }
 
   const startCursor = nodes.length ? nodes[0].id : undefined

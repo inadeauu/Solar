@@ -31,8 +31,8 @@ const NavUnauth = () => {
         onClick={() => setOpenMenu((prev) => !prev)}
       >
         <div
-          className={`border-2 border-gray-300 hover:border-gray-400 rounded-md pl-2 pr-1 py-1 hover:cursor-pointer flex items-center justify-between ${
-            openMenu && "border-gray-400"
+          className={`border-2 border-neutral-300 hover:border-neutral-400 rounded-md pl-2 pr-1 py-1 hover:cursor-pointer flex items-center justify-between ${
+            openMenu && "border-neutral-400"
           }`}
         >
           <BsPerson className="w-7 h-7 hover:cursor-pointer lg:hidden" />
@@ -45,10 +45,10 @@ const NavUnauth = () => {
           </span>
         </div>
         {openMenu && (
-          <div className="absolute right-0 top-11 bg-gray-50 w-[110px] border border-gray-300 rounded-md text-sm font-medium">
+          <div className="absolute right-0 top-11 bg-neutral-50 w-[110px] border border-neutral-300 rounded-md text-sm font-medium">
             <Link
               to="/signup"
-              className="flex items-center gap-2 p-2 rounded-t-md hover:bg-gray-200 hover:cursor-pointer"
+              className="flex items-center gap-2 p-2 rounded-t-md hover:bg-neutral-200 hover:cursor-pointer"
             >
               <div className="w-[25%]">
                 <BsPersonPlus className="w-5 h-5" />
@@ -57,7 +57,7 @@ const NavUnauth = () => {
             </Link>
             <Link
               to="/login"
-              className="flex items-center gap-2 p-2 rounded-b-md hover:bg-gray-200 hover:cursor-pointer"
+              className="flex items-center gap-2 p-2 rounded-b-md hover:bg-neutral-200 hover:cursor-pointer"
             >
               <div className="w-[25%]">
                 <FiLogIn className="w-4 h-4 mr-auto" />

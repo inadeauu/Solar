@@ -19,7 +19,7 @@ const SearchBar = () => {
         <input
           value={search}
           placeholder={`Search ${searchType}`}
-          className={`px-2 py-1 rounded-md border-2 border-gray-300 outline-none bg-gray-50 hover:border-blue-400 focus:border-blue-400 w-full xs-max:placeholder:text-xs placeholder-shown:text-ellipsis ${
+          className={`px-2 py-1 rounded-md border-2 border-neutral-300 outline-none bg-neutral-50 hover:border-blue-400 focus:border-blue-400 w-full xs-max:placeholder:text-xs placeholder-shown:text-ellipsis ${
             showResults && "rounded-b-none"
           }`}
           onChange={(e) => setSearch(e.target.value)}

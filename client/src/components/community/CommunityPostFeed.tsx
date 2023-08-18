@@ -5,7 +5,7 @@ import { graphql } from "../../gql"
 import { graphQLClient } from "../../utils/graphql"
 import { useEffect } from "react"
 import { ImSpinner11 } from "react-icons/im"
-import { Link } from "react-router-dom"
+import Post from "../post/Post"
 
 type CommunityPostFeedProps = {
   community: NonNullable<CommunityQuery["community"]>
@@ -79,35 +79,16 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
     <>
       {isSuccess &&
         data.pages.map((page) =>
-          page.posts.edges.map((edge) => {
+          page.posts.edges.map((edge, i) => {
             return (
-              <div
+              <Post
+                innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
                 key={edge.node.id}
-                className="bg-gray-100 border border-gray-300 rounded-lg p-4 hover:bg-gray-200 hover:cursor-pointer"
-              >
-                <div className="flex flex-col gap-2">
-                  <span className="text-xs">
-                    Posted by{" "}
-                    <Link
-                      to="#"
-                      className="font-medium hover:underline hover:cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                      }}
-                    >
-                      {edge.node.owner.username}
-                    </Link>
-                    {""}
-                  </span>
-                  <span className="font-semibold text-lg">
-                    {edge.node.title}
-                  </span>
-                </div>
-              </div>
+                post={edge.node}
+              />
             )
           })
         )}
-      <span ref={ref} />
       {isFetchingNextPage && (
         <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
       )}

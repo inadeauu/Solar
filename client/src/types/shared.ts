@@ -14,3 +14,5 @@ export const initialFieldState: FieldState = {
   success: false,
   error: false,
 }
+
+export type Flatten<T> = T extends any[] ? T[number] : T

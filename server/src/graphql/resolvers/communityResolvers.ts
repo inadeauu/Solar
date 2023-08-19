@@ -121,8 +121,8 @@ export const resolvers: Resolvers = {
         })
       }
 
-      let successMsg: string
       let updatedCommunity: Community
+      let successMsg: string
 
       if (!community.members.length) {
         updatedCommunity = await prisma.community.update({

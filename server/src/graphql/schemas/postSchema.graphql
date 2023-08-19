@@ -1,12 +1,15 @@
 scalar DateTime
 
 type Query @rateLimit(limit: 180, duration: 60) {
+  post(input: PostInput!): Post
   posts(input: PostsInput!): PostConnection!
 }
 
 type Mutation {
   createPost(input: CreatePostInput!): CreatePostResult!
     @rateLimit(limit: 5, duration: 60)
+  votePost(input: VotePostInput!): VotePostResult!
+    @rateLimit(limit: 120, duration: 60)
 }
 
 type Post {
@@ -16,9 +19,18 @@ type Post {
   created_at: DateTime!
   updated_at: DateTime!
 
+  commentCount: Int!
+  voteSum: Int!
+  voteStatus: PostVoteStatus!
+
   owner: User!
   community: Community!
   comments(input: PostCommentInput!): CommentConnection!
+}
+
+# -- POST QUERY
+input PostInput {
+  id: ID!
 }
 
 # -- POSTS QUERY
@@ -64,9 +76,29 @@ type CreatePostInputErrors {
   communityId: String
 }
 
+# -- VOTEPOST MUTATIOn
+union VotePostResult = VotePostSuccess
+
+input VotePostInput {
+  postId: String!
+  like: Boolean!
+}
+
+type VotePostSuccess implements Success {
+  successMsg: String!
+  code: Int!
+  post: Post!
+}
+
 # -- ENUMS
 enum PostOrderByType {
   recent
+}
+
+enum PostVoteStatus {
+  NONE
+  LIKE
+  DISLIKE
 }
 
 # -- RESOLVERS

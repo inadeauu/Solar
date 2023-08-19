@@ -16,18 +16,21 @@ const getPostFeedDocument = graphql(/* GraphQL */ `
     posts(input: $input) {
       edges {
         node {
+          id
           body
+          created_at
+          title
+          commentCount
+          voteSum
+          voteStatus
           community {
             id
             title
           }
-          created_at
-          id
           owner {
             id
             username
           }
-          title
         }
       }
       pageInfo {
@@ -85,6 +88,7 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
                 innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
                 key={edge.node.id}
                 post={edge.node}
+                queryKey={["communityPostFeed", community.id]}
               />
             )
           })

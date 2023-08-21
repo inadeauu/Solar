@@ -1,15 +1,16 @@
 import { useLayoutEffect, useRef, useState } from "react"
 import { useAuth } from "../../utils/useAuth"
 import { useNavigate } from "react-router-dom"
-import { CommunityQuery, CreatePostInput } from "../../gql/graphql"
-import { graphql } from "../../gql"
+import { CommunityQuery, CreatePostInput } from "../../graphql_codegen/graphql"
+import { graphql } from "../../graphql_codegen/gql"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../../utils/graphql"
 import { ImSpinner11 } from "react-icons/im"
 import ErrorCard from "../misc/ErrorCard"
+import type { Community } from "../../graphql/types"
 
 type CommunityPostFormProps = {
-  community: NonNullable<CommunityQuery["community"]>
+  community: Community
 }
 
 const createCommunityPostDocument = graphql(/* GraphQL */ `

@@ -8,10 +8,10 @@ import ErrorCard from "../components/misc/ErrorCard"
 import { ImSpinner11 } from "react-icons/im"
 import TextInput from "../components/misc/TextInput"
 import { api } from "../utils/axios"
-import { graphql } from "../gql"
+import { graphql } from "../graphql_codegen/gql"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
-import { RegisterUsernameInput } from "../gql/graphql"
+import { RegisterUsernameInput } from "../graphql_codegen/graphql"
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi"
 import { debounce } from "lodash"
 import { FieldState, FieldStates, initialFieldState } from "../types/shared"
@@ -61,7 +61,7 @@ enum FieldErrorMsgs {
   PASSWORD_MATCH = "Passwords do not match",
 }
 
-const Signup = () => {
+const SignupPage = () => {
   const [fieldStates, setFieldStates] =
     useState<FormFieldStates>(initialFieldStates)
   const [validatingUsername, setValidatingUsername] = useState<boolean>(false)
@@ -391,4 +391,4 @@ const Signup = () => {
   )
 }
 
-export default Signup
+export default SignupPage

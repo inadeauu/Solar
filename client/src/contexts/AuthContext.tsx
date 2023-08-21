@@ -1,8 +1,8 @@
 import { createContext } from "react"
 import { ImSpinner11 } from "react-icons/im"
 import { useQuery } from "@tanstack/react-query"
-import { AuthUserQuery } from "../gql/graphql"
-import { graphql } from "../gql"
+import { AuthUserQuery } from "../graphql_codegen/graphql"
+import { graphql } from "../graphql_codegen/gql"
 import { graphQLClient } from "../utils/graphql"
 
 const authUserQueryDocument = graphql(/* GraphQL */ `

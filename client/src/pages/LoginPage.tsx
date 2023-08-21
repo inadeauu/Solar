@@ -9,9 +9,9 @@ import { ImSpinner11 } from "react-icons/im"
 import { api } from "../utils/axios"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
-import { graphql } from "../gql"
+import { graphql } from "../graphql_codegen/gql"
 import TextInput from "../components/misc/TextInput"
-import { LoginUsernameInput } from "../gql/graphql"
+import { LoginUsernameInput } from "../graphql_codegen/graphql"
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi"
 import { FieldState, FieldStates, initialFieldState } from "../types/shared"
 import { setFieldStateSuccess, setFieldStateValue } from "../utils/form"
@@ -47,7 +47,7 @@ enum FieldErrorMsgs {
   REQUIRED = "Required",
 }
 
-const Login = () => {
+const LoginPage = () => {
   const [fieldStates, setFieldStates] =
     useState<FormFieldStates>(initialFieldStates)
   const [submitting, setSubmitting] = useState<boolean>(false)
@@ -276,4 +276,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default LoginPage

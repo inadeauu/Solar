@@ -2,10 +2,10 @@ import { ImSpinner11 } from "react-icons/im"
 import TextInput from "../components/misc/TextInput"
 import { useCallback, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { graphql } from "../gql"
+import { graphql } from "../graphql_codegen/gql"
 import { graphQLClient } from "../utils/graphql"
 import { useMutation } from "@tanstack/react-query"
-import { CreateCommunityInput } from "../gql/graphql"
+import { CreateCommunityInput } from "../graphql_codegen/graphql"
 import { debounce } from "lodash"
 import { FieldState, FieldStates, initialFieldState } from "../types/shared"
 import { setFieldStateSuccess, setFieldStateValue } from "../utils/form"
@@ -49,7 +49,7 @@ enum FieldErrorMsgs {
   TITLE_TAKEN = "Title in use",
 }
 
-const CreateCommunity = () => {
+const CreateCommunityPage = () => {
   const [fieldStates, setFieldStates] =
     useState<FormFieldStates>(initialFieldStates)
   const [submitting, setSubmitting] = useState<boolean>(false)
@@ -204,4 +204,4 @@ const CreateCommunity = () => {
   )
 }
 
-export default CreateCommunity
+export default CreateCommunityPage

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { graphql } from "../../gql"
+import { graphql } from "../../graphql_codegen/gql"
 import { graphQLClient } from "../../utils/graphql"
 import { useNavigate } from "react-router-dom"
 import { pluralize } from "../../utils/utils"

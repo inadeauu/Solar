@@ -57,7 +57,11 @@ const main = async () => {
   routes(app)
 
   const httpServer = http.createServer(app)
-  const armor = new ApolloArmor()
+  const armor = new ApolloArmor({
+    maxDepth: {
+      n: 9,
+    },
+  })
 
   const server = new ApolloServer<Context>({
     schema,

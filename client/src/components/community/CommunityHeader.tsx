@@ -1,11 +1,11 @@
 import CommunityJoinButton from "./CommunityJoinButton"
 import { pluralize } from "../../utils/utils"
-import { CommunityQuery } from "../../gql/graphql"
 import { Link } from "react-router-dom"
 import moment from "moment"
+import type { Community } from "../../graphql/types"
 
 type CommunityHeaderProps = {
-  community: NonNullable<CommunityQuery["community"]>
+  community: Community
 }
 
 const CommunityHeader = ({ community }: CommunityHeaderProps) => {

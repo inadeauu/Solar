@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 
-const NotFound = () => {
+const NotFoundPage = () => {
   return (
     <div className="flex h-screen justify-center mt-[125px]">
       <div className="flex flex-col items-center gap-4 h-fit">
@@ -14,4 +14,4 @@ const NotFound = () => {
   )
 }
 
-export default NotFound
+export default NotFoundPage

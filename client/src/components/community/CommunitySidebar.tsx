@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom"
 import { pluralize } from "../../utils/utils"
-import { CommunityQuery } from "../../gql/graphql"
 import JoinCommunityButton from "./CommunityJoinButton"
 import moment from "moment"
+import type { Community } from "../../graphql/types"
 
 type CommunitySidebarProps = {
-  community: NonNullable<CommunityQuery["community"]>
+  community: Community
 }
 
 const CommunitySidebar = ({ community }: CommunitySidebarProps) => {

@@ -1,14 +1,15 @@
 import { Route, Routes } from "react-router-dom"
-import Home from "./pages/Home"
-import Login from "./pages/Login"
-import Signup from "./pages/Signup"
+import HomePage from "./pages/HomePage"
+import LoginPage from "./pages/LoginPage"
+import SignupPage from "./pages/SignupPage"
 import Layout from "./components/structure/Layout"
-import CreateCommunity from "./pages/CreateCommunity"
+import CreateCommunityPage from "./pages/CreateCommunityPage"
 import ProtectedRoute from "./components/structure/ProtectedRoute"
-import Community from "./pages/Community"
-import NotFound from "./pages/NotFound"
+import CommunityPage from "./pages/CommunityPage"
+import NotFoundPage from "./pages/NotFoundPage"
 import { ToastContainer, Zoom } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
+import PostPage from "./pages/PostPage"
 
 const App = () => {
   return (
@@ -28,15 +29,16 @@ const App = () => {
       />
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
+          <Route index element={<HomePage />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="create-community" element={<CreateCommunity />} />
+            <Route path="create-community" element={<CreateCommunityPage />} />
           </Route>
-          <Route path="communities/:title/:id" element={<Community />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="communities/:title/:id" element={<CommunityPage />} />
+          <Route path="posts/:title/:id" element={<PostPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Routes>
     </>
   )

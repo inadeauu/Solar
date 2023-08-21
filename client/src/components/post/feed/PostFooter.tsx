@@ -5,96 +5,66 @@ import {
   BiSolidUpvote,
   BiUpvote,
 } from "react-icons/bi"
-import { Flatten } from "../../types/shared"
-import { PostFeedQuery, PostVoteStatus, VotePostInput } from "../../gql/graphql"
+import {
+  PostFeedQuery,
+  PostVoteStatus,
+  VotePostInput,
+} from "../../../graphql_codegen/graphql"
 import { useRef } from "react"
-import { graphql } from "../../gql"
 import {
   InfiniteData,
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query"
-import { graphQLClient } from "../../utils/graphql"
-import { toast } from "react-toastify"
-import { useAuth } from "../../utils/useAuth"
+import { graphQLClient } from "../../../utils/graphql"
+import { useAuth } from "../../../utils/useAuth"
 import { redirect } from "react-router-dom"
+import type { Post } from "../../../graphql/types"
+import { votePostDocument } from "../../../graphql/sharedDocuments"
 
 type PostFooterProps = {
-  post: Flatten<PostFeedQuery["posts"]["edges"]>["node"]
+  post: Post
   queryKey: any[]
-}
-
-const votePostDocument = graphql(/* GraphQL */ `
-  mutation VotePost($input: VotePostInput!) {
-    votePost(input: $input) {
-      ... on VotePostSuccess {
-        successMsg
-        code
-        post {
-          id
-          body
-          created_at
-          title
-          commentCount
-          voteSum
-          voteStatus
-          community {
-            id
-            title
-          }
-          owner {
-            id
-            username
-          }
-        }
-      }
-    }
-  }
-`)
-
-const newPostFeed = (
-  oldData: InfiniteData<PostFeedQuery>,
-  newPost: Flatten<PostFeedQuery["posts"]["edges"]>["node"] | undefined
-): InfiniteData<PostFeedQuery> => {
-  const newPages: PostFeedQuery[] = oldData.pages.map((page) => {
-    return {
-      posts: {
-        ...page.posts,
-        edges: page.posts.edges.map((edge) => {
-          if (newPost && edge.node.id == newPost.id) {
-            return {
-              node: newPost,
-            }
-          } else {
-            return edge
-          }
-        }),
-      },
-    }
-  })
-
-  return {
-    ...oldData,
-    pages: newPages,
-  }
 }
 
 const PostFooter = ({ post, queryKey }: PostFooterProps) => {
   const { user } = useAuth()
   const queryClient = useQueryClient()
 
-  const rollback = useRef<
-    Flatten<PostFeedQuery["posts"]["edges"]>["node"] | null
-  >(null)
-  const previous_post =
-    useRef<Flatten<PostFeedQuery["posts"]["edges"]>["node"]>(post)
+  const rollback = useRef<Post | null>(null)
+  const previous_post = useRef<Post>(post)
   const error = useRef<boolean>(false)
   const sent_requests = useRef<number>(0)
   const last_updated = useRef<string>("")
 
-  const updatePostFeed = (
-    post: Flatten<PostFeedQuery["posts"]["edges"]>["node"] | undefined
-  ) => {
+  const newPostFeed = (
+    oldData: InfiniteData<PostFeedQuery>,
+    newPost: Post | undefined
+  ): InfiniteData<PostFeedQuery> => {
+    const newPages: PostFeedQuery[] = oldData.pages.map((page) => {
+      return {
+        posts: {
+          ...page.posts,
+          edges: page.posts.edges.map((edge) => {
+            if (newPost && edge.node.id == newPost.id) {
+              return {
+                node: newPost,
+              }
+            } else {
+              return edge
+            }
+          }),
+        },
+      }
+    })
+
+    return {
+      ...oldData,
+      pages: newPages,
+    }
+  }
+
+  const updatePostFeed = (post: Post | undefined) => {
     queryClient.setQueryData<InfiniteData<PostFeedQuery>>(
       queryKey,
       (oldData) => {
@@ -180,7 +150,6 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
       }
     },
     onSuccess: async (data, _0, context) => {
-      toast.success(data.votePost.successMsg)
       rollback.current = data.votePost.post
 
       if (last_updated.current <= context!.updated_at) {

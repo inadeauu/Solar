@@ -1,14 +1,14 @@
-import { CommunityQuery } from "../../gql/graphql"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useInView } from "react-intersection-observer"
-import { graphql } from "../../gql"
+import { graphql } from "../../graphql_codegen/gql"
 import { graphQLClient } from "../../utils/graphql"
 import { useEffect } from "react"
 import { ImSpinner11 } from "react-icons/im"
-import Post from "../post/Post"
+import Post from "../post/feed/Post"
+import type { Community } from "../../graphql/types"
 
 type CommunityPostFeedProps = {
-  community: NonNullable<CommunityQuery["community"]>
+  community: Community
 }
 
 const getPostFeedDocument = graphql(/* GraphQL */ `

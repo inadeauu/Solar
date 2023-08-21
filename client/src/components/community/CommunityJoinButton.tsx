@@ -1,11 +1,15 @@
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../utils/useAuth"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { graphql } from "../../gql"
-import { CommunityQuery, UserJoinCommunityInput } from "../../gql/graphql"
+import { graphql } from "../../graphql_codegen/gql"
+import {
+  CommunityQuery,
+  UserJoinCommunityInput,
+} from "../../graphql_codegen/graphql"
 import { graphQLClient } from "../../utils/graphql"
 import { useRef } from "react"
 import { toast } from "react-toastify"
+import type { Community } from "../../graphql/types"
 
 const userJoinCommunityDocument = graphql(/* GraphQL */ `
   mutation UserJoinCommunity($input: UserJoinCommunityInput!) {
@@ -33,7 +37,7 @@ const userJoinCommunityDocument = graphql(/* GraphQL */ `
 `)
 
 type CommunityJoinButtonProps = {
-  community: NonNullable<CommunityQuery["community"]>
+  community: Community
 }
 
 const CommunityJoinButton = ({ community }: CommunityJoinButtonProps) => {

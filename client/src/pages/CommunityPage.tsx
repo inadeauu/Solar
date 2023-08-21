@@ -1,5 +1,5 @@
 import { Navigate, useParams } from "react-router-dom"
-import { graphql } from "../gql"
+import { graphql } from "../graphql_codegen/gql"
 import { translator } from "../utils/uuid"
 import { useQuery } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
@@ -27,7 +27,7 @@ const getCommunityDocument = graphql(/* GraphQL */ `
   }
 `)
 
-const Community = () => {
+const CommunityPage = () => {
   const { title, id } = useParams()
   const uuid = translator.toUUID(id!)
 
@@ -49,7 +49,7 @@ const Community = () => {
 
   return (
     <section className="flex gap-6">
-      <div className="flex flex-col gap-5 md:grow md-max:w-full">
+      <div className="flex flex-col gap-5 md:grow md-max:w-full break-words min-w-0">
         <CommunityHeader community={data.community} />
         <CommunityPostForm community={data.community} />
         <CommunityPostFeed community={data.community} />
@@ -59,4 +59,4 @@ const Community = () => {
   )
 }
 
-export default Community
+export default CommunityPage

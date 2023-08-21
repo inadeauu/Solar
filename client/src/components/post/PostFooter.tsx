@@ -15,6 +15,9 @@ import {
   useQueryClient,
 } from "@tanstack/react-query"
 import { graphQLClient } from "../../utils/graphql"
+import { toast } from "react-toastify"
+import { useAuth } from "../../utils/useAuth"
+import { redirect } from "react-router-dom"
 
 type PostFooterProps = {
   post: Flatten<PostFeedQuery["posts"]["edges"]>["node"]
@@ -77,11 +80,14 @@ const newPostFeed = (
 }
 
 const PostFooter = ({ post, queryKey }: PostFooterProps) => {
+  const { user } = useAuth()
   const queryClient = useQueryClient()
 
   const rollback = useRef<
     Flatten<PostFeedQuery["posts"]["edges"]>["node"] | null
   >(null)
+  const previous_post =
+    useRef<Flatten<PostFeedQuery["posts"]["edges"]>["node"]>(post)
   const error = useRef<boolean>(false)
   const sent_requests = useRef<number>(0)
   const last_updated = useRef<string>("")
@@ -168,12 +174,13 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
       if (!error.current) error.current = true
 
       if (last_updated.current <= context!.updated_at && !rollback.current) {
-        updatePostFeed(context?.previous_post)
+        updatePostFeed(previous_post.current)
       } else if (sent_requests.current == 1 && rollback.current) {
         updatePostFeed(rollback.current)
       }
     },
     onSuccess: async (data, _0, context) => {
+      toast.success(data.votePost.successMsg)
       rollback.current = data.votePost.post
 
       if (last_updated.current <= context!.updated_at) {
@@ -184,6 +191,10 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
     },
     onSettled: async () => {
       if (sent_requests.current == 1) {
+        if (rollback.current) {
+          previous_post.current = rollback.current
+        }
+
         rollback.current = null
         error.current = false
       }
@@ -192,56 +203,47 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
     },
   })
 
+  const vote = (
+    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    like: boolean
+  ) => {
+    if (!user) return redirect("/login")
+
+    e.preventDefault()
+    e.stopPropagation()
+    last_updated.current = new Date().toISOString()
+    sent_requests.current++
+    postVoteMutation.mutate({ postId: post.id, like })
+  }
+
   return (
     <div className="flex mt-4 gap-4">
       <div className="flex items-center gap-1 bg-neutral-200 rounded-full">
-        <div className="group/upvote rounded-full p-[6px] hover:bg-neutral-300">
+        <div
+          onClick={(e) => vote(e, true)}
+          className="group/upvote rounded-full p-[6px] hover:bg-neutral-300"
+        >
           {post.voteStatus == PostVoteStatus.Like ? (
-            <div
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                postVoteMutation.mutate({ postId: post.id, like: true })
-              }}
-            >
-              <BiSolidUpvote className="w-[18px] h-[18px] text-green-500" />
-            </div>
+            <BiSolidUpvote className="w-[18px] h-[18px] text-green-500" />
           ) : (
-            <div
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                postVoteMutation.mutate({ postId: post.id, like: true })
-              }}
-            >
+            <>
               <BiUpvote className="w-[18px] h-[18px] group-hover/upvote:hidden" />
               <BiSolidUpvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-green-500" />
-            </div>
+            </>
           )}
         </div>
         <span className="text-sm">{post.voteSum}</span>
-        <div className="group/upvote rounded-full p-[6px] hover:bg-neutral-300">
+        <div
+          onClick={(e) => vote(e, false)}
+          className="group/upvote rounded-full p-[6px] hover:bg-neutral-300"
+        >
           {post.voteStatus == PostVoteStatus.Dislike ? (
-            <div
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                postVoteMutation.mutate({ postId: post.id, like: false })
-              }}
-            >
-              <BiSolidDownvote className="w-[18px] h-[18px] text-red-500" />
-            </div>
+            <BiSolidDownvote className="w-[18px] h-[18px] text-red-500" />
           ) : (
-            <div
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                postVoteMutation.mutate({ postId: post.id, like: false })
-              }}
-            >
+            <>
               <BiDownvote className="w-[18px] h-[18px] group-hover/upvote:hidden" />
               <BiSolidDownvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-red-500" />
-            </div>
+            </>
           )}
         </div>
       </div>

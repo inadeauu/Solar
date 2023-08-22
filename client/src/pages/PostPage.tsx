@@ -7,6 +7,8 @@ import { ImSpinner11 } from "react-icons/im"
 import Post from "../components/post/single/Post"
 import CommunitySidebar from "../components/community/CommunitySidebar"
 import { useCommunity } from "../graphql/useQuery"
+import PostCommentForm from "../components/post/single/PostCommentForm"
+import PostCommentFeed from "../components/post/single/PostCommentFeed"
 
 const getPostDocument = graphql(/* GraphQL */ `
   query SinglePost($input: PostInput!) {
@@ -63,8 +65,10 @@ const PostPage = () => {
 
   return (
     <div className="flex gap-6">
-      <div className="md:grow md-max:w-full break-words min-w-0">
+      <div className="flex flex-col gap-5 md:grow md-max:w-full break-words min-w-0">
         <Post post={post.post} />
+        <PostCommentForm post={post.post} />
+        <PostCommentFeed post={post.post} />
       </div>
       <CommunitySidebar community={community.community} />
     </div>

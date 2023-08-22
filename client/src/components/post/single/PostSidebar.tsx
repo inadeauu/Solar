@@ -129,7 +129,7 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
     <div className="flex flex-col items-center gap-1 rounded-full max-h-fit">
       <div
         onClick={(e) => vote(e, true)}
-        className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover"
+        className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
       >
         {post.voteStatus == PostVoteStatus.Like ? (
           <BiSolidUpvote className="w-[18px] h-[18px] text-upvote-green" />
@@ -143,7 +143,7 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
       <span className="text-xs font-semibold">{post.voteSum}</span>
       <div
         onClick={(e) => vote(e, false)}
-        className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover"
+        className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
       >
         {post.voteStatus == PostVoteStatus.Dislike ? (
           <BiSolidDownvote className="w-[18px] h-[18px] text-red-500" />

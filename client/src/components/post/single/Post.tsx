@@ -3,12 +3,16 @@ import moment from "moment"
 import { useLayoutEffect, useRef, useState } from "react"
 import PostSidebar from "./PostSidebar"
 import { IoIosArrowDown } from "react-icons/io"
+import { BiComment } from "react-icons/bi"
+import { useNavigate } from "react-router-dom"
+import { translator } from "../../../utils/uuid"
 
 type PostProps = {
   post: Post
 }
 
 const Post = ({ post }: PostProps) => {
+  const navigate = useNavigate()
   const [overflown, setOverflown] = useState<boolean>(true)
   const bodyRef = useRef<HTMLDivElement | null>(null)
 
@@ -31,6 +35,21 @@ const Post = ({ post }: PostProps) => {
         </span>
         <div className="flex flex-col gap-[6px] break-words min-w-0 px-4 py-2">
           <span className="text-neutral-500 text-xs">
+            <span
+              className="text-black font-medium hover:underline hover:cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                navigate(
+                  `/communities/${post.community.title}/${translator.fromUUID(
+                    post.community.id
+                  )}`
+                )
+              }}
+            >
+              {post.community.title}
+            </span>
+            {" • "}
             Posted by{" "}
             <span
               className="text-black font-medium hover:underline hover:cursor-pointer"
@@ -63,6 +82,10 @@ const Post = ({ post }: PostProps) => {
               Show More <IoIosArrowDown />
             </span>
           )}
+          <div className="flex gap-2 items-center bg-post-icon rounded-full px-3 py-[6px] hover:bg-upvote-hover w-fit mt-1">
+            <BiComment className="w-[18px] h-[18px]" />
+            <span className="text-sm">{post.commentCount}</span>
+          </div>
         </div>
       </div>
     </div>

@@ -45,7 +45,7 @@ const Post = ({ post, innerRef, queryKey }: PostProps) => {
         </span>
         <span className="font-semibold text-lg">{post.title}</span>
         {post.body && (
-          <div ref={bodyRef} className="line-clamp-[12]">
+          <div ref={bodyRef} className="max-h-[250px] overflow-hidden">
             <p className="text-sm font-light text-neutral-800">{post.body}</p>
           </div>
         )}

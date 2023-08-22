@@ -8,6 +8,7 @@ import { graphQLClient } from "../../utils/graphql"
 import { ImSpinner11 } from "react-icons/im"
 import ErrorCard from "../misc/ErrorCard"
 import type { Community } from "../../graphql/types"
+import { toast } from "react-toastify"
 
 type CommunityPostFormProps = {
   community: Community
@@ -52,6 +53,8 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
     },
     onSuccess: (data) => {
       if (data.createPost.__typename == "CreatePostSuccess") {
+        toast.success(data.createPost.successMsg)
+
         queryClient.setQueryData<CommunityQuery>([community.id], (oldData) =>
           oldData
             ? {
@@ -104,7 +107,9 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
           onClick={() => {
             if (!user) {
               navigate("/login")
+              return
             }
+
             setOpenEditor((prev) => !prev)
           }}
           className="btn_blue py-1 px-3 text-sm"

@@ -14,7 +14,8 @@ export default {
       },
       colors: {
         "upvote-green": "#07DB35",
-        "upvote-hover": "#F3F3F3",
+        "upvote-hover": "#EBEBEB",
+        "post-icon": "#F6F6F6",
       },
     },
   },

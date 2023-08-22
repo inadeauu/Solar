@@ -19,7 +19,7 @@ const CommunityPage = () => {
 
   return (
     <section className="flex gap-6">
-      <div className="flex flex-col gap-5 md:grow md-max:w-full">
+      <div className="flex flex-col gap-5 md:grow md-max:w-full min-w-0 break-words">
         <CommunityHeader community={data.community} />
         <CommunityPostForm community={data.community} />
         <CommunityPostFeed community={data.community} />

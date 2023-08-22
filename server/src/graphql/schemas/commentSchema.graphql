@@ -5,6 +5,11 @@ type Query @rateLimit(limit: 180, duration: 60) {
   comments(input: CommentsInput!): CommentConnection!
 }
 
+type Mutation {
+  createComment(input: CreateCommentInput!): CreateCommentResult!
+    @rateLimit(limit: 5, duration: 60)
+}
+
 type Comment {
   id: ID!
   body: String!
@@ -14,7 +19,7 @@ type Comment {
   owner: User!
   post: Post!
   children(input: CommentChildrenInput!): CommentConnection!
-  parent: Comment!
+  parent: Comment
 }
 
 # -- COMMENT QUERY
@@ -31,6 +36,33 @@ input CommentsInput {
 input CommentsFilters {
   userId: ID
   postId: ID
+  parentId: ID
+}
+
+# -- CREATECOMMENT MUTATION
+union CreateCommentResult = CreateCommentSuccess | CreateCommentInputError
+
+input CreateCommentInput {
+  body: String!
+  postId: ID!
+  commentId: ID
+}
+
+type CreateCommentSuccess implements Success {
+  successMsg: String!
+  code: Int!
+}
+
+type CreateCommentInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: CreateCommentInputErrors!
+}
+
+type CreateCommentInputErrors {
+  body: String
+  postId: String
+  commentId: String
 }
 
 # -- RESOLVERS

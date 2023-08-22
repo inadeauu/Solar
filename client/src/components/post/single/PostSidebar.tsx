@@ -8,8 +8,8 @@ import {
   VotePostInput,
 } from "../../../graphql_codegen/graphql"
 import { graphQLClient } from "../../../utils/graphql"
-import { useAuth } from "../../../utils/useAuth"
-import { redirect } from "react-router-dom"
+import { useAuth } from "../../../hooks/useAuth"
+import { useNavigate } from "react-router-dom"
 import {
   BiDownvote,
   BiSolidDownvote,
@@ -24,6 +24,7 @@ type PostSidebarProps = {
 const PostSidebar = ({ post }: PostSidebarProps) => {
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const rollback = useRef<Post | null>(null)
   const previous_post = useRef<Post>(post)
@@ -111,34 +112,38 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     like: boolean
   ) => {
-    if (!user) return redirect("/login")
-
     e.preventDefault()
     e.stopPropagation()
+
+    if (!user) {
+      navigate("/login")
+      return
+    }
+
     last_updated.current = new Date().toISOString()
     sent_requests.current++
     postVoteMutation.mutate({ postId: post.id, like })
   }
 
   return (
-    <div className="flex flex-col items-center gap-1 bg-neutral-200 rounded-full">
+    <div className="flex flex-col items-center gap-1 rounded-full max-h-fit">
       <div
         onClick={(e) => vote(e, true)}
-        className="group/upvote rounded-full p-[6px] hover:bg-neutral-300"
+        className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover"
       >
         {post.voteStatus == PostVoteStatus.Like ? (
-          <BiSolidUpvote className="w-[18px] h-[18px] text-green-500" />
+          <BiSolidUpvote className="w-[18px] h-[18px] text-upvote-green" />
         ) : (
           <>
             <BiUpvote className="w-[18px] h-[18px] group-hover/upvote:hidden" />
-            <BiSolidUpvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-green-500" />
+            <BiSolidUpvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-upvote-green" />
           </>
         )}
       </div>
-      <span className="text-sm">{post.voteSum}</span>
+      <span className="text-xs font-semibold">{post.voteSum}</span>
       <div
         onClick={(e) => vote(e, false)}
-        className="group/upvote rounded-full p-[6px] hover:bg-neutral-300"
+        className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover"
       >
         {post.voteStatus == PostVoteStatus.Dislike ? (
           <BiSolidDownvote className="w-[18px] h-[18px] text-red-500" />

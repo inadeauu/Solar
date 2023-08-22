@@ -17,8 +17,8 @@ import {
   useQueryClient,
 } from "@tanstack/react-query"
 import { graphQLClient } from "../../../utils/graphql"
-import { useAuth } from "../../../utils/useAuth"
-import { redirect } from "react-router-dom"
+import { useAuth } from "../../../hooks/useAuth"
+import { useNavigate } from "react-router-dom"
 import type { Post } from "../../../graphql/types"
 import { votePostDocument } from "../../../graphql/sharedDocuments"
 
@@ -30,6 +30,7 @@ type PostFooterProps = {
 const PostFooter = ({ post, queryKey }: PostFooterProps) => {
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const rollback = useRef<Post | null>(null)
   const previous_post = useRef<Post>(post)
@@ -176,10 +177,14 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
     e: React.MouseEvent<HTMLDivElement, MouseEvent>,
     like: boolean
   ) => {
-    if (!user) return redirect("/login")
-
     e.preventDefault()
     e.stopPropagation()
+
+    if (!user) {
+      navigate("/login")
+      return
+    }
+
     last_updated.current = new Date().toISOString()
     sent_requests.current++
     postVoteMutation.mutate({ postId: post.id, like })
@@ -187,24 +192,24 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
 
   return (
     <div className="flex mt-4 gap-4">
-      <div className="flex items-center gap-1 bg-neutral-200 rounded-full">
+      <div className="flex items-center gap-1 bg-neutral-50 rounded-full">
         <div
           onClick={(e) => vote(e, true)}
-          className="group/upvote rounded-full p-[6px] hover:bg-neutral-300"
+          className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover"
         >
           {post.voteStatus == PostVoteStatus.Like ? (
-            <BiSolidUpvote className="w-[18px] h-[18px] text-green-500" />
+            <BiSolidUpvote className="w-[18px] h-[18px] text-upvote-green" />
           ) : (
             <>
               <BiUpvote className="w-[18px] h-[18px] group-hover/upvote:hidden" />
-              <BiSolidUpvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-green-500" />
+              <BiSolidUpvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-upvote-green" />
             </>
           )}
         </div>
-        <span className="text-sm">{post.voteSum}</span>
+        <span className="text-sm font-semibold">{post.voteSum}</span>
         <div
           onClick={(e) => vote(e, false)}
-          className="group/upvote rounded-full p-[6px] hover:bg-neutral-300"
+          className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover"
         >
           {post.voteStatus == PostVoteStatus.Dislike ? (
             <BiSolidDownvote className="w-[18px] h-[18px] text-red-500" />
@@ -216,7 +221,7 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
           )}
         </div>
       </div>
-      <div className="flex gap-2 items-center bg-neutral-200 rounded-full px-3 py-[6px] hover:bg-neutral-300">
+      <div className="flex gap-2 items-center bg-neutral-50 rounded-full px-3 py-[6px] hover:bg-upvote-hover">
         <BiComment className="w-[18px] h-[18px]" />
         <span className="text-sm">{post.commentCount}</span>
       </div>

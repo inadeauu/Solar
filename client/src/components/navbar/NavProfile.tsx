@@ -1,12 +1,12 @@
 import { useRef, useState } from "react"
 import { CiLogout } from "react-icons/ci"
-import useClickOutside from "../../utils/useClickOutside"
+import useClickOutside from "../../hooks/useClickOutside"
 import { BsHouseAdd, BsPerson } from "react-icons/bs"
 import { Link } from "react-router-dom"
 import { useMutation } from "@tanstack/react-query"
 import { graphql } from "../../graphql_codegen/gql"
 import { graphQLClient } from "../../utils/graphql"
-import { useAuth } from "../../utils/useAuth"
+import { useAuth } from "../../hooks/useAuth"
 import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/Ri"
 
 const logoutDocument = graphql(/* GraphQL */ `

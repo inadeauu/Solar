@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { useAuth } from "../../utils/useAuth"
+import { useAuth } from "../../hooks/useAuth"
 import NavProfile from "./NavProfile"
 import SearchBar from "../searchbar/SearchBar"
 import NavUnauth from "./NavUnauth"

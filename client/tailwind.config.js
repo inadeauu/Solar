@@ -12,6 +12,10 @@ export default {
         "xs-max": { max: "475px" },
         xs: "476px",
       },
+      colors: {
+        "upvote-green": "#07DB35",
+        "upvote-hover": "#F3F3F3",
+      },
     },
   },
   plugins: [],

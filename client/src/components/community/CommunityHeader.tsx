@@ -15,7 +15,7 @@ const CommunityHeader = ({ community }: CommunityHeaderProps) => {
         <h1 className="font-semibold text-xl text-ellipsis whitespace-nowrap overflow-hidden">
           {community.title}
         </h1>
-        <CommunityJoinButton community={community} />
+        <CommunityJoinButton className="py-1 px-3" community={community} />
       </div>
       <span className="flex flex-col gap-1 text-neutral-500 text-sm xs-max:text-xs">
         <span className="break-words">

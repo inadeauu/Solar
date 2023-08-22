@@ -27,3 +27,21 @@ export const votePostDocument = graphql(/* GraphQL */ `
     }
   }
 `)
+
+export const getCommunityDocument = graphql(/* GraphQL */ `
+  query Community($input: CommunityInput!) {
+    community(input: $input) {
+      id
+      memberCount
+      postCount
+      inCommunity
+      owner {
+        id
+        username
+      }
+      title
+      created_at
+      updated_at
+    }
+  }
+`)

@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react"
-import { useAuth } from "../../utils/useAuth"
+import { useAuth } from "../../hooks/useAuth"
 import { useNavigate } from "react-router-dom"
 import { CommunityQuery, CreatePostInput } from "../../graphql_codegen/graphql"
 import { graphql } from "../../graphql_codegen/gql"

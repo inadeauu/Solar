@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom"
-import { useAuth } from "../../utils/useAuth"
+import { useAuth } from "../../hooks/useAuth"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphql } from "../../graphql_codegen/gql"
 import {
@@ -38,9 +38,13 @@ const userJoinCommunityDocument = graphql(/* GraphQL */ `
 
 type CommunityJoinButtonProps = {
   community: Community
+  className?: string
 }
 
-const CommunityJoinButton = ({ community }: CommunityJoinButtonProps) => {
+const CommunityJoinButton = ({
+  community,
+  className,
+}: CommunityJoinButtonProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -114,7 +118,7 @@ const CommunityJoinButton = ({ community }: CommunityJoinButtonProps) => {
 
   return (
     <button
-      className="btn_blue py-1 px-3"
+      className={`btn_blue ${className}`}
       onClick={() => {
         if (!user) {
           navigate("/login")

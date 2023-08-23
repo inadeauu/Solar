@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { ImSpinner11 } from "react-icons/im"
 import Post from "../components/post/single/Post"
-import { useCommunity } from "../graphql/useQuery"
 import PostCommentForm from "../components/post/single/PostCommentForm"
 import PostCommentFeed from "../components/post/single/PostCommentFeed"
 
@@ -45,20 +44,9 @@ const PostPage = () => {
       }),
   })
 
-  const communityId = post?.post?.community.id
-
-  const { data: community, isLoading: communityLoading } = useCommunity(
-    communityId,
-    { enabled: !!communityId }
-  )
-
-  if (postLoading || communityLoading) {
+  if (postLoading) {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
-  } else if (
-    !post?.post ||
-    !community?.community ||
-    post.post.title !== title
-  ) {
+  } else if (!post?.post || post.post.title !== title) {
     return <Navigate to="/404-not-found" />
   }
 

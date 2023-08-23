@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../hooks/useAuth"
-import useCommentVoteMutation from "./useCommentVoteMutation"
+import useCommentVoteMutation from "../../graphql/useCommentVoteMutation"
 import { VoteStatus } from "../../graphql_codegen/graphql"
 import {
   BiDownvote,
@@ -18,6 +18,7 @@ type CommentVoteProps = {
 const CommentVote = ({ comment, queryKey }: CommentVoteProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
+
   const commentVoteMutation = useCommentVoteMutation({ comment, queryKey })
 
   const vote = (

@@ -5,3 +5,11 @@ export const pluralize = (count: number, noun: string, suffix = "s") => {
 
   return noun
 }
+
+export const getReply = (count: number) => {
+  if (count !== 1) {
+    return "Replies"
+  }
+
+  return "Reply"
+}

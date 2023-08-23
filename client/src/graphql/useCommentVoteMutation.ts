@@ -8,10 +8,10 @@ import {
   CommentFeedQuery,
   VoteCommentInput,
   VoteStatus,
-} from "../../graphql_codegen/graphql"
-import { graphQLClient } from "../../utils/graphql"
-import type { Comment } from "../../graphql/types"
-import { graphql } from "../../graphql_codegen/gql"
+} from "../graphql_codegen/graphql"
+import { graphQLClient } from "../utils/graphql"
+import type { Comment } from "./types"
+import { graphql } from "../graphql_codegen/gql"
 
 type useCommentVoteMutationProps = {
   comment: Comment
@@ -28,6 +28,9 @@ const voteCommentDocument = graphql(/* GraphQL */ `
           body
           created_at
           id
+          post {
+            id
+          }
           owner {
             id
             username

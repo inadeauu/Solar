@@ -60,7 +60,6 @@ const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
                 }
                 key={edge.node.id}
                 comment={edge.node}
-                queryKey={["postCommentFeed", post.id]}
               />
             )
           })

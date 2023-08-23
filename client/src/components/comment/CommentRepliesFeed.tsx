@@ -29,7 +29,6 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
     },
     {
       getNextPageParam: (lastPage) => {
-        console.log(lastPage.comments.pageInfo.endCursor)
         return lastPage.comments.pageInfo.endCursor
       },
     }
@@ -40,7 +39,7 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-4 mt-2">
       {isSuccess &&
         data.pages.map((page) =>
           page.comments.edges.map((edge) => {
@@ -48,7 +47,7 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
               <CommentReply
                 key={edge.node.id}
                 comment={edge.node}
-                queryKey={["commentRepliesFeed", comment.id]}
+                parentId={comment.id}
               />
             )
           })

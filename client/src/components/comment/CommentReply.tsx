@@ -4,12 +4,12 @@ import CommentVote from "./CommentVote"
 
 type CommentReplyType = {
   comment: Comment
-  queryKey: any[]
+  parentId: string
 }
 
-export const CommentReply = ({ comment, queryKey }: CommentReplyType) => {
+export const CommentReply = ({ comment, parentId }: CommentReplyType) => {
   return (
-    <div className="bg-white border border-neutral-300 rounded-lg py-4 px-[11px]">
+    <div className="px-[11px]">
       <div className="flex flex-col gap-1">
         <div className="flex flex-col gap-[6px] px-[5px]">
           <span className="text-neutral-500 text-xs">
@@ -27,7 +27,10 @@ export const CommentReply = ({ comment, queryKey }: CommentReplyType) => {
           </span>
           <p className="text-sm font-light text-neutral-800">{comment.body}</p>
         </div>
-        <CommentVote comment={comment} queryKey={queryKey} />
+        <CommentVote
+          comment={comment}
+          queryKey={["commentRepliesFeed", parentId]}
+        />
       </div>
     </div>
   )

@@ -54,6 +54,9 @@ export const getCommentFeedDocument = graphql(/* GraphQL */ `
           body
           created_at
           id
+          post {
+            id
+          }
           owner {
             id
             username

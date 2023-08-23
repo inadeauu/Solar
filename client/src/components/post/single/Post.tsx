@@ -86,7 +86,7 @@ const Post = ({ post }: PostProps) => {
             </span>
           )}
           <div className="flex gap-2 items-center w-fit mt-1">
-            <BiComment className="w-[16px] h-[16px]" />
+            <BiComment className="w-[16px] h-[16px] mt-[1px]" />
             <span className="text-sm">{post.commentCount}</span>
           </div>
         </div>

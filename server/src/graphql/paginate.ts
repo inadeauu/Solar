@@ -82,8 +82,9 @@ export const paginate = async <Node extends { id: string }>(
     }
   }
 
-  const startCursor = nodes.length ? nodes[0].id : undefined
-  const endCursor = nodes.length ? nodes[nodes.length - 1].id : undefined
+  const startCursor = nodes.length && hasPreviousPage ? nodes[0].id : undefined
+  const endCursor =
+    nodes.length && hasNextPage ? nodes[nodes.length - 1].id : undefined
 
   const pageInfo: PageInfo = {
     endCursor,

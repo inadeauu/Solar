@@ -45,3 +45,28 @@ export const getCommunityDocument = graphql(/* GraphQL */ `
     }
   }
 `)
+
+export const getCommentFeedDocument = graphql(/* GraphQL */ `
+  query CommentFeed($input: CommentsInput!) {
+    comments(input: $input) {
+      edges {
+        node {
+          body
+          created_at
+          id
+          owner {
+            id
+            username
+          }
+          voteSum
+          voteStatus
+          replyCount
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`)

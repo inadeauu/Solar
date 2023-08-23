@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import { Post } from "../../../graphql/types"
+import type { Post } from "../../../graphql/types"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { votePostDocument } from "../../../graphql/sharedDocuments"
 import {

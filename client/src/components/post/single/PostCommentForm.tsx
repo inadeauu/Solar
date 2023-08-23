@@ -4,11 +4,11 @@ import { useMutation } from "@tanstack/react-query"
 import { graphQLClient } from "../../../utils/graphql"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../../hooks/useAuth"
-import { graphql } from "../../../graphql_codegen"
 import { CreateCommentInput } from "../../../graphql_codegen/graphql"
 import { ImSpinner11 } from "react-icons/im"
 import ErrorCard from "../../misc/ErrorCard"
 import { toast } from "react-toastify"
+import { graphql } from "../../../graphql_codegen/gql"
 
 type PostCommentFormProps = {
   post: Post

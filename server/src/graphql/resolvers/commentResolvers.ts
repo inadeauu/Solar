@@ -63,20 +63,7 @@ export const resolvers: Resolvers = {
         where: { id: args.input.postId },
       })
 
-      let parentComment: Comment | null = null
-
-      if (args.input.commentId) {
-        parentComment = await prisma.comment.findUnique({
-          where: { id: args.input.commentId },
-        })
-      }
-
-      if (
-        bodyError ||
-        !post ||
-        (args.input.commentId && !parentComment) ||
-        parentComment?.parentId
-      ) {
+      if (bodyError || !post) {
         return {
           __typename: "CreateCommentInputError",
           errorMsg: "Invalid input",
@@ -86,6 +73,48 @@ export const resolvers: Resolvers = {
               ? "Body must be less than 2000 characters long"
               : null,
             postId: !post ? "Invalid post ID" : null,
+          },
+        }
+      }
+
+      await prisma.comment.create({
+        data: {
+          userId: req.session.userId,
+          postId: args.input.postId,
+          body: args.input.body,
+          parentId: null,
+        },
+      })
+
+      return {
+        __typename: "CreateCommentSuccess",
+        successMsg: "Successfully created comment",
+        code: 200,
+      }
+    },
+    createCommentReply: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
+      }
+
+      const bodyError =
+        args.input.body.trim().length <= 0 || args.input.body.length > 2000
+
+      const parentComment = await prisma.comment.findUnique({
+        where: { id: args.input.commentId },
+      })
+
+      if (!parentComment || parentComment.parentId) {
+        return {
+          __typename: "CreateCommentReplyInputError",
+          errorMsg: "Invalid input",
+          code: 400,
+          inputErrors: {
+            body: bodyError
+              ? "Body must be less than 2000 characters long"
+              : null,
             commentId:
               !parentComment || parentComment.parentId
                 ? "Invalid comment ID"
@@ -97,15 +126,15 @@ export const resolvers: Resolvers = {
       await prisma.comment.create({
         data: {
           userId: req.session.userId,
-          postId: args.input.postId,
+          postId: parentComment.postId,
           body: args.input.body,
           parentId: args.input.commentId,
         },
       })
 
       return {
-        __typename: "CreateCommentSuccess",
-        successMsg: "Successfully created comment",
+        __typename: "CreateCommentReplySuccess",
+        successMsg: "Successfully replied",
         code: 200,
       }
     },
@@ -256,7 +285,7 @@ export const resolvers: Resolvers = {
         return VoteStatus.Dislike
       }
     },
-    voteSum: async (comment, args) => {
+    voteSum: async (comment) => {
       const likeSum = (await prisma.comment.findUnique({
         where: { id: comment.id },
         include: {
@@ -274,6 +303,16 @@ export const resolvers: Resolvers = {
       const voteSum = likeSum - dislikeSum
 
       return voteSum
+    },
+    replyCount: async (comment) => {
+      const replyCount = (await prisma.comment.findUnique({
+        where: { id: comment.id },
+        include: {
+          _count: { select: { children: true } },
+        },
+      }))!._count.children
+
+      return replyCount
     },
   },
 }

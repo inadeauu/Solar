@@ -1,39 +1,15 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useInView } from "react-intersection-observer"
-import { graphql } from "../../../graphql_codegen"
 import { graphQLClient } from "../../../utils/graphql"
 import { useEffect } from "react"
 import { ImSpinner11 } from "react-icons/im"
 import type { Post } from "../../../graphql/types"
 import Comment from "../../comment/Comment"
+import { getCommentFeedDocument } from "../../../graphql/sharedDocuments"
 
 type PostCommentFeedProps = {
   post: Post
 }
-
-const getPostCommentFeedDocument = graphql(/* GraphQL */ `
-  query PostCommentFeed($input: CommentsInput!) {
-    comments(input: $input) {
-      edges {
-        node {
-          body
-          created_at
-          id
-          owner {
-            id
-            username
-          }
-          voteSum
-          voteStatus
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-      }
-    }
-  }
-`)
 
 const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
   const { ref, inView } = useInView()
@@ -48,7 +24,7 @@ const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
   } = useInfiniteQuery(
     ["postCommentFeed", post.id],
     ({ pageParam = undefined }) => {
-      return graphQLClient.request(getPostCommentFeedDocument, {
+      return graphQLClient.request(getCommentFeedDocument, {
         input: {
           filters: { postId: post.id, parentId: null },
           paginate: { first: 10, after: pageParam },

@@ -7,7 +7,10 @@ type Query @rateLimit(limit: 180, duration: 60) {
 
 type Mutation {
   createComment(input: CreateCommentInput!): CreateCommentResult!
-    @rateLimit(limit: 5, duration: 60)
+    @rateLimit(limit: 10, duration: 60)
+  createCommentReply(
+    input: CreateCommentReplyInput!
+  ): CreateCommentReplyResult! @rateLimit(limit: 10, duration: 60)
   voteComment(input: VoteCommentInput!): VoteCommentResult!
     @rateLimit(limit: 120, duration: 60)
 }
@@ -20,6 +23,7 @@ type Comment {
 
   voteSum: Int!
   voteStatus: VoteStatus!
+  replyCount: Int!
 
   owner: User!
   post: Post!
@@ -50,7 +54,6 @@ union CreateCommentResult = CreateCommentSuccess | CreateCommentInputError
 input CreateCommentInput {
   body: String!
   postId: ID!
-  commentId: ID
 }
 
 type CreateCommentSuccess implements Success {
@@ -67,10 +70,35 @@ type CreateCommentInputError implements Error {
 type CreateCommentInputErrors {
   body: String
   postId: String
+}
+
+# -- CREATECOMMENTREPLY MUTATION
+union CreateCommentReplyResult =
+    CreateCommentReplySuccess
+  | CreateCommentReplyInputError
+
+input CreateCommentReplyInput {
+  body: String!
+  commentId: ID!
+}
+
+type CreateCommentReplySuccess implements Success {
+  successMsg: String!
+  code: Int!
+}
+
+type CreateCommentReplyInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: CreateCommentReplyInputErrors!
+}
+
+type CreateCommentReplyInputErrors {
+  body: String
   commentId: String
 }
 
-# -- VOTEPOST MUTATION
+# -- VOTECOMMENT MUTATION
 union VoteCommentResult = VoteCommentSuccess
 
 input VoteCommentInput {

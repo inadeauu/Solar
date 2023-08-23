@@ -3,23 +3,25 @@ import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query"
-import { Comment } from "../../graphql/types"
+import type { Comment } from "../../graphql/types"
 import { graphql } from "../../graphql_codegen/gql"
 import { useAuth } from "../../hooks/useAuth"
 import { useNavigate } from "react-router-dom"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import {
-  PostCommentFeedQuery,
+  CommentFeedQuery,
   VoteCommentInput,
   VoteStatus,
 } from "../../graphql_codegen/graphql"
 import { graphQLClient } from "../../utils/graphql"
 import {
+  BiComment,
   BiDownvote,
   BiSolidDownvote,
   BiSolidUpvote,
   BiUpvote,
 } from "react-icons/bi"
+import CommentReplyForm from "./CommentReplyForm"
 
 type CommentFooterProps = {
   comment: Comment
@@ -42,6 +44,7 @@ const voteCommentDocument = graphql(/* GraphQL */ `
           }
           voteSum
           voteStatus
+          replyCount
         }
       }
     }
@@ -52,6 +55,7 @@ const CommentFooter = ({ comment, queryKey }: CommentFooterProps) => {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const [reply, setReply] = useState<boolean>(false)
 
   const rollback = useRef<Comment | null>(null)
   const previous_comment = useRef<Comment>(comment)
@@ -60,10 +64,10 @@ const CommentFooter = ({ comment, queryKey }: CommentFooterProps) => {
   const last_updated = useRef<string>("")
 
   const newCommentFeed = (
-    oldData: InfiniteData<PostCommentFeedQuery>,
+    oldData: InfiniteData<CommentFeedQuery>,
     newComment: Comment | undefined
-  ): InfiniteData<PostCommentFeedQuery> => {
-    const newPages: PostCommentFeedQuery[] = oldData.pages.map((page) => {
+  ): InfiniteData<CommentFeedQuery> => {
+    const newPages: CommentFeedQuery[] = oldData.pages.map((page) => {
       return {
         comments: {
           ...page.comments,
@@ -87,7 +91,7 @@ const CommentFooter = ({ comment, queryKey }: CommentFooterProps) => {
   }
 
   const updateCommentFeed = (comment: Comment | undefined) => {
-    queryClient.setQueryData<InfiniteData<PostCommentFeedQuery>>(
+    queryClient.setQueryData<InfiniteData<CommentFeedQuery>>(
       queryKey,
       (oldData) => {
         if (!oldData) return oldData
@@ -106,7 +110,7 @@ const CommentFooter = ({ comment, queryKey }: CommentFooterProps) => {
       await queryClient.cancelQueries({ queryKey })
 
       const previous_comment_feed =
-        queryClient.getQueryData<InfiniteData<PostCommentFeedQuery>>(queryKey)
+        queryClient.getQueryData<InfiniteData<CommentFeedQuery>>(queryKey)
 
       const previous_comment_query = previous_comment_feed?.pages.find((page) =>
         page.comments.edges.find((edge) => edge.node.id === input.commentId)
@@ -116,12 +120,12 @@ const CommentFooter = ({ comment, queryKey }: CommentFooterProps) => {
         (edge) => edge.node.id == input.commentId
       )
 
-      queryClient.setQueryData<InfiniteData<PostCommentFeedQuery>>(
+      queryClient.setQueryData<InfiniteData<CommentFeedQuery>>(
         queryKey,
         (oldData) => {
           if (!oldData) return oldData
 
-          const newPages: PostCommentFeedQuery[] = oldData.pages.map((page) => {
+          const newPages: CommentFeedQuery[] = oldData.pages.map((page) => {
             return {
               comments: {
                 ...page.comments,
@@ -212,7 +216,7 @@ const CommentFooter = ({ comment, queryKey }: CommentFooterProps) => {
   }
 
   return (
-    <div className="flex mt-2 gap-4">
+    <div className="flex flex-col gap-4">
       <div className="flex items-center gap-1">
         <div
           onClick={(e) => vote(e, true)}
@@ -241,7 +245,25 @@ const CommentFooter = ({ comment, queryKey }: CommentFooterProps) => {
             </>
           )}
         </div>
+        <button
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+
+            if (!user) {
+              navigate("/login")
+              return
+            }
+
+            setReply((prev) => !prev)
+          }}
+          className="flex gap-[6px] rounded-full text-sm py-1 px-3 hover:cursor-pointer items-center hover:bg-post-icon"
+        >
+          <BiComment className="w-[14px] h-[14px] mt-[1px]" />
+          Reply
+        </button>
       </div>
+      {reply && <CommentReplyForm comment={comment} setOpen={setReply} />}
     </div>
   )
 }

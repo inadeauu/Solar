@@ -65,10 +65,8 @@ const PostPage = () => {
   return (
     <div className="flex flex-col gap-5 sm:w-[80%] sm-max:w-full break-words min-w-0 mx-auto">
       <Post post={post.post} />
-      <div id="comments" className="flex flex-col gap-5">
-        <PostCommentForm post={post.post} />
-        <PostCommentFeed post={post.post} />
-      </div>
+      <PostCommentForm post={post.post} />
+      <PostCommentFeed post={post.post} />
     </div>
   )
 }

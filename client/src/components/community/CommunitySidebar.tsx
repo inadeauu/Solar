@@ -11,9 +11,9 @@ type CommunitySidebarProps = {
 const CommunitySidebar = ({ community }: CommunitySidebarProps) => {
   return (
     <aside className="p-4 sticky top-[80px] bg-white w-[300px] shrink-0 h-fit rounded-lg border border-neutral-300 md-max:hidden">
-      <div className="flex flex-col gap-4">
-        <h1 className="font-semibold break-words">{community.title}</h1>
-        <div className="flex flex-col gap-1 text-neutral-500 text-sm min-w-0 break-words">
+      <div className="flex flex-col gap-4 break-words">
+        <h1 className="font-semibold">{community.title}</h1>
+        <div className="flex flex-col gap-1 text-neutral-500 text-sm">
           <span>
             Created {moment(community.created_at).format("MM/DD/YYYY")}
           </span>
@@ -23,7 +23,7 @@ const CommunitySidebar = ({ community }: CommunitySidebarProps) => {
           <span>
             {community.postCount} {pluralize(community.postCount, "Post")}
           </span>
-          <span className="text-ellipsis whitespace-nowrap overflow-hidden">
+          <span>
             Owner:{" "}
             <Link
               to="/signup"

@@ -11,7 +11,7 @@ type CommunityHeaderProps = {
 const CommunityHeader = ({ community }: CommunityHeaderProps) => {
   return (
     <div className="flex flex-col gap-2 bg-white border border-neutral-300 rounded-lg p-4 md:hidden">
-      <div className="flex justify-between">
+      <div className="flex gap-2 justify-between">
         <h1 className="font-semibold text-xl text-ellipsis whitespace-nowrap overflow-hidden">
           {community.title}
         </h1>

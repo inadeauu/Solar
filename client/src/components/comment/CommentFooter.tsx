@@ -212,32 +212,32 @@ const CommentFooter = ({ comment, queryKey }: CommentFooterProps) => {
   }
 
   return (
-    <div className="flex mt-4 gap-4">
+    <div className="flex mt-2 gap-4">
       <div className="flex items-center gap-1">
         <div
           onClick={(e) => vote(e, true)}
-          className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
+          className="group/upvote rounded-full p-[5px] hover:bg-upvote-hover hover:cursor-pointer"
         >
           {comment.voteStatus == VoteStatus.Like ? (
-            <BiSolidUpvote className="w-[18px] h-[18px] text-upvote-green" />
+            <BiSolidUpvote className="w-[16px] h-[16px] text-upvote-green" />
           ) : (
             <>
-              <BiUpvote className="w-[18px] h-[18px] group-hover/upvote:hidden" />
-              <BiSolidUpvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-upvote-green" />
+              <BiUpvote className="w-[16px] h-[16px] group-hover/upvote:hidden" />
+              <BiSolidUpvote className="w-[16px] h-[16px] hidden group-hover/upvote:block text-upvote-green" />
             </>
           )}
         </div>
         <span className="text-sm font-semibold">{comment.voteSum}</span>
         <div
           onClick={(e) => vote(e, false)}
-          className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
+          className="group/upvote rounded-full p-[5px] hover:bg-upvote-hover hover:cursor-pointer"
         >
           {comment.voteStatus == VoteStatus.Dislike ? (
-            <BiSolidDownvote className="w-[18px] h-[18px] text-red-500" />
+            <BiSolidDownvote className="w-[16px] h-[16px] text-red-500" />
           ) : (
             <>
-              <BiDownvote className="w-[18px] h-[18px] group-hover/upvote:hidden" />
-              <BiSolidDownvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-red-500" />
+              <BiDownvote className="w-[16px] h-[16px] group-hover/upvote:hidden" />
+              <BiSolidDownvote className="w-[16px] h-[16px] hidden group-hover/upvote:block text-red-500" />
             </>
           )}
         </div>

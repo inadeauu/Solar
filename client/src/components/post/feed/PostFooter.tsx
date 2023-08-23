@@ -221,7 +221,7 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
           )}
         </div>
       </div>
-      <div className="flex gap-2 items-center bg-post-icon rounded-full px-3 py-[6px] hover:bg-upvote-hover">
+      <div className="flex gap-2 items-center bg-post-icon rounded-full px-3 py-[6px]">
         <BiComment className="w-[18px] h-[18px]" />
         <span className="text-sm">{post.commentCount}</span>
       </div>

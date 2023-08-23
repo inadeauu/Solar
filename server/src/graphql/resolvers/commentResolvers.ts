@@ -71,17 +71,12 @@ export const resolvers: Resolvers = {
         })
       }
 
-      console.log(bodyError)
-      console.log(post)
-      console.log(parentComment)
-
       if (
         bodyError ||
         !post ||
         (args.input.commentId && !parentComment) ||
         parentComment?.parentId
       ) {
-        console.log("whhat")
         return {
           __typename: "CreateCommentInputError",
           errorMsg: "Invalid input",

@@ -5,7 +5,6 @@ import { useQuery } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { ImSpinner11 } from "react-icons/im"
 import Post from "../components/post/single/Post"
-import CommunitySidebar from "../components/community/CommunitySidebar"
 import { useCommunity } from "../graphql/useQuery"
 import PostCommentForm from "../components/post/single/PostCommentForm"
 import PostCommentFeed from "../components/post/single/PostCommentFeed"
@@ -64,13 +63,12 @@ const PostPage = () => {
   }
 
   return (
-    <div className="flex gap-6">
-      <div className="flex flex-col gap-5 md:grow md-max:w-full break-words min-w-0">
-        <Post post={post.post} />
+    <div className="flex flex-col gap-5 sm:w-[80%] sm-max:w-full break-words min-w-0 mx-auto">
+      <Post post={post.post} />
+      <div id="comments" className="flex flex-col gap-5">
         <PostCommentForm post={post.post} />
         <PostCommentFeed post={post.post} />
       </div>
-      <CommunitySidebar community={community.community} />
     </div>
   )
 }

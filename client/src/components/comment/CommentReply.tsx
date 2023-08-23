@@ -1,5 +1,6 @@
 import moment from "moment"
 import type { Comment } from "../../graphql/types"
+import CommentVote from "./CommentVote"
 
 type CommentReplyType = {
   comment: Comment
@@ -26,6 +27,7 @@ export const CommentReply = ({ comment, queryKey }: CommentReplyType) => {
           </span>
           <p className="text-sm font-light text-neutral-800">{comment.body}</p>
         </div>
+        <CommentVote comment={comment} queryKey={queryKey} />
       </div>
     </div>
   )

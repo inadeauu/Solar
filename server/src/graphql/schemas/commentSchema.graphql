@@ -8,6 +8,8 @@ type Query @rateLimit(limit: 180, duration: 60) {
 type Mutation {
   createComment(input: CreateCommentInput!): CreateCommentResult!
     @rateLimit(limit: 5, duration: 60)
+  voteComment(input: VoteCommentInput!): VoteCommentResult!
+    @rateLimit(limit: 120, duration: 60)
 }
 
 type Comment {
@@ -15,6 +17,9 @@ type Comment {
   body: String!
   created_at: DateTime!
   updated_at: DateTime!
+
+  voteSum: Int!
+  voteStatus: VoteStatus!
 
   owner: User!
   post: Post!
@@ -63,6 +68,20 @@ type CreateCommentInputErrors {
   body: String
   postId: String
   commentId: String
+}
+
+# -- VOTEPOST MUTATION
+union VoteCommentResult = VoteCommentSuccess
+
+input VoteCommentInput {
+  commentId: String!
+  like: Boolean!
+}
+
+type VoteCommentSuccess implements Success {
+  successMsg: String!
+  code: Int!
+  comment: Comment!
 }
 
 # -- RESOLVERS

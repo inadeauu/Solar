@@ -12,9 +12,9 @@ const Comment = ({ comment, innerRef, queryKey }: CommentProps) => {
   return (
     <div
       ref={innerRef}
-      className="bg-white border border-neutral-300 rounded-lg p-4"
+      className="bg-white border border-neutral-300 rounded-lg py-4 px-[10px]"
     >
-      <div className="flex flex-col gap-[6px]">
+      <div className="flex flex-col gap-[6px] px-[6px]">
         <span className="text-neutral-500 text-xs">
           <span
             className="text-black font-medium hover:underline hover:cursor-pointer"

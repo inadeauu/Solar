@@ -1,7 +1,7 @@
 import { Post } from "@prisma/client"
 import {
   PostOrderByType,
-  PostVoteStatus,
+  VoteStatus,
   Resolvers,
 } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
@@ -229,7 +229,7 @@ export const resolvers: Resolvers = {
       return commentCount
     },
     voteStatus: async (post, _0, { req }) => {
-      if (!req.session.userId) return PostVoteStatus.None
+      if (!req.session.userId) return VoteStatus.None
 
       const postVote = await prisma.postVote.findUnique({
         where: {
@@ -238,11 +238,11 @@ export const resolvers: Resolvers = {
       })
 
       if (!postVote) {
-        return PostVoteStatus.None
+        return VoteStatus.None
       } else if (postVote.like) {
-        return PostVoteStatus.Like
+        return VoteStatus.Like
       } else {
-        return PostVoteStatus.Dislike
+        return VoteStatus.Dislike
       }
     },
   },

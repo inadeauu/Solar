@@ -3,7 +3,7 @@ import { Post } from "../../../graphql/types"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { votePostDocument } from "../../../graphql/sharedDocuments"
 import {
-  PostVoteStatus,
+  VoteStatus,
   SinglePostQuery,
   VotePostInput,
 } from "../../../graphql_codegen/graphql"
@@ -50,14 +50,13 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
               post: {
                 ...post,
                 voteStatus:
-                  (oldData.post!.voteStatus == PostVoteStatus.Like &&
-                    input.like) ||
-                  (oldData.post!.voteStatus == PostVoteStatus.Dislike &&
+                  (oldData.post!.voteStatus == VoteStatus.Like && input.like) ||
+                  (oldData.post!.voteStatus == VoteStatus.Dislike &&
                     !input.like)
-                    ? PostVoteStatus.None
+                    ? VoteStatus.None
                     : input.like
-                    ? PostVoteStatus.Like
-                    : PostVoteStatus.Dislike,
+                    ? VoteStatus.Like
+                    : VoteStatus.Dislike,
               },
             }
           : oldData
@@ -131,7 +130,7 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
         onClick={(e) => vote(e, true)}
         className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
       >
-        {post.voteStatus == PostVoteStatus.Like ? (
+        {post.voteStatus == VoteStatus.Like ? (
           <BiSolidUpvote className="w-[18px] h-[18px] text-upvote-green" />
         ) : (
           <>
@@ -145,7 +144,7 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
         onClick={(e) => vote(e, false)}
         className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
       >
-        {post.voteStatus == PostVoteStatus.Dislike ? (
+        {post.voteStatus == VoteStatus.Dislike ? (
           <BiSolidDownvote className="w-[18px] h-[18px] text-red-500" />
         ) : (
           <>

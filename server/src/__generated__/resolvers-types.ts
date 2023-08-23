@@ -43,6 +43,8 @@ export type Comment = {
   parent?: Maybe<Comment>;
   post: Post;
   updated_at: Scalars['DateTime']['output'];
+  voteStatus: VoteStatus;
+  voteSum: Scalars['Int']['output'];
 };
 
 
@@ -270,6 +272,7 @@ export type Mutation = {
   logout: LogoutResult;
   registerUsername: RegisterUsernameResult;
   userJoinCommunity: UserJoinCommunityResult;
+  voteComment: VoteCommentResult;
   votePost: VotePostResult;
 };
 
@@ -301,6 +304,11 @@ export type MutationRegisterUsernameArgs = {
 
 export type MutationUserJoinCommunityArgs = {
   input: UserJoinCommunityInput;
+};
+
+
+export type MutationVoteCommentArgs = {
+  input: VoteCommentInput;
 };
 
 
@@ -340,7 +348,7 @@ export type Post = {
   owner: User;
   title: Scalars['String']['output'];
   updated_at: Scalars['DateTime']['output'];
-  voteStatus: PostVoteStatus;
+  voteStatus: VoteStatus;
   voteSum: Scalars['Int']['output'];
 };
 
@@ -374,13 +382,6 @@ export const PostOrderByType = {
 } as const;
 
 export type PostOrderByType = typeof PostOrderByType[keyof typeof PostOrderByType];
-export const PostVoteStatus = {
-  Dislike: 'DISLIKE',
-  Like: 'LIKE',
-  None: 'NONE'
-} as const;
-
-export type PostVoteStatus = typeof PostVoteStatus[keyof typeof PostVoteStatus];
 export type PostsFilters = {
   communityId?: InputMaybe<Scalars['ID']['input']>;
   orderBy?: InputMaybe<PostsOrderBy>;
@@ -601,6 +602,20 @@ export type UsersOrderBy = {
   type: UserOrderByType;
 };
 
+export type VoteCommentInput = {
+  commentId: Scalars['String']['input'];
+  like: Scalars['Boolean']['input'];
+};
+
+export type VoteCommentResult = VoteCommentSuccess;
+
+export type VoteCommentSuccess = Success & {
+  __typename?: 'VoteCommentSuccess';
+  code: Scalars['Int']['output'];
+  comment: Comment;
+  successMsg: Scalars['String']['output'];
+};
+
 export type VotePostInput = {
   like: Scalars['Boolean']['input'];
   postId: Scalars['String']['input'];
@@ -615,6 +630,13 @@ export type VotePostSuccess = Success & {
   successMsg: Scalars['String']['output'];
 };
 
+export const VoteStatus = {
+  Dislike: 'DISLIKE',
+  Like: 'LIKE',
+  None: 'NONE'
+} as const;
+
+export type VoteStatus = typeof VoteStatus[keyof typeof VoteStatus];
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
 
@@ -693,13 +715,14 @@ export type ResolversUnionTypes<RefType extends Record<string, unknown>> = Resol
   LogoutResult: ( LogoutSuccess );
   RegisterUsernameResult: ( RegisterUsernameInputError ) | ( RegisterUsernameSuccess );
   UserJoinCommunityResult: ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } );
+  VoteCommentResult: ( Omit<VoteCommentSuccess, 'comment'> & { comment: RefType['Comment'] } );
   VotePostResult: ( Omit<VotePostSuccess, 'post'> & { post: RefType['Post'] } );
 }>;
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
   Error: ( CreateCommentInputError ) | ( CreateCommunityInputError ) | ( CreatePostInputError ) | ( LoginUsernameInputError ) | ( RegisterUsernameInputError );
-  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( CreateCommentSuccess ) | ( CreateCommunitySuccess ) | ( CreatePostSuccess ) | ( LoginUsernameSuccess ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } ) | ( Omit<VotePostSuccess, 'post'> & { post: RefType['Post'] } );
+  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( CreateCommentSuccess ) | ( CreateCommunitySuccess ) | ( CreatePostSuccess ) | ( LoginUsernameSuccess ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } ) | ( Omit<VoteCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<VotePostSuccess, 'post'> & { post: RefType['Post'] } );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -760,7 +783,6 @@ export type ResolversTypes = ResolversObject<{
   PostEdge: ResolverTypeWrapper<Omit<PostEdge, 'node'> & { node: ResolversTypes['Post'] }>;
   PostInput: PostInput;
   PostOrderByType: PostOrderByType;
-  PostVoteStatus: PostVoteStatus;
   PostsFilters: PostsFilters;
   PostsInput: PostsInput;
   PostsOrderBy: PostsOrderBy;
@@ -788,9 +810,13 @@ export type ResolversTypes = ResolversObject<{
   UsersFilters: UsersFilters;
   UsersInput: UsersInput;
   UsersOrderBy: UsersOrderBy;
+  VoteCommentInput: VoteCommentInput;
+  VoteCommentResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['VoteCommentResult']>;
+  VoteCommentSuccess: ResolverTypeWrapper<Omit<VoteCommentSuccess, 'comment'> & { comment: ResolversTypes['Comment'] }>;
   VotePostInput: VotePostInput;
   VotePostResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['VotePostResult']>;
   VotePostSuccess: ResolverTypeWrapper<Omit<VotePostSuccess, 'post'> & { post: ResolversTypes['Post'] }>;
+  VoteStatus: VoteStatus;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -873,6 +899,9 @@ export type ResolversParentTypes = ResolversObject<{
   UsersFilters: UsersFilters;
   UsersInput: UsersInput;
   UsersOrderBy: UsersOrderBy;
+  VoteCommentInput: VoteCommentInput;
+  VoteCommentResult: ResolversUnionTypes<ResolversParentTypes>['VoteCommentResult'];
+  VoteCommentSuccess: Omit<VoteCommentSuccess, 'comment'> & { comment: ResolversParentTypes['Comment'] };
   VotePostInput: VotePostInput;
   VotePostResult: ResolversUnionTypes<ResolversParentTypes>['VotePostResult'];
   VotePostSuccess: Omit<VotePostSuccess, 'post'> & { post: ResolversParentTypes['Post'] };
@@ -898,6 +927,8 @@ export type CommentResolvers<ContextType = Context, ParentType extends Resolvers
   parent?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType>;
   post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  voteStatus?: Resolver<ResolversTypes['VoteStatus'], ParentType, ContextType>;
+  voteSum?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1053,6 +1084,7 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
   logout?: Resolver<ResolversTypes['LogoutResult'], ParentType, ContextType>;
   registerUsername?: Resolver<ResolversTypes['RegisterUsernameResult'], ParentType, ContextType, RequireFields<MutationRegisterUsernameArgs, 'input'>>;
   userJoinCommunity?: Resolver<ResolversTypes['UserJoinCommunityResult'], ParentType, ContextType, RequireFields<MutationUserJoinCommunityArgs, 'input'>>;
+  voteComment?: Resolver<ResolversTypes['VoteCommentResult'], ParentType, ContextType, RequireFields<MutationVoteCommentArgs, 'input'>>;
   votePost?: Resolver<ResolversTypes['VotePostResult'], ParentType, ContextType, RequireFields<MutationVotePostArgs, 'input'>>;
 }>;
 
@@ -1074,7 +1106,7 @@ export type PostResolvers<ContextType = Context, ParentType extends ResolversPar
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   updated_at?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
-  voteStatus?: Resolver<ResolversTypes['PostVoteStatus'], ParentType, ContextType>;
+  voteStatus?: Resolver<ResolversTypes['VoteStatus'], ParentType, ContextType>;
   voteSum?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -1129,7 +1161,7 @@ export type RegisterUsernameSuccessResolvers<ContextType = Context, ParentType e
 }>;
 
 export type SuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Success'] = ResolversParentTypes['Success']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'CreateCommentSuccess' | 'CreateCommunitySuccess' | 'CreatePostSuccess' | 'LoginUsernameSuccess' | 'LogoutSuccess' | 'RegisterUsernameSuccess' | 'UserJoinCommunitySuccess' | 'VotePostSuccess', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'CreateCommentSuccess' | 'CreateCommunitySuccess' | 'CreatePostSuccess' | 'LoginUsernameSuccess' | 'LogoutSuccess' | 'RegisterUsernameSuccess' | 'UserJoinCommunitySuccess' | 'VoteCommentSuccess' | 'VotePostSuccess', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successMsg?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
@@ -1168,6 +1200,17 @@ export type UserJoinCommunityResultResolvers<ContextType = Context, ParentType e
 export type UserJoinCommunitySuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserJoinCommunitySuccess'] = ResolversParentTypes['UserJoinCommunitySuccess']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   community?: Resolver<ResolversTypes['Community'], ParentType, ContextType>;
+  successMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type VoteCommentResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['VoteCommentResult'] = ResolversParentTypes['VoteCommentResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'VoteCommentSuccess', ParentType, ContextType>;
+}>;
+
+export type VoteCommentSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['VoteCommentSuccess'] = ResolversParentTypes['VoteCommentSuccess']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  comment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType>;
   successMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -1227,6 +1270,8 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   UserEdge?: UserEdgeResolvers<ContextType>;
   UserJoinCommunityResult?: UserJoinCommunityResultResolvers<ContextType>;
   UserJoinCommunitySuccess?: UserJoinCommunitySuccessResolvers<ContextType>;
+  VoteCommentResult?: VoteCommentResultResolvers<ContextType>;
+  VoteCommentSuccess?: VoteCommentSuccessResolvers<ContextType>;
   VotePostResult?: VotePostResultResolvers<ContextType>;
   VotePostSuccess?: VotePostSuccessResolvers<ContextType>;
 }>;

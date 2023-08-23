@@ -23,11 +23,12 @@ model User {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  ownedCommunities Community[] @relation("UserOwnedCommunities")
-  inCommunities    Community[] @relation("UserInCommunities")
+  ownedCommunities Community[]   @relation("UserOwnedCommunities")
+  inCommunities    Community[]   @relation("UserInCommunities")
   posts            Post[]
   comments         Comment[]
   postVotes        PostVote[]
+  commentVotes     CommentVote[]
 }
 
 model Community {
@@ -69,8 +70,9 @@ model Comment {
   owner User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   post  Post @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  children Comment[] @relation("CommentChildren")
-  parent   Comment?  @relation("CommentChildren", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  children     Comment[]     @relation("CommentChildren")
+  parent       Comment?      @relation("CommentChildren", fields: [parentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  commentVotes CommentVote[]
 }
 
 model PostVote {
@@ -84,4 +86,17 @@ model PostVote {
   post Post @relation(fields: [postId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([userId, postId])
+}
+
+model CommentVote {
+  userId     String
+  commentId  String
+  like       Boolean
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([userId, commentId])
 }

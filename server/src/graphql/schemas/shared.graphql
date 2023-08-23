@@ -8,3 +8,10 @@ interface Success {
   successMsg: String
   code: Int!
 }
+
+# -- ENUMS
+enum VoteStatus {
+  NONE
+  LIKE
+  DISLIKE
+}

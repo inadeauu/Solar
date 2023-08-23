@@ -23,6 +23,8 @@ const getPostCommentFeedDocument = graphql(/* GraphQL */ `
             id
             username
           }
+          voteSum
+          voteStatus
         }
       }
       pageInfo {

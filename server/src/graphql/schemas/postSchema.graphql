@@ -21,7 +21,7 @@ type Post {
 
   commentCount: Int!
   voteSum: Int!
-  voteStatus: PostVoteStatus!
+  voteStatus: VoteStatus!
 
   owner: User!
   community: Community!
@@ -76,7 +76,7 @@ type CreatePostInputErrors {
   communityId: String
 }
 
-# -- VOTEPOST MUTATIOn
+# -- VOTEPOST MUTATION
 union VotePostResult = VotePostSuccess
 
 input VotePostInput {
@@ -93,12 +93,6 @@ type VotePostSuccess implements Success {
 # -- ENUMS
 enum PostOrderByType {
   recent
-}
-
-enum PostVoteStatus {
-  NONE
-  LIKE
-  DISLIKE
 }
 
 # -- RESOLVERS

@@ -7,7 +7,7 @@ import {
 } from "react-icons/bi"
 import {
   PostFeedQuery,
-  PostVoteStatus,
+  VoteStatus,
   VotePostInput,
 } from "../../../graphql_codegen/graphql"
 import { useRef } from "react"
@@ -111,14 +111,14 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
                       node: {
                         ...edge.node,
                         voteStatus:
-                          (edge.node.voteStatus == PostVoteStatus.Like &&
+                          (edge.node.voteStatus == VoteStatus.Like &&
                             input.like) ||
-                          (edge.node.voteStatus == PostVoteStatus.Dislike &&
+                          (edge.node.voteStatus == VoteStatus.Dislike &&
                             !input.like)
-                            ? PostVoteStatus.None
+                            ? VoteStatus.None
                             : input.like
-                            ? PostVoteStatus.Like
-                            : PostVoteStatus.Dislike,
+                            ? VoteStatus.Like
+                            : VoteStatus.Dislike,
                       },
                     }
                   } else {
@@ -197,7 +197,7 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
           onClick={(e) => vote(e, true)}
           className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
         >
-          {post.voteStatus == PostVoteStatus.Like ? (
+          {post.voteStatus == VoteStatus.Like ? (
             <BiSolidUpvote className="w-[18px] h-[18px] text-upvote-green" />
           ) : (
             <>
@@ -211,7 +211,7 @@ const PostFooter = ({ post, queryKey }: PostFooterProps) => {
           onClick={(e) => vote(e, false)}
           className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
         >
-          {post.voteStatus == PostVoteStatus.Dislike ? (
+          {post.voteStatus == VoteStatus.Dislike ? (
             <BiSolidDownvote className="w-[18px] h-[18px] text-red-500" />
           ) : (
             <>

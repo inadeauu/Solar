@@ -1,4 +1,5 @@
-import { PrismaPromise } from "@prisma/client"
+import { Prisma, PrismaPromise } from "@prisma/client"
+import { Sql } from "@prisma/client/runtime/library"
 import { GraphQLError } from "graphql"
 
 interface PaginateArgs {
@@ -16,6 +17,11 @@ interface PrismaPaginateArgs {
   skip?: number
 }
 
+interface PrismaSqlPaginateArgs {
+  limit: Sql
+  cursor: Sql
+}
+
 interface Edge<T> {
   node: T
   cursor: string
@@ -28,14 +34,18 @@ interface PageInfo {
   hasPreviousPage: boolean
 }
 
-interface PaginateReturn<T> {
+export interface PaginateReturn<T> {
   edges: Array<Edge<T>>
   pageInfo: PageInfo
 }
 
 export const paginate = async <Node extends { id: string }>(
+  rawQuery: boolean,
   paginateArgs: PaginateArgs,
-  prismaFunc: (options: PrismaPaginateArgs) => PrismaPromise<Array<Node> | null>
+  prismaFunc: (
+    options?: PrismaPaginateArgs,
+    sql?: PrismaSqlPaginateArgs
+  ) => PrismaPromise<Array<Node> | null>
 ): Promise<PaginateReturn<Node>> => {
   checkPaginationArgs(paginateArgs)
 
@@ -45,11 +55,25 @@ export const paginate = async <Node extends { id: string }>(
   let hasNextPage: boolean
 
   if (paginateArgs.first) {
-    const cursor = paginateArgs.after ? { id: paginateArgs.after } : undefined
-    const take = paginateArgs.first + 1
-    const skip = cursor ? 1 : undefined
+    if (!rawQuery) {
+      const cursor = paginateArgs.after ? { id: paginateArgs.after } : undefined
+      const take = paginateArgs.first + 1
+      const skip = cursor ? 1 : undefined
 
-    nodes = (await prismaFunc({ cursor, take, skip })) ?? []
+      nodes = (await prismaFunc({ cursor, take, skip })) ?? []
+    } else {
+      const cursor = paginateArgs.after
+        ? Prisma.sql`WHERE "A"."id" > ${paginateArgs.after}`
+        : Prisma.sql``
+
+      nodes =
+        (await prismaFunc(undefined, {
+          limit: Prisma.sql`LIMIT ${paginateArgs.first + 1}`,
+          cursor,
+        })) ?? []
+
+      console.log(nodes)
+    }
 
     edges = nodes.map((node) => {
       return { node, cursor: node.id }

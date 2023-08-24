@@ -409,24 +409,22 @@ export type PostInput = {
 };
 
 export const PostOrderByType = {
-  Recent: 'recent'
+  Low: 'LOW',
+  New: 'NEW',
+  Old: 'OLD',
+  Top: 'TOP'
 } as const;
 
 export type PostOrderByType = typeof PostOrderByType[keyof typeof PostOrderByType];
 export type PostsFilters = {
   communityId?: InputMaybe<Scalars['ID']['input']>;
-  orderBy?: InputMaybe<PostsOrderBy>;
+  orderBy: PostOrderByType;
   userId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type PostsInput = {
   filters?: InputMaybe<PostsFilters>;
   paginate: PaginateInput;
-};
-
-export type PostsOrderBy = {
-  dir: OrderByDir;
-  type: PostOrderByType;
 };
 
 export const Provider = {
@@ -822,7 +820,6 @@ export type ResolversTypes = ResolversObject<{
   PostOrderByType: PostOrderByType;
   PostsFilters: PostsFilters;
   PostsInput: PostsInput;
-  PostsOrderBy: PostsOrderBy;
   Provider: Provider;
   Query: ResolverTypeWrapper<{}>;
   RegisterUsernameInput: RegisterUsernameInput;
@@ -918,7 +915,6 @@ export type ResolversParentTypes = ResolversObject<{
   PostInput: PostInput;
   PostsFilters: PostsFilters;
   PostsInput: PostsInput;
-  PostsOrderBy: PostsOrderBy;
   Query: {};
   RegisterUsernameInput: RegisterUsernameInput;
   RegisterUsernameInputError: RegisterUsernameInputError;

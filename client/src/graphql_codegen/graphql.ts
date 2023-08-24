@@ -573,23 +573,21 @@ export type PostInput = {
 };
 
 export enum PostOrderByType {
-  Recent = 'recent'
+  Low = 'LOW',
+  New = 'NEW',
+  Old = 'OLD',
+  Top = 'TOP'
 }
 
 export type PostsFilters = {
   communityId?: InputMaybe<Scalars['ID']['input']>;
-  orderBy?: InputMaybe<PostsOrderBy>;
+  orderBy: PostOrderByType;
   userId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type PostsInput = {
   filters?: InputMaybe<PostsFilters>;
   paginate: PaginateInput;
-};
-
-export type PostsOrderBy = {
-  dir: OrderByDir;
-  type: PostOrderByType;
 };
 
 export enum Provider {

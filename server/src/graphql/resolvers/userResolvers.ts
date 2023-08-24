@@ -16,22 +16,25 @@ export const resolvers: Resolvers = {
       const filters = args.input?.filters
       const orderBy = filters?.orderBy
 
-      const users = await paginate<User>(args.input.paginate, (options) =>
-        prisma.user.findMany({
-          where: {
-            username: {
-              contains: filters?.usernameContains ?? undefined,
+      const users = await paginate<User>(
+        false,
+        args.input.paginate,
+        (options) =>
+          prisma.user.findMany({
+            where: {
+              username: {
+                contains: filters?.usernameContains ?? undefined,
+              },
             },
-          },
-          orderBy: {
-            id: "asc",
-            ...(orderBy &&
-              orderBy.type == UserOrderByType.PostCount && {
-                posts: { _count: orderBy.dir },
-              }),
-          },
-          ...options,
-        })
+            orderBy: {
+              id: "asc",
+              ...(orderBy &&
+                orderBy.type == UserOrderByType.PostCount && {
+                  posts: { _count: orderBy.dir },
+                }),
+            },
+            ...options,
+          })
       )
 
       return users
@@ -47,6 +50,7 @@ export const resolvers: Resolvers = {
   User: {
     ownedCommunities: async (user, args) => {
       const ownedCommunities = await paginate<Community>(
+        false,
         args.input.paginate,
         (options) =>
           prisma.user
@@ -58,6 +62,7 @@ export const resolvers: Resolvers = {
     },
     inCommunities: async (user, args) => {
       const inCommunities = await paginate<Community>(
+        false,
         args.input.paginate,
         (options) =>
           prisma.user
@@ -68,19 +73,25 @@ export const resolvers: Resolvers = {
       return inCommunities
     },
     posts: async (user, args) => {
-      const posts = await paginate<Post>(args.input.paginate, (options) =>
-        prisma.user
-          .findUnique({ where: { id: user.id } })
-          .posts({ orderBy: { id: "asc" }, ...options })
+      const posts = await paginate<Post>(
+        false,
+        args.input.paginate,
+        (options) =>
+          prisma.user
+            .findUnique({ where: { id: user.id } })
+            .posts({ orderBy: { id: "asc" }, ...options })
       )
 
       return posts
     },
     comments: async (user, args) => {
-      const comments = await paginate<Comment>(args.input.paginate, (options) =>
-        prisma.user
-          .findUnique({ where: { id: user.id } })
-          .comments({ orderBy: { id: "asc" }, ...options })
+      const comments = await paginate<Comment>(
+        false,
+        args.input.paginate,
+        (options) =>
+          prisma.user
+            .findUnique({ where: { id: user.id } })
+            .comments({ orderBy: { id: "asc" }, ...options })
       )
 
       return comments

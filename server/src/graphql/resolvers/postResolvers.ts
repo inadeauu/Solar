@@ -1,11 +1,11 @@
-import { Post } from "@prisma/client"
+import { Post, Prisma } from "@prisma/client"
 import {
-  PostOrderByType,
   VoteStatus,
   Resolvers,
+  PostOrderByType,
 } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
-import { paginate } from "../paginate"
+import { PaginateReturn, paginate } from "../paginate"
 import { GraphQLError } from "graphql"
 
 export const resolvers: Resolvers = {
@@ -18,31 +18,48 @@ export const resolvers: Resolvers = {
       return post
     },
     posts: async (_0, args) => {
-      const filters = args.input?.filters
+      const filters = args.input.filters
       const orderBy = filters?.orderBy
 
-      const posts = await paginate<Post>(args.input.paginate, (options) =>
-        prisma.post.findMany({
-          where: {
-            AND: [
-              {
-                userId: args.input.filters?.userId ?? undefined,
-              },
-              {
-                communityId: args.input.filters?.communityId ?? undefined,
-              },
-            ],
-          },
-          orderBy: {
-            id: "asc",
-            ...(orderBy &&
-              orderBy.type == PostOrderByType.Recent && {
-                created_at: orderBy.dir,
+      let posts: PaginateReturn<Post>
+      const postsVoteSum = Prisma.sql`SELECT "A".*, CAST(COALESCE("B"."votes", 0) AS int) as "voteSum" FROM "Post" "A" LEFT JOIN (SELECT "postId", sum("like") as "votes" FROM "PostVote" GROUP BY "postId") "B" ON "A"."id" = "B"."postId"`
+
+      if (orderBy == "TOP") {
+        posts = await paginate<Post>(
+          true,
+          args.input.paginate,
+          (_0, sql) =>
+            prisma.$queryRaw`${postsVoteSum}  ORDER BY "voteSum" DESC, "A"."id" DESC ${sql?.limit}`
+        )
+      } else if (orderBy == "LOW") {
+        posts = await paginate<Post>(
+          true,
+          args.input.paginate,
+          (_0, sql) =>
+            prisma.$queryRaw`${postsVoteSum} ${sql?.cursor} ORDER BY "voteSum" ASC ${sql?.limit}`
+        )
+      } else {
+        posts = await paginate<Post>(false, args.input.paginate, (options) =>
+          prisma.post.findMany({
+            where: {
+              AND: [
+                {
+                  userId: args.input.filters?.userId ?? undefined,
+                },
+                {
+                  communityId: args.input.filters?.communityId ?? undefined,
+                },
+              ],
+            },
+            orderBy: {
+              ...((orderBy == "NEW" || orderBy == "OLD") && {
+                created_at: orderBy == "NEW" ? "desc" : "asc",
               }),
-          },
-          ...options,
-        })
-      )
+            },
+            ...options,
+          })
+        )
+      }
 
       return posts
     },
@@ -132,15 +149,15 @@ export const resolvers: Resolvers = {
             postVotes: {
               create: {
                 userId: req.session.userId,
-                like: args.input.like,
+                like: args.input.like ? 1 : -1,
               },
             },
           },
         })
         successMsg = "Successfully " + doMsg + " post"
       } else if (
-        (postVote.like && args.input.like) ||
-        (!postVote.like && !args.input.like)
+        (postVote.like == 1 && args.input.like) ||
+        (postVote.like == -1 && !args.input.like)
       ) {
         updatedPost = await prisma.post.update({
           where: { id: args.input.postId },
@@ -169,7 +186,7 @@ export const resolvers: Resolvers = {
                   },
                 },
                 data: {
-                  like: args.input.like,
+                  like: args.input.like ? 1 : -1,
                 },
               },
             },
@@ -205,14 +222,14 @@ export const resolvers: Resolvers = {
       const likeSum = (await prisma.post.findUnique({
         where: { id: post.id },
         include: {
-          _count: { select: { postVotes: { where: { like: true } } } },
+          _count: { select: { postVotes: { where: { like: 1 } } } },
         },
       }))!._count.postVotes
 
       const dislikeSum = (await prisma.post.findUnique({
         where: { id: post.id },
         include: {
-          _count: { select: { postVotes: { where: { like: false } } } },
+          _count: { select: { postVotes: { where: { like: -1 } } } },
         },
       }))!._count.postVotes
 
@@ -239,7 +256,7 @@ export const resolvers: Resolvers = {
 
       if (!postVote) {
         return VoteStatus.None
-      } else if (postVote.like) {
+      } else if (postVote.like == 1) {
         return VoteStatus.Like
       } else {
         return VoteStatus.Dislike

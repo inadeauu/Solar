@@ -42,12 +42,7 @@ input PostsInput {
 input PostsFilters {
   userId: ID
   communityId: ID
-  orderBy: PostsOrderBy
-}
-
-input PostsOrderBy {
-  type: PostOrderByType!
-  dir: OrderByDir!
+  orderBy: PostOrderByType!
 }
 
 # -- CREATEPOST MUTATION
@@ -92,7 +87,10 @@ type VotePostSuccess implements Success {
 
 # -- ENUMS
 enum PostOrderByType {
-  recent
+  NEW
+  OLD
+  TOP
+  LOW
 }
 
 # -- RESOLVERS

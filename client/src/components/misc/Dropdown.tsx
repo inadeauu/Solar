@@ -31,7 +31,7 @@ const Dropdown = ({
   return (
     <div
       ref={menuRef}
-      className={`flex items-center gap-1 px-2 text-sm relative rounded-md font-medium bg-white border-2 border-neutral-300 hover:border-neutral-400 cursor-pointer ${className} ${
+      className={`flex items-center gap-1 px-2 text-sm relative rounded-md font-medium bg-white border border-neutral-300 hover:border-neutral-400 cursor-pointer ${className} ${
         openMenu && "border-neutral-400"
       } ${!constValue && width}`}
       onClick={() => setOpenMenu((prev) => !prev)}

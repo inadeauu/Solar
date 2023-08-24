@@ -18,32 +18,35 @@ export const resolvers: Resolvers = {
     comments: async (_0, args) => {
       const filters = args.input.filters
 
-      const comments = paginate<Comment>(args.input.paginate, (options) =>
-        prisma.comment.findMany({
-          where: {
-            AND: [
-              {
-                ...(filters?.userId && {
-                  userId: filters.userId,
-                }),
-              },
-              {
-                ...(filters?.postId && {
-                  postId: filters.postId,
-                }),
-              },
-              {
-                ...(filters?.parentId !== undefined && {
-                  parentId: filters.parentId,
-                }),
-              },
-            ],
-          },
-          orderBy: {
-            id: "asc",
-          },
-          ...options,
-        })
+      const comments = paginate<Comment>(
+        false,
+        args.input.paginate,
+        (options) =>
+          prisma.comment.findMany({
+            where: {
+              AND: [
+                {
+                  ...(filters?.userId && {
+                    userId: filters.userId,
+                  }),
+                },
+                {
+                  ...(filters?.postId && {
+                    postId: filters.postId,
+                  }),
+                },
+                {
+                  ...(filters?.parentId !== undefined && {
+                    parentId: filters.parentId,
+                  }),
+                },
+              ],
+            },
+            orderBy: {
+              id: "asc",
+            },
+            ...options,
+          })
       )
 
       return comments
@@ -176,15 +179,15 @@ export const resolvers: Resolvers = {
             commentVotes: {
               create: {
                 userId: req.session.userId,
-                like: args.input.like,
+                like: args.input.like ? 1 : -1,
               },
             },
           },
         })
         successMsg = "Successfully " + doMsg + " post"
       } else if (
-        (commentVote.like && args.input.like) ||
-        (!commentVote.like && !args.input.like)
+        (commentVote.like == 1 && args.input.like) ||
+        (commentVote.like == -1 && !args.input.like)
       ) {
         updatedComment = await prisma.comment.update({
           where: { id: args.input.commentId },
@@ -213,7 +216,7 @@ export const resolvers: Resolvers = {
                   },
                 },
                 data: {
-                  like: args.input.like,
+                  like: args.input.like ? 1 : -1,
                 },
               },
             },
@@ -257,10 +260,13 @@ export const resolvers: Resolvers = {
       return parent
     },
     children: async (comment, args) => {
-      const children = await paginate<Comment>(args.input.paginate, (options) =>
-        prisma.comment
-          .findUnique({ where: { id: comment.id } })
-          .children({ orderBy: { id: "asc" }, ...options })
+      const children = await paginate<Comment>(
+        false,
+        args.input.paginate,
+        (options) =>
+          prisma.comment
+            .findUnique({ where: { id: comment.id } })
+            .children({ orderBy: { id: "asc" }, ...options })
       )
 
       return children
@@ -279,7 +285,7 @@ export const resolvers: Resolvers = {
 
       if (!commentVote) {
         return VoteStatus.None
-      } else if (commentVote.like) {
+      } else if (commentVote.like == 1) {
         return VoteStatus.Like
       } else {
         return VoteStatus.Dislike
@@ -289,14 +295,14 @@ export const resolvers: Resolvers = {
       const likeSum = (await prisma.comment.findUnique({
         where: { id: comment.id },
         include: {
-          _count: { select: { commentVotes: { where: { like: true } } } },
+          _count: { select: { commentVotes: { where: { like: 1 } } } },
         },
       }))!._count.commentVotes
 
       const dislikeSum = (await prisma.comment.findUnique({
         where: { id: comment.id },
         include: {
-          _count: { select: { commentVotes: { where: { like: false } } } },
+          _count: { select: { commentVotes: { where: { like: -1 } } } },
         },
       }))!._count.commentVotes
 

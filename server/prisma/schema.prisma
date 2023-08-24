@@ -78,7 +78,7 @@ model Comment {
 model PostVote {
   userId     String
   postId     String
-  like       Boolean
+  like       Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -91,7 +91,7 @@ model PostVote {
 model CommentVote {
   userId     String
   commentId  String
-  like       Boolean
+  like       Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 

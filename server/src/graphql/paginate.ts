@@ -1,6 +1,7 @@
 import { Prisma, PrismaPromise } from "@prisma/client"
 import { GraphQLError } from "graphql"
 import prisma from "../config/prisma"
+import { PostsFilters } from "../__generated__/resolvers-types"
 
 type Cursor = {
   id: string
@@ -8,10 +9,8 @@ type Cursor = {
 }
 
 interface PaginateArgs {
-  first?: number
+  first: number
   after?: Cursor
-  last?: number
-  before?: Cursor
 }
 
 interface PrismaPaginateArgs {
@@ -30,8 +29,6 @@ interface Edge<T> {
 interface PageInfo {
   endCursor?: Cursor
   hasNextPage: boolean
-  startCursor?: Cursor
-  hasPreviousPage: boolean
 }
 
 export interface PaginateReturn<T> {
@@ -39,11 +36,12 @@ export interface PaginateReturn<T> {
   pageInfo: PageInfo
 }
 
-export const paginateVoteSum = async <
+export const paginatePostsByVoteSum = async <
   Node extends { id: string; voteSum: number }
 >(
   paginateArgs: PaginateArgs,
-  top: boolean
+  asc: boolean,
+  filters?: PostsFilters
 ): Promise<PaginateReturn<Node>> => {
   checkPaginationArgs(paginateArgs)
 
@@ -53,70 +51,50 @@ export const paginateVoteSum = async <
     })
   }
 
-  let nodes: Array<Node>
-  let edges: Array<Edge<Node>>
-  let hasPreviousPage: boolean
-  let hasNextPage: boolean
+  const communityId = filters?.communityId
+  const userId = filters?.userId
 
-  const postsQuery = Prisma.sql`SELECT "A".*, CAST(COALESCE("B"."votes", 0) AS int) as "voteSum" FROM "Post" "A" LEFT JOIN (SELECT "postId", sum("like") as "votes" FROM "PostVote" GROUP BY "postId") "B" ON "A"."id" = "B"."postId"`
-  const orderBy = top
+  const postsQuery = Prisma.sql`
+    SELECT "A".*, CAST(COALESCE("B"."votes", 0) AS int) as "voteSum" FROM "Post" "A" 
+    LEFT JOIN (SELECT "postId", sum("like") as "votes" 
+    FROM "PostVote" GROUP BY "postId") "B" ON "A"."id" = "B"."postId"`
+
+  const cursor = asc
+    ? Prisma.sql`(${paginateArgs.after}::json IS NULL OR CAST(COALESCE("B"."votes", 0) AS int) <= ${paginateArgs.after?.voteSum} AND ("A"."id" > ${paginateArgs.after?.id} OR CAST(COALESCE("B"."votes", 0) AS int) < ${paginateArgs.after?.voteSum}))`
+    : Prisma.sql`(${paginateArgs.after}::json IS NULL OR CAST(COALESCE("B"."votes", 0) AS int) >= ${paginateArgs.after?.voteSum} AND ("A"."id" > ${paginateArgs.after?.id} OR CAST(COALESCE("B"."votes", 0) AS int) > ${paginateArgs.after?.voteSum}))`
+
+  const where = Prisma.sql`WHERE 1=1 
+    AND (${communityId}::text IS NULL OR "A"."communityId" = ${communityId}) 
+    AND (${userId}::text IS NULL OR "A"."userId" = ${userId}) 
+    AND ${cursor}`
+
+  const orderBy = asc
     ? Prisma.sql`ORDER BY "voteSum" DESC, "A"."id" ASC`
     : Prisma.sql`ORDER BY "voteSum" ASC, "A"."id" ASC`
 
-  if (paginateArgs.first) {
-    const cursor = paginateArgs.after
-      ? Prisma.sql`WHERE CAST(COALESCE("B"."votes", 0) AS int) <= ${paginateArgs.after.voteSum} AND ("A"."id" >= ${paginateArgs.after.id} OR CAST(COALESCE("B"."votes", 0) AS int) < ${paginateArgs.after.voteSum})`
-      : Prisma.sql``
-    const take = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
+  const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}::int`
 
-    nodes = await prisma.$queryRaw`${postsQuery} ${cursor} ${orderBy} ${take}`
+  const nodes: Node[] =
+    await prisma.$queryRaw`${postsQuery} ${where} ${orderBy} ${limit}`
 
-    edges = nodes.map((node) => {
-      return { node, cursor: { id: node.id, voteSum: node.voteSum } }
-    })
+  const edges: Edge<Node>[] = nodes.map((node) => {
+    return { node, cursor: { id: node.id, voteSum: node.voteSum } }
+  })
 
-    hasPreviousPage = !!paginateArgs.after
-    hasNextPage = nodes.length > paginateArgs.first
+  const hasNextPage = nodes.length > paginateArgs.first
 
-    if (hasNextPage) {
-      edges.pop()
-      nodes.pop()
-    }
-  } else {
-    const cursor =
-      paginateArgs.before &&
-      Prisma.sql`WHERE ("voteSum", "id") <= (${paginateArgs.before.voteSum}, ${paginateArgs.before.id})`
-    const take = Prisma.sql`LIMIT ${paginateArgs.last! + 1}`
-
-    nodes = await prisma.$queryRaw`${postsQuery} ${cursor} ${orderBy} ${take}`
-
-    edges = nodes.map((node) => {
-      return { node, cursor: { id: node.id, voteSum: node.voteSum } }
-    })
-
-    hasPreviousPage = nodes.length > paginateArgs.last!
-    hasNextPage = !!paginateArgs.before
-
-    if (hasPreviousPage) {
-      edges.shift()
-      nodes.shift()
-    }
+  if (hasNextPage) {
+    edges.pop()
+    nodes.pop()
   }
 
-  const startCursor =
-    nodes.length && hasPreviousPage ? edges[0].cursor : undefined
   const endCursor =
-    nodes.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
+    edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
 
   const pageInfo: PageInfo = {
     endCursor,
     hasNextPage,
-    startCursor,
-    hasPreviousPage,
   }
-
-  console.log(paginateArgs)
-  console.log(pageInfo)
 
   return {
     edges,
@@ -130,63 +108,29 @@ export const paginate = async <Node extends { id: string }>(
 ): Promise<PaginateReturn<Node>> => {
   checkPaginationArgs(paginateArgs)
 
-  let nodes: Array<Node>
-  let edges: Array<Edge<Node>>
-  let hasPreviousPage: boolean
-  let hasNextPage: boolean
+  const cursor = paginateArgs.after ? { id: paginateArgs.after.id } : undefined
+  const take = paginateArgs.first + 1
+  const skip = cursor ? 1 : undefined
 
-  if (paginateArgs.first) {
-    const cursor = paginateArgs.after
-      ? { id: paginateArgs.after.id }
-      : undefined
-    const take = paginateArgs.first + 1
-    const skip = cursor ? 1 : undefined
+  const nodes: Node[] = (await prismaFunc({ cursor, take, skip })) ?? []
 
-    nodes = (await prismaFunc({ cursor, take, skip })) ?? []
+  const edges: Edge<Node>[] = nodes.map((node) => {
+    return { node, cursor: { id: node.id } }
+  })
 
-    edges = nodes.map((node) => {
-      return { node, cursor: { id: node.id } }
-    })
+  const hasNextPage = nodes.length > paginateArgs.first
 
-    hasPreviousPage = !!paginateArgs.after
-    hasNextPage = nodes.length > paginateArgs.first
-
-    if (hasNextPage) {
-      edges.pop()
-      nodes.pop()
-    }
-  } else {
-    const cursor = paginateArgs.before
-      ? { id: paginateArgs.before.id }
-      : undefined
-    const take = -(paginateArgs.last! + 1)
-    const skip = cursor ? 1 : undefined
-
-    nodes = (await prismaFunc({ cursor, take, skip })) ?? []
-
-    edges = nodes.map((node) => {
-      return { node, cursor: { id: node.id } }
-    })
-
-    hasPreviousPage = nodes.length > paginateArgs.last!
-    hasNextPage = !!paginateArgs.before
-
-    if (hasPreviousPage) {
-      edges.shift()
-      nodes.shift()
-    }
+  if (hasNextPage) {
+    edges.pop()
+    nodes.pop()
   }
 
-  const startCursor =
-    nodes.length && hasPreviousPage ? edges[0].cursor : undefined
   const endCursor =
     nodes.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
 
   const pageInfo: PageInfo = {
     endCursor,
     hasNextPage,
-    startCursor,
-    hasPreviousPage,
   }
 
   return {
@@ -196,33 +140,8 @@ export const paginate = async <Node extends { id: string }>(
 }
 
 export const checkPaginationArgs = (paginateArgs: PaginateArgs): void => {
-  if (paginateArgs.first == null && paginateArgs.last == null) {
-    throw new GraphQLError("Either first or last must be specified", {
-      extensions: { code: "PAGINATION_ERROR" },
-    })
-  } else if (
-    (paginateArgs.first && paginateArgs.last) ||
-    (paginateArgs.first && paginateArgs.before) ||
-    (paginateArgs.after && paginateArgs.last) ||
-    (paginateArgs.after && paginateArgs.before)
-  ) {
-    throw new GraphQLError("Only first/after or last/before may be specified", {
-      extensions: { code: "PAGINATION_ERROR" },
-    })
-  } else if (paginateArgs.first && paginateArgs.first <= 0) {
-    throw new GraphQLError("First must be greater than 0", {
-      extensions: { code: "PAGINATION_ERROR" },
-    })
-  } else if (paginateArgs.last && paginateArgs.last <= 0) {
-    throw new GraphQLError("Last must be greater than 0", {
-      extensions: { code: "PAGINATION_ERROR" },
-    })
-  } else if (paginateArgs.first && paginateArgs.first > 100) {
-    throw new GraphQLError("First must be 100 or less", {
-      extensions: { code: "PAGINATION_ERROR" },
-    })
-  } else if (paginateArgs.last && paginateArgs.last > 100) {
-    throw new GraphQLError("Last must be 100 or less", {
+  if (paginateArgs.first <= 0 || paginateArgs.first > 100) {
+    throw new GraphQLError("First must be between 0 and 100", {
       extensions: { code: "PAGINATION_ERROR" },
     })
   }

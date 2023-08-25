@@ -1,11 +1,7 @@
-import { Post, Prisma } from "@prisma/client"
-import {
-  VoteStatus,
-  Resolvers,
-  PostOrderByType,
-} from "../../__generated__/resolvers-types"
+import { Post } from "@prisma/client"
+import { VoteStatus, Resolvers } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
-import { PaginateReturn, paginate, paginateVoteSum } from "../paginate"
+import { PaginateReturn, paginate, paginatePostsByVoteSum } from "../paginate"
 import { GraphQLError } from "graphql"
 
 export const resolvers: Resolvers = {
@@ -24,14 +20,16 @@ export const resolvers: Resolvers = {
       let posts: PaginateReturn<Post>
 
       if (orderBy == "TOP") {
-        posts = await paginateVoteSum<Post & { voteSum: number }>(
+        posts = await paginatePostsByVoteSum<Post & { voteSum: number }>(
           args.input.paginate,
-          true
+          true,
+          args.input.filters
         )
       } else if (orderBy == "LOW") {
-        posts = await paginateVoteSum<Post & { voteSum: number }>(
+        posts = await paginatePostsByVoteSum<Post & { voteSum: number }>(
           args.input.paginate,
-          false
+          false,
+          args.input.filters
         )
       } else {
         posts = await paginate<Post>(args.input.paginate, (options) =>

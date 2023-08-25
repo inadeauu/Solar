@@ -2,15 +2,11 @@
 type PageInfo {
   endCursor: Cursor
   hasNextPage: Boolean!
-  startCursor: Cursor
-  hasPreviousPage: Boolean!
 }
 
 input PaginateInput {
-  first: Int
+  first: Int!
   after: CursorInput
-  last: Int
-  before: CursorInput
 }
 
 input CursorInput {

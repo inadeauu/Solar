@@ -361,15 +361,11 @@ export type PageInfo = {
   __typename?: 'PageInfo';
   endCursor?: Maybe<Cursor>;
   hasNextPage: Scalars['Boolean']['output'];
-  hasPreviousPage: Scalars['Boolean']['output'];
-  startCursor?: Maybe<Cursor>;
 };
 
 export type PaginateInput = {
   after?: InputMaybe<CursorInput>;
-  before?: InputMaybe<CursorInput>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  first: Scalars['Int']['input'];
 };
 
 export type Post = {
@@ -1165,8 +1161,6 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
 export type PageInfoResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
   endCursor?: Resolver<Maybe<ResolversTypes['Cursor']>, ParentType, ContextType>;
   hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  startCursor?: Resolver<Maybe<ResolversTypes['Cursor']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

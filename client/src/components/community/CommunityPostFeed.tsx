@@ -39,6 +39,7 @@ const getPostFeedDocument = graphql(/* GraphQL */ `
         endCursor {
           id
           voteSum
+          created_at
         }
         hasNextPage
       }
@@ -74,9 +75,7 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
     }
   )
 
-  const changePostOrder = (newOrder: string) => {
-    setPostOrder(newOrder)
-  }
+  console.log("reload")
 
   const getPostOrder = () => {
     switch (postOrder) {
@@ -109,7 +108,7 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
         width="w-[70px] py-2"
         items={["New", "Old", "Top", "Low"]}
         value={postOrder}
-        setValue={changePostOrder}
+        setValue={setPostOrder}
       />
       {isSuccess &&
         data.pages.map((page) =>

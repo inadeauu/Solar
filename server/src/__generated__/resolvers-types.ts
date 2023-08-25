@@ -257,12 +257,14 @@ export type CreatePostSuccess = Success & {
 
 export type Cursor = {
   __typename?: 'Cursor';
-  id: Scalars['String']['output'];
+  created_at?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
   voteSum?: Maybe<Scalars['Int']['output']>;
 };
 
 export type CursorInput = {
-  id: Scalars['String']['input'];
+  created_at?: InputMaybe<Scalars['DateTime']['input']>;
+  id: Scalars['ID']['input'];
   voteSum?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -423,7 +425,7 @@ export type PostsFilters = {
 };
 
 export type PostsInput = {
-  filters?: InputMaybe<PostsFilters>;
+  filters: PostsFilters;
   paginate: PaginateInput;
 };
 
@@ -1104,7 +1106,8 @@ export type CreatePostSuccessResolvers<ContextType = Context, ParentType extends
 }>;
 
 export type CursorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Cursor'] = ResolversParentTypes['Cursor']> = ResolversObject<{
-  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  created_at?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   voteSum?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

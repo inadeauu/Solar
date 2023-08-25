@@ -1,4 +1,4 @@
-import { Prisma, PrismaPromise } from "@prisma/client"
+import { Post, Prisma, PrismaPromise } from "@prisma/client"
 import { GraphQLError } from "graphql"
 import prisma from "../config/prisma"
 import { PostsFilters } from "../__generated__/resolvers-types"
@@ -6,6 +6,7 @@ import { PostsFilters } from "../__generated__/resolvers-types"
 type Cursor = {
   id: string
   voteSum?: number
+  created_at?: Date
 }
 
 interface PaginateArgs {
@@ -36,49 +37,88 @@ export interface PaginateReturn<T> {
   pageInfo: PageInfo
 }
 
-export const paginatePostsByVoteSum = async <
-  Node extends { id: string; voteSum: number }
->(
+type PostPaginate = Post & { voteSum: number }
+
+export const paginatePosts = async (
   paginateArgs: PaginateArgs,
-  asc: boolean,
-  filters?: PostsFilters
-): Promise<PaginateReturn<Node>> => {
+  filters: PostsFilters
+): Promise<PaginateReturn<Post>> => {
   checkPaginationArgs(paginateArgs)
 
-  if (paginateArgs.after && paginateArgs.after.voteSum == null) {
-    throw new GraphQLError("Vote sum must be specified with cursor", {
-      extensions: { code: "PAGINATION_ERROR" },
-    })
+  const communityId = filters.communityId
+  const userId = filters.userId
+  const orderByType = filters.orderBy
+
+  let postsQuery: Prisma.Sql
+  let cursor: Prisma.Sql
+  let orderBy: Prisma.Sql
+
+  if (orderByType == "NEW" || orderByType == "OLD") {
+    if (paginateArgs.after && paginateArgs.after.created_at == null) {
+      throw new GraphQLError("Created at must be specified with cursor", {
+        extensions: { code: "PAGINATION_ERROR" },
+      })
+    }
+
+    postsQuery = Prisma.sql`SELECT "p".* FROM (SELECT "id", "userId", "communityId", "title", "body", to_char("created_at"::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "created_at", "updated_at" from "Post") as "p"`
+    const id = paginateArgs.after?.id
+    const created_at = paginateArgs.after?.created_at?.toISOString()
+
+    cursor =
+      orderByType == "NEW"
+        ? Prisma.sql`(${paginateArgs.after}::json IS NULL OR "p"."created_at" <= ${created_at} AND ("p"."id" > ${id} OR "p"."created_at" < ${created_at}))`
+        : Prisma.sql`(${paginateArgs.after}::json IS NULL OR "p"."created_at" >= ${created_at} AND ("p"."id" > ${id} OR "p"."created_at" > ${created_at}))`
+
+    orderBy =
+      orderByType == "NEW"
+        ? Prisma.sql`ORDER BY "p"."created_at" DESC, "p"."id" ASC`
+        : Prisma.sql`ORDER BY "p"."created_at" ASC, "p"."id" ASC`
+  } else {
+    if (paginateArgs.after && paginateArgs.after.voteSum == null) {
+      throw new GraphQLError("Vote sum must be specified with cursor", {
+        extensions: { code: "PAGINATION_ERROR" },
+      })
+    }
+
+    postsQuery = Prisma.sql`
+      SELECT "p".* FROM (SELECT "id", "userId", "communityId", "title", "body", "created_at", "updated_at", CAST(COALESCE("B"."votes", 0) AS int) as "voteSum" FROM "Post"
+      LEFT JOIN (SELECT "postId", sum("like") as "votes" 
+      FROM "PostVote" GROUP BY "postId") "B" ON "Post"."id" = "B"."postId") as "p"`
+
+    const id = paginateArgs.after?.id
+    const voteSum = paginateArgs.after?.voteSum
+
+    cursor =
+      orderByType == "TOP"
+        ? Prisma.sql`(${paginateArgs.after}::json IS NULL OR "p"."voteSum" <= ${voteSum} AND ("p"."id" > ${id} OR "p"."voteSum" < ${voteSum}))`
+        : Prisma.sql`(${paginateArgs.after}::json IS NULL OR "p"."voteSum" >= ${voteSum} AND ("p"."id" > ${id} OR "p"."voteSum" > ${voteSum}))`
+
+    orderBy =
+      orderByType == "TOP"
+        ? Prisma.sql`ORDER BY "p"."voteSum" DESC, "p"."id" ASC`
+        : Prisma.sql`ORDER BY "p"."voteSum" ASC, "p"."id" ASC`
   }
 
-  const communityId = filters?.communityId
-  const userId = filters?.userId
-
-  const postsQuery = Prisma.sql`
-    SELECT "A".*, CAST(COALESCE("B"."votes", 0) AS int) as "voteSum" FROM "Post" "A" 
-    LEFT JOIN (SELECT "postId", sum("like") as "votes" 
-    FROM "PostVote" GROUP BY "postId") "B" ON "A"."id" = "B"."postId"`
-
-  const cursor = asc
-    ? Prisma.sql`(${paginateArgs.after}::json IS NULL OR CAST(COALESCE("B"."votes", 0) AS int) <= ${paginateArgs.after?.voteSum} AND ("A"."id" > ${paginateArgs.after?.id} OR CAST(COALESCE("B"."votes", 0) AS int) < ${paginateArgs.after?.voteSum}))`
-    : Prisma.sql`(${paginateArgs.after}::json IS NULL OR CAST(COALESCE("B"."votes", 0) AS int) >= ${paginateArgs.after?.voteSum} AND ("A"."id" > ${paginateArgs.after?.id} OR CAST(COALESCE("B"."votes", 0) AS int) > ${paginateArgs.after?.voteSum}))`
-
   const where = Prisma.sql`WHERE 1=1 
-    AND (${communityId}::text IS NULL OR "A"."communityId" = ${communityId}) 
-    AND (${userId}::text IS NULL OR "A"."userId" = ${userId}) 
+    AND (${communityId}::text IS NULL OR "p"."communityId" = ${communityId}) 
+    AND (${userId}::text IS NULL OR "p"."userId" = ${userId}) 
     AND ${cursor}`
 
-  const orderBy = asc
-    ? Prisma.sql`ORDER BY "voteSum" DESC, "A"."id" ASC`
-    : Prisma.sql`ORDER BY "voteSum" ASC, "A"."id" ASC`
+  const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
 
-  const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}::int`
-
-  const nodes: Node[] =
+  const nodes: PostPaginate[] =
     await prisma.$queryRaw`${postsQuery} ${where} ${orderBy} ${limit}`
 
-  const edges: Edge<Node>[] = nodes.map((node) => {
-    return { node, cursor: { id: node.id, voteSum: node.voteSum } }
+  const edges: Edge<Post>[] = nodes.map((node) => {
+    console.log(node.id)
+    return {
+      node,
+      cursor: {
+        id: node.id,
+        voteSum: node.voteSum,
+        created_at: node.created_at,
+      },
+    }
   })
 
   const hasNextPage = nodes.length > paginateArgs.first
@@ -90,6 +130,8 @@ export const paginatePostsByVoteSum = async <
 
   const endCursor =
     edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
+
+  console.log(endCursor)
 
   const pageInfo: PageInfo = {
     endCursor,

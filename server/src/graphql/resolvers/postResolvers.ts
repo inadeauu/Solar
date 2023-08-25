@@ -1,7 +1,7 @@
 import { Post } from "@prisma/client"
 import { VoteStatus, Resolvers } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
-import { PaginateReturn, paginate, paginatePostsByVoteSum } from "../paginate"
+import { paginatePosts } from "../paginate"
 import { GraphQLError } from "graphql"
 
 export const resolvers: Resolvers = {
@@ -14,45 +14,7 @@ export const resolvers: Resolvers = {
       return post
     },
     posts: async (_0, args) => {
-      const filters = args.input.filters
-      const orderBy = filters?.orderBy
-
-      let posts: PaginateReturn<Post>
-
-      if (orderBy == "TOP") {
-        posts = await paginatePostsByVoteSum<Post & { voteSum: number }>(
-          args.input.paginate,
-          true,
-          args.input.filters
-        )
-      } else if (orderBy == "LOW") {
-        posts = await paginatePostsByVoteSum<Post & { voteSum: number }>(
-          args.input.paginate,
-          false,
-          args.input.filters
-        )
-      } else {
-        posts = await paginate<Post>(args.input.paginate, (options) =>
-          prisma.post.findMany({
-            where: {
-              AND: [
-                {
-                  userId: args.input.filters?.userId ?? undefined,
-                },
-                {
-                  communityId: args.input.filters?.communityId ?? undefined,
-                },
-              ],
-            },
-            orderBy: {
-              ...((orderBy == "NEW" || orderBy == "OLD") && {
-                created_at: orderBy == "NEW" ? "desc" : "asc",
-              }),
-            },
-            ...options,
-          })
-        )
-      }
+      const posts = await paginatePosts(args.input.paginate, args.input.filters)
 
       return posts
     },

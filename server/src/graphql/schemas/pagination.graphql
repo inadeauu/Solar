@@ -1,3 +1,5 @@
+scalar DateTime
+
 # -- GENERAL
 type PageInfo {
   endCursor: Cursor
@@ -10,13 +12,15 @@ input PaginateInput {
 }
 
 input CursorInput {
-  id: String!
+  id: ID!
   voteSum: Int
+  created_at: DateTime
 }
 
 type Cursor {
-  id: String!
+  id: ID!
   voteSum: Int
+  created_at: DateTime
 }
 
 # -- USER

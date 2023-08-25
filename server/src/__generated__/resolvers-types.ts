@@ -65,7 +65,7 @@ export type CommentConnection = {
 
 export type CommentEdge = {
   __typename?: 'CommentEdge';
-  cursor: Scalars['String']['output'];
+  cursor: Cursor;
   node: Comment;
 };
 
@@ -95,7 +95,6 @@ export type CommunitiesInput = {
 };
 
 export type CommunitiesOrderBy = {
-  dir: OrderByDir;
   type: CommunityOrderByType;
 };
 
@@ -131,7 +130,7 @@ export type CommunityConnection = {
 
 export type CommunityEdge = {
   __typename?: 'CommunityEdge';
-  cursor: Scalars['String']['output'];
+  cursor: Cursor;
   node: Community;
 };
 
@@ -256,6 +255,17 @@ export type CreatePostSuccess = Success & {
   successMsg: Scalars['String']['output'];
 };
 
+export type Cursor = {
+  __typename?: 'Cursor';
+  id: Scalars['String']['output'];
+  voteSum?: Maybe<Scalars['Int']['output']>;
+};
+
+export type CursorInput = {
+  id: Scalars['String']['input'];
+  voteSum?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Error = {
   code: Scalars['Int']['output'];
   errorMsg: Scalars['String']['output'];
@@ -347,23 +357,17 @@ export type MutationVotePostArgs = {
   input: VotePostInput;
 };
 
-export const OrderByDir = {
-  Asc: 'asc',
-  Desc: 'desc'
-} as const;
-
-export type OrderByDir = typeof OrderByDir[keyof typeof OrderByDir];
 export type PageInfo = {
   __typename?: 'PageInfo';
-  endCursor?: Maybe<Scalars['String']['output']>;
+  endCursor?: Maybe<Cursor>;
   hasNextPage: Scalars['Boolean']['output'];
   hasPreviousPage: Scalars['Boolean']['output'];
-  startCursor?: Maybe<Scalars['String']['output']>;
+  startCursor?: Maybe<Cursor>;
 };
 
 export type PaginateInput = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
+  after?: InputMaybe<CursorInput>;
+  before?: InputMaybe<CursorInput>;
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -400,7 +404,7 @@ export type PostConnection = {
 
 export type PostEdge = {
   __typename?: 'PostEdge';
-  cursor: Scalars['String']['output'];
+  cursor: Cursor;
   node: Post;
 };
 
@@ -577,7 +581,7 @@ export type UserConnection = {
 
 export type UserEdge = {
   __typename?: 'UserEdge';
-  cursor: Scalars['String']['output'];
+  cursor: Cursor;
   node: User;
 };
 
@@ -627,7 +631,6 @@ export type UsersInput = {
 };
 
 export type UsersOrderBy = {
-  dir: OrderByDir;
   type: UserOrderByType;
 };
 
@@ -798,6 +801,8 @@ export type ResolversTypes = ResolversObject<{
   CreatePostInputErrors: ResolverTypeWrapper<CreatePostInputErrors>;
   CreatePostResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreatePostResult']>;
   CreatePostSuccess: ResolverTypeWrapper<CreatePostSuccess>;
+  Cursor: ResolverTypeWrapper<Cursor>;
+  CursorInput: CursorInput;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Error: ResolverTypeWrapper<ResolversInterfaceTypes<ResolversTypes>['Error']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
@@ -809,7 +814,6 @@ export type ResolversTypes = ResolversObject<{
   LogoutResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['LogoutResult']>;
   LogoutSuccess: ResolverTypeWrapper<LogoutSuccess>;
   Mutation: ResolverTypeWrapper<{}>;
-  OrderByDir: OrderByDir;
   PageInfo: ResolverTypeWrapper<PageInfo>;
   PaginateInput: PaginateInput;
   Post: ResolverTypeWrapper<PostModel>;
@@ -895,6 +899,8 @@ export type ResolversParentTypes = ResolversObject<{
   CreatePostInputErrors: CreatePostInputErrors;
   CreatePostResult: ResolversUnionTypes<ResolversParentTypes>['CreatePostResult'];
   CreatePostSuccess: CreatePostSuccess;
+  Cursor: Cursor;
+  CursorInput: CursorInput;
   DateTime: Scalars['DateTime']['output'];
   Error: ResolversInterfaceTypes<ResolversParentTypes>['Error'];
   ID: Scalars['ID']['output'];
@@ -978,7 +984,7 @@ export type CommentConnectionResolvers<ContextType = Context, ParentType extends
 }>;
 
 export type CommentEdgeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CommentEdge'] = ResolversParentTypes['CommentEdge']> = ResolversObject<{
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cursor?: Resolver<ResolversTypes['Cursor'], ParentType, ContextType>;
   node?: Resolver<ResolversTypes['Comment'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -1004,7 +1010,7 @@ export type CommunityConnectionResolvers<ContextType = Context, ParentType exten
 }>;
 
 export type CommunityEdgeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CommunityEdge'] = ResolversParentTypes['CommunityEdge']> = ResolversObject<{
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cursor?: Resolver<ResolversTypes['Cursor'], ParentType, ContextType>;
   node?: Resolver<ResolversTypes['Community'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -1101,6 +1107,12 @@ export type CreatePostSuccessResolvers<ContextType = Context, ParentType extends
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export type CursorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Cursor'] = ResolversParentTypes['Cursor']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  voteSum?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
 export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
   name: 'DateTime';
 }
@@ -1151,10 +1163,10 @@ export type MutationResolvers<ContextType = Context, ParentType extends Resolver
 }>;
 
 export type PageInfoResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PageInfo'] = ResolversParentTypes['PageInfo']> = ResolversObject<{
-  endCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  endCursor?: Resolver<Maybe<ResolversTypes['Cursor']>, ParentType, ContextType>;
   hasNextPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   hasPreviousPage?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  startCursor?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  startCursor?: Resolver<Maybe<ResolversTypes['Cursor']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1180,7 +1192,7 @@ export type PostConnectionResolvers<ContextType = Context, ParentType extends Re
 }>;
 
 export type PostEdgeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PostEdge'] = ResolversParentTypes['PostEdge']> = ResolversObject<{
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cursor?: Resolver<ResolversTypes['Cursor'], ParentType, ContextType>;
   node?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -1250,7 +1262,7 @@ export type UserConnectionResolvers<ContextType = Context, ParentType extends Re
 }>;
 
 export type UserEdgeResolvers<ContextType = Context, ParentType extends ResolversParentTypes['UserEdge'] = ResolversParentTypes['UserEdge']> = ResolversObject<{
-  cursor?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  cursor?: Resolver<ResolversTypes['Cursor'], ParentType, ContextType>;
   node?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
@@ -1313,6 +1325,7 @@ export type Resolvers<ContextType = Context> = ResolversObject<{
   CreatePostInputErrors?: CreatePostInputErrorsResolvers<ContextType>;
   CreatePostResult?: CreatePostResultResolvers<ContextType>;
   CreatePostSuccess?: CreatePostSuccessResolvers<ContextType>;
+  Cursor?: CursorResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
   Error?: ErrorResolvers<ContextType>;
   LoginUsernameInputError?: LoginUsernameInputErrorResolvers<ContextType>;

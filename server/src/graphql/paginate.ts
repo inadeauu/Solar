@@ -1,12 +1,17 @@
 import { Prisma, PrismaPromise } from "@prisma/client"
-import { Sql } from "@prisma/client/runtime/library"
 import { GraphQLError } from "graphql"
+import prisma from "../config/prisma"
+
+type Cursor = {
+  id: string
+  voteSum?: number
+}
 
 interface PaginateArgs {
   first?: number
-  after?: string
+  after?: Cursor
   last?: number
-  before?: string
+  before?: Cursor
 }
 
 interface PrismaPaginateArgs {
@@ -17,20 +22,15 @@ interface PrismaPaginateArgs {
   skip?: number
 }
 
-interface PrismaSqlPaginateArgs {
-  limit: Sql
-  cursor: Sql
-}
-
 interface Edge<T> {
   node: T
-  cursor: string
+  cursor: Cursor
 }
 
 interface PageInfo {
-  endCursor?: string
+  endCursor?: Cursor
   hasNextPage: boolean
-  startCursor?: string
+  startCursor?: Cursor
   hasPreviousPage: boolean
 }
 
@@ -39,44 +39,40 @@ export interface PaginateReturn<T> {
   pageInfo: PageInfo
 }
 
-export const paginate = async <Node extends { id: string }>(
-  rawQuery: boolean,
+export const paginateVoteSum = async <
+  Node extends { id: string; voteSum: number }
+>(
   paginateArgs: PaginateArgs,
-  prismaFunc: (
-    options?: PrismaPaginateArgs,
-    sql?: PrismaSqlPaginateArgs
-  ) => PrismaPromise<Array<Node> | null>
+  top: boolean
 ): Promise<PaginateReturn<Node>> => {
   checkPaginationArgs(paginateArgs)
+
+  if (paginateArgs.after && paginateArgs.after.voteSum == null) {
+    throw new GraphQLError("Vote sum must be specified with cursor", {
+      extensions: { code: "PAGINATION_ERROR" },
+    })
+  }
 
   let nodes: Array<Node>
   let edges: Array<Edge<Node>>
   let hasPreviousPage: boolean
   let hasNextPage: boolean
 
+  const postsQuery = Prisma.sql`SELECT "A".*, CAST(COALESCE("B"."votes", 0) AS int) as "voteSum" FROM "Post" "A" LEFT JOIN (SELECT "postId", sum("like") as "votes" FROM "PostVote" GROUP BY "postId") "B" ON "A"."id" = "B"."postId"`
+  const orderBy = top
+    ? Prisma.sql`ORDER BY "voteSum" DESC, "A"."id" ASC`
+    : Prisma.sql`ORDER BY "voteSum" ASC, "A"."id" ASC`
+
   if (paginateArgs.first) {
-    if (!rawQuery) {
-      const cursor = paginateArgs.after ? { id: paginateArgs.after } : undefined
-      const take = paginateArgs.first + 1
-      const skip = cursor ? 1 : undefined
+    const cursor = paginateArgs.after
+      ? Prisma.sql`WHERE CAST(COALESCE("B"."votes", 0) AS int) <= ${paginateArgs.after.voteSum} AND ("A"."id" >= ${paginateArgs.after.id} OR CAST(COALESCE("B"."votes", 0) AS int) < ${paginateArgs.after.voteSum})`
+      : Prisma.sql``
+    const take = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
 
-      nodes = (await prismaFunc({ cursor, take, skip })) ?? []
-    } else {
-      const cursor = paginateArgs.after
-        ? Prisma.sql`WHERE "A"."id" > ${paginateArgs.after}`
-        : Prisma.sql``
-
-      nodes =
-        (await prismaFunc(undefined, {
-          limit: Prisma.sql`LIMIT ${paginateArgs.first + 1}`,
-          cursor,
-        })) ?? []
-
-      console.log(nodes)
-    }
+    nodes = await prisma.$queryRaw`${postsQuery} ${cursor} ${orderBy} ${take}`
 
     edges = nodes.map((node) => {
-      return { node, cursor: node.id }
+      return { node, cursor: { id: node.id, voteSum: node.voteSum } }
     })
 
     hasPreviousPage = !!paginateArgs.after
@@ -87,14 +83,15 @@ export const paginate = async <Node extends { id: string }>(
       nodes.pop()
     }
   } else {
-    const cursor = paginateArgs.before ? { id: paginateArgs.before } : undefined
-    const take = -(paginateArgs.last! + 1)
-    const skip = cursor ? 1 : undefined
+    const cursor =
+      paginateArgs.before &&
+      Prisma.sql`WHERE ("voteSum", "id") <= (${paginateArgs.before.voteSum}, ${paginateArgs.before.id})`
+    const take = Prisma.sql`LIMIT ${paginateArgs.last! + 1}`
 
-    nodes = (await prismaFunc({ cursor, take, skip })) ?? []
+    nodes = await prisma.$queryRaw`${postsQuery} ${cursor} ${orderBy} ${take}`
 
     edges = nodes.map((node) => {
-      return { node, cursor: node.id }
+      return { node, cursor: { id: node.id, voteSum: node.voteSum } }
     })
 
     hasPreviousPage = nodes.length > paginateArgs.last!
@@ -106,9 +103,84 @@ export const paginate = async <Node extends { id: string }>(
     }
   }
 
-  const startCursor = nodes.length && hasPreviousPage ? nodes[0].id : undefined
+  const startCursor =
+    nodes.length && hasPreviousPage ? edges[0].cursor : undefined
   const endCursor =
-    nodes.length && hasNextPage ? nodes[nodes.length - 1].id : undefined
+    nodes.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
+
+  const pageInfo: PageInfo = {
+    endCursor,
+    hasNextPage,
+    startCursor,
+    hasPreviousPage,
+  }
+
+  console.log(paginateArgs)
+  console.log(pageInfo)
+
+  return {
+    edges,
+    pageInfo,
+  }
+}
+
+export const paginate = async <Node extends { id: string }>(
+  paginateArgs: PaginateArgs,
+  prismaFunc: (options: PrismaPaginateArgs) => PrismaPromise<Array<Node> | null>
+): Promise<PaginateReturn<Node>> => {
+  checkPaginationArgs(paginateArgs)
+
+  let nodes: Array<Node>
+  let edges: Array<Edge<Node>>
+  let hasPreviousPage: boolean
+  let hasNextPage: boolean
+
+  if (paginateArgs.first) {
+    const cursor = paginateArgs.after
+      ? { id: paginateArgs.after.id }
+      : undefined
+    const take = paginateArgs.first + 1
+    const skip = cursor ? 1 : undefined
+
+    nodes = (await prismaFunc({ cursor, take, skip })) ?? []
+
+    edges = nodes.map((node) => {
+      return { node, cursor: { id: node.id } }
+    })
+
+    hasPreviousPage = !!paginateArgs.after
+    hasNextPage = nodes.length > paginateArgs.first
+
+    if (hasNextPage) {
+      edges.pop()
+      nodes.pop()
+    }
+  } else {
+    const cursor = paginateArgs.before
+      ? { id: paginateArgs.before.id }
+      : undefined
+    const take = -(paginateArgs.last! + 1)
+    const skip = cursor ? 1 : undefined
+
+    nodes = (await prismaFunc({ cursor, take, skip })) ?? []
+
+    edges = nodes.map((node) => {
+      return { node, cursor: { id: node.id } }
+    })
+
+    hasPreviousPage = nodes.length > paginateArgs.last!
+    hasNextPage = !!paginateArgs.before
+
+    if (hasPreviousPage) {
+      edges.shift()
+      nodes.shift()
+    }
+  }
+
+  const startCursor =
+    nodes.length && hasPreviousPage ? edges[0].cursor : undefined
+  const endCursor =
+    nodes.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
 
   const pageInfo: PageInfo = {
     endCursor,

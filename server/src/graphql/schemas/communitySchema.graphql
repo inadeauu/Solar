@@ -46,7 +46,6 @@ input CommunitiesFilters {
 
 input CommunitiesOrderBy {
   type: CommunityOrderByType!
-  dir: OrderByDir!
 }
 
 # -- CREATECOMMUNITY MUTATION

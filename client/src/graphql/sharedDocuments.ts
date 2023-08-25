@@ -67,7 +67,9 @@ export const getCommentFeedDocument = graphql(/* GraphQL */ `
         }
       }
       pageInfo {
-        endCursor
+        endCursor {
+          id
+        }
         hasNextPage
       }
     }

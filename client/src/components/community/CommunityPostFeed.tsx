@@ -36,7 +36,10 @@ const getPostFeedDocument = graphql(/* GraphQL */ `
         }
       }
       pageInfo {
-        endCursor
+        endCursor {
+          id
+          voteSum
+        }
         hasNextPage
       }
     }

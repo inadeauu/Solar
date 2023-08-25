@@ -5,7 +5,7 @@ import {
   PostOrderByType,
 } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
-import { PaginateReturn, paginate } from "../paginate"
+import { PaginateReturn, paginate, paginateVoteSum } from "../paginate"
 import { GraphQLError } from "graphql"
 
 export const resolvers: Resolvers = {
@@ -22,24 +22,19 @@ export const resolvers: Resolvers = {
       const orderBy = filters?.orderBy
 
       let posts: PaginateReturn<Post>
-      const postsVoteSum = Prisma.sql`SELECT "A".*, CAST(COALESCE("B"."votes", 0) AS int) as "voteSum" FROM "Post" "A" LEFT JOIN (SELECT "postId", sum("like") as "votes" FROM "PostVote" GROUP BY "postId") "B" ON "A"."id" = "B"."postId"`
 
       if (orderBy == "TOP") {
-        posts = await paginate<Post>(
-          true,
+        posts = await paginateVoteSum<Post & { voteSum: number }>(
           args.input.paginate,
-          (_0, sql) =>
-            prisma.$queryRaw`${postsVoteSum}  ORDER BY "voteSum" DESC, "A"."id" DESC ${sql?.limit}`
+          true
         )
       } else if (orderBy == "LOW") {
-        posts = await paginate<Post>(
-          true,
+        posts = await paginateVoteSum<Post & { voteSum: number }>(
           args.input.paginate,
-          (_0, sql) =>
-            prisma.$queryRaw`${postsVoteSum} ${sql?.cursor} ORDER BY "voteSum" ASC ${sql?.limit}`
+          false
         )
       } else {
-        posts = await paginate<Post>(false, args.input.paginate, (options) =>
+        posts = await paginate<Post>(args.input.paginate, (options) =>
           prisma.post.findMany({
             where: {
               AND: [

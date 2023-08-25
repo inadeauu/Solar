@@ -1,27 +1,32 @@
 # -- GENERAL
 type PageInfo {
-  endCursor: String
+  endCursor: Cursor
   hasNextPage: Boolean!
-  startCursor: String
+  startCursor: Cursor
   hasPreviousPage: Boolean!
 }
 
 input PaginateInput {
   first: Int
-  after: String
+  after: CursorInput
   last: Int
-  before: String
+  before: CursorInput
 }
 
-enum OrderByDir {
-  asc
-  desc
+input CursorInput {
+  id: String!
+  voteSum: Int
+}
+
+type Cursor {
+  id: String!
+  voteSum: Int
 }
 
 # -- USER
 type UserEdge {
   node: User!
-  cursor: String!
+  cursor: Cursor!
 }
 
 type UserConnection {
@@ -32,7 +37,7 @@ type UserConnection {
 # -- POST
 type PostEdge {
   node: Post!
-  cursor: String!
+  cursor: Cursor!
 }
 
 type PostConnection {
@@ -43,7 +48,7 @@ type PostConnection {
 # -- COMMUNITY
 type CommunityEdge {
   node: Community!
-  cursor: String!
+  cursor: Cursor!
 }
 
 type CommunityConnection {
@@ -54,7 +59,7 @@ type CommunityConnection {
 # -- COMMENT
 type CommentEdge {
   node: Comment!
-  cursor: String!
+  cursor: Cursor!
 }
 
 type CommentConnection {

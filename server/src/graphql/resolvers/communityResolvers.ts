@@ -29,7 +29,6 @@ export const resolvers: Resolvers = {
       const orderBy = filters?.orderBy
 
       const communities = await paginate<Community>(
-        false,
         args.input.paginate,
         (options) =>
           prisma.community.findMany({
@@ -40,10 +39,6 @@ export const resolvers: Resolvers = {
             },
             orderBy: {
               id: "asc",
-              ...(orderBy &&
-                orderBy.type == CommunityOrderByType.MemberCount && {
-                  members: { _count: orderBy.dir },
-                }),
             },
             ...options,
           })
@@ -170,25 +165,19 @@ export const resolvers: Resolvers = {
       return owner
     },
     members: async (community, args) => {
-      const members = await paginate<User>(
-        false,
-        args.input.paginate,
-        (options) =>
-          prisma.community
-            .findUnique({ where: { id: community.id } })
-            .members({ orderBy: { id: "asc" }, ...options })
+      const members = await paginate<User>(args.input.paginate, (options) =>
+        prisma.community
+          .findUnique({ where: { id: community.id } })
+          .members({ orderBy: { id: "asc" }, ...options })
       )
 
       return members
     },
     posts: async (community, args) => {
-      const posts = await paginate<Post>(
-        false,
-        args.input.paginate,
-        (options) =>
-          prisma.community
-            .findUnique({ where: { id: community.id } })
-            .posts({ orderBy: { id: "asc" }, ...options })
+      const posts = await paginate<Post>(args.input.paginate, (options) =>
+        prisma.community
+          .findUnique({ where: { id: community.id } })
+          .posts({ orderBy: { id: "asc" }, ...options })
       )
 
       return posts

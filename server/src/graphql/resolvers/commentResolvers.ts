@@ -18,35 +18,32 @@ export const resolvers: Resolvers = {
     comments: async (_0, args) => {
       const filters = args.input.filters
 
-      const comments = paginate<Comment>(
-        false,
-        args.input.paginate,
-        (options) =>
-          prisma.comment.findMany({
-            where: {
-              AND: [
-                {
-                  ...(filters?.userId && {
-                    userId: filters.userId,
-                  }),
-                },
-                {
-                  ...(filters?.postId && {
-                    postId: filters.postId,
-                  }),
-                },
-                {
-                  ...(filters?.parentId !== undefined && {
-                    parentId: filters.parentId,
-                  }),
-                },
-              ],
-            },
-            orderBy: {
-              id: "asc",
-            },
-            ...options,
-          })
+      const comments = paginate<Comment>(args.input.paginate, (options) =>
+        prisma.comment.findMany({
+          where: {
+            AND: [
+              {
+                ...(filters?.userId && {
+                  userId: filters.userId,
+                }),
+              },
+              {
+                ...(filters?.postId && {
+                  postId: filters.postId,
+                }),
+              },
+              {
+                ...(filters?.parentId !== undefined && {
+                  parentId: filters.parentId,
+                }),
+              },
+            ],
+          },
+          orderBy: {
+            id: "asc",
+          },
+          ...options,
+        })
       )
 
       return comments
@@ -260,13 +257,10 @@ export const resolvers: Resolvers = {
       return parent
     },
     children: async (comment, args) => {
-      const children = await paginate<Comment>(
-        false,
-        args.input.paginate,
-        (options) =>
-          prisma.comment
-            .findUnique({ where: { id: comment.id } })
-            .children({ orderBy: { id: "asc" }, ...options })
+      const children = await paginate<Comment>(args.input.paginate, (options) =>
+        prisma.comment
+          .findUnique({ where: { id: comment.id } })
+          .children({ orderBy: { id: "asc" }, ...options })
       )
 
       return children

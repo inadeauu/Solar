@@ -2,15 +2,16 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 import { useInView } from "react-intersection-observer"
 import { graphql } from "../../graphql_codegen/gql"
 import { graphQLClient } from "../../utils/graphql"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { ImSpinner11 } from "react-icons/im"
 import Post from "../post/feed/Post"
 import type { Community } from "../../graphql/types"
 import { PostOrderByType } from "../../graphql_codegen/graphql"
-import Dropdown from "../misc/Dropdown"
 
 type CommunityPostFeedProps = {
   community: Community
+  postOrder: PostOrderByType
+  queryKey: any[]
 }
 
 const getPostFeedDocument = graphql(/* GraphQL */ `
@@ -47,9 +48,12 @@ const getPostFeedDocument = graphql(/* GraphQL */ `
   }
 `)
 
-const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
+const CommunityPostFeed = ({
+  community,
+  postOrder,
+  queryKey,
+}: CommunityPostFeedProps) => {
   const { ref, inView } = useInView()
-  const [postOrder, setPostOrder] = useState<string>("New")
 
   const {
     data,
@@ -59,11 +63,11 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ["communityPostFeed", community.id, postOrder],
+    queryKey,
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getPostFeedDocument, {
         input: {
-          filters: { communityId: community.id, orderBy: getPostOrder() },
+          filters: { communityId: community.id, orderBy: postOrder },
           paginate: { first: 10, after: pageParam },
         },
       })
@@ -75,23 +79,6 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
     }
   )
 
-  console.log("reload")
-
-  const getPostOrder = () => {
-    switch (postOrder) {
-      case "New":
-        return PostOrderByType.New
-      case "Old":
-        return PostOrderByType.Old
-      case "Top":
-        return PostOrderByType.Top
-      case "Low":
-        return PostOrderByType.Low
-      default:
-        return PostOrderByType.New
-    }
-  }
-
   useEffect(() => {
     if (inView && hasNextPage) {
       fetchNextPage()
@@ -102,14 +89,16 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
   }
 
+  if (isSuccess && !data.pages[0].posts.edges.length) {
+    return (
+      <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
+        No posts
+      </span>
+    )
+  }
+
   return (
     <div className="flex flex-col gap-5">
-      <Dropdown
-        width="w-[70px] py-2"
-        items={["New", "Old", "Top", "Low"]}
-        value={postOrder}
-        setValue={setPostOrder}
-      />
       {isSuccess &&
         data.pages.map((page) =>
           page.posts.edges.map((edge, i) => {
@@ -118,7 +107,7 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
                 innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
                 key={edge.node.id}
                 post={edge.node}
-                queryKey={["communityPostFeed", community.id, postOrder]}
+                queryKey={queryKey}
               />
             )
           })

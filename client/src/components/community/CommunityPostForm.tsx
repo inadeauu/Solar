@@ -12,6 +12,7 @@ import { toast } from "react-toastify"
 
 type CommunityPostFormProps = {
   community: Community
+  queryKey: any[]
 }
 
 const createCommunityPostDocument = graphql(/* GraphQL */ `
@@ -31,7 +32,7 @@ const createCommunityPostDocument = graphql(/* GraphQL */ `
   }
 `)
 
-const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
+const CommunityPostForm = ({ community, queryKey }: CommunityPostFormProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -76,6 +77,8 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
         if (error) setError("")
 
         setOpenEditor(false)
+
+        queryClient.resetQueries(queryKey)
       } else if (data.createPost.__typename == "CreatePostInputError") {
         setError(data.createPost.errorMsg)
       }

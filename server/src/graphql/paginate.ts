@@ -110,7 +110,6 @@ export const paginatePosts = async (
     await prisma.$queryRaw`${postsQuery} ${where} ${orderBy} ${limit}`
 
   const edges: Edge<Post>[] = nodes.map((node) => {
-    console.log(node.id)
     return {
       node,
       cursor: {
@@ -130,8 +129,6 @@ export const paginatePosts = async (
 
   const endCursor =
     edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
-
-  console.log(endCursor)
 
   const pageInfo: PageInfo = {
     endCursor,

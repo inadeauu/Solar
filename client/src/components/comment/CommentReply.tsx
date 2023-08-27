@@ -1,13 +1,16 @@
 import moment from "moment"
 import type { Comment } from "../../graphql/types"
 import CommentVote from "./CommentVote"
+import { useContext } from "react"
+import { CommentContext } from "../../contexts/CommentContext"
 
 type CommentReplyType = {
   comment: Comment
-  parentId: string
 }
 
-export const CommentReply = ({ comment, parentId }: CommentReplyType) => {
+export const CommentReply = ({ comment }: CommentReplyType) => {
+  const { commentOrderByType } = useContext(CommentContext)
+
   return (
     <div className="px-[11px]">
       <div className="flex flex-col gap-1">
@@ -29,7 +32,7 @@ export const CommentReply = ({ comment, parentId }: CommentReplyType) => {
         </div>
         <CommentVote
           comment={comment}
-          queryKey={["commentRepliesFeed", parentId]}
+          queryKey={["commentRepliesFeed", comment.id, commentOrderByType]}
         />
       </div>
     </div>

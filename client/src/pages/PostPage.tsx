@@ -7,6 +7,9 @@ import { ImSpinner11 } from "react-icons/im"
 import Post from "../components/post/single/Post"
 import PostCommentForm from "../components/post/single/PostCommentForm"
 import PostCommentFeed from "../components/post/single/PostCommentFeed"
+import { useContext } from "react"
+import Dropdown from "../components/misc/Dropdown"
+import { CommentContext } from "../contexts/CommentContext"
 
 const getPostDocument = graphql(/* GraphQL */ `
   query SinglePost($input: PostInput!) {
@@ -34,7 +37,9 @@ const PostPage = () => {
   const { title, id } = useParams()
   const uuid = translator.toUUID(id!)
 
-  const { data: post, isLoading: postLoading } = useQuery({
+  const { commentOrderBy, setCommentOrderBy } = useContext(CommentContext)
+
+  const { data, isLoading } = useQuery({
     queryKey: [uuid],
     queryFn: () =>
       graphQLClient.request(getPostDocument, {
@@ -44,17 +49,24 @@ const PostPage = () => {
       }),
   })
 
-  if (postLoading) {
+  if (isLoading) {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
-  } else if (!post?.post || post.post.title !== title) {
+  } else if (!data?.post || data.post.title !== title) {
     return <Navigate to="/404-not-found" />
   }
 
   return (
     <div className="flex flex-col gap-5 sm:w-[80%] sm-max:w-full break-words min-w-0 mx-auto">
-      <Post post={post.post} />
-      <PostCommentForm post={post.post} />
-      <PostCommentFeed post={post.post} />
+      <Post post={data.post} />
+      <PostCommentForm post={data.post} />
+      <Dropdown
+        className="py-1"
+        width="w-[65px]"
+        items={["New", "Old", "Top", "Low"]}
+        value={commentOrderBy}
+        setValue={setCommentOrderBy}
+      />
+      <PostCommentFeed post={data.post} />
     </div>
   )
 }

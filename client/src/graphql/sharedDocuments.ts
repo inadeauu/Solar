@@ -69,6 +69,8 @@ export const getCommentFeedDocument = graphql(/* GraphQL */ `
       pageInfo {
         endCursor {
           id
+          created_at
+          voteSum
         }
         hasNextPage
       }

@@ -1,12 +1,13 @@
 import type { Comment } from "../../graphql/types"
 import { useAuth } from "../../hooks/useAuth"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { BiComment, BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi"
 import CommentReplyForm from "./CommentReplyForm"
 import CommentVote from "./CommentVote"
 import CommentReplies from "./CommentRepliesFeed"
 import { getReply } from "../../utils/utils"
+import { CommentContext } from "../../contexts/CommentContext"
 
 type CommentFooterProps = {
   comment: Comment
@@ -18,12 +19,14 @@ const CommentFooter = ({ comment }: CommentFooterProps) => {
   const [reply, setReply] = useState<boolean>(false)
   const [showReplies, setShowReplies] = useState<boolean>(false)
 
+  const { commentOrderByType } = useContext(CommentContext)
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-1">
         <CommentVote
           comment={comment}
-          queryKey={["postCommentFeed", comment.post.id]}
+          queryKey={["postCommentFeed", comment.post.id, commentOrderByType]}
         />
         <button
           onClick={(e) => {

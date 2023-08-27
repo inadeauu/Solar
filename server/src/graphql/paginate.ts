@@ -1,7 +1,7 @@
-import { Post, Prisma, PrismaPromise } from "@prisma/client"
+import { Comment, Post, Prisma, PrismaPromise } from "@prisma/client"
 import { GraphQLError } from "graphql"
 import prisma from "../config/prisma"
-import { PostsFilters } from "../__generated__/resolvers-types"
+import { CommentsFilters, PostsFilters } from "../__generated__/resolvers-types"
 
 type Cursor = {
   id: string
@@ -110,6 +110,112 @@ export const paginatePosts = async (
     await prisma.$queryRaw`${postsQuery} ${where} ${orderBy} ${limit}`
 
   const edges: Edge<Post>[] = nodes.map((node) => {
+    return {
+      node,
+      cursor: {
+        id: node.id,
+        voteSum: node.voteSum,
+        created_at: node.created_at,
+      },
+    }
+  })
+
+  const hasNextPage = nodes.length > paginateArgs.first
+
+  if (hasNextPage) {
+    edges.pop()
+    nodes.pop()
+  }
+
+  const endCursor =
+    edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
+
+  const pageInfo: PageInfo = {
+    endCursor,
+    hasNextPage,
+  }
+
+  return {
+    edges,
+    pageInfo,
+  }
+}
+
+type CommentPaginate = Comment & { voteSum: number }
+
+export const paginateComments = async (
+  paginateArgs: PaginateArgs,
+  filters: CommentsFilters
+): Promise<PaginateReturn<Comment>> => {
+  checkPaginationArgs(paginateArgs)
+
+  const userId = filters.userId
+  const postId = filters.postId
+  const parentId = filters.parentId
+  const orderByType = filters.orderBy
+
+  let commentsQuery: Prisma.Sql
+  let cursor: Prisma.Sql
+  let orderBy: Prisma.Sql
+
+  if (orderByType == "NEW" || orderByType == "OLD") {
+    if (paginateArgs.after && paginateArgs.after.created_at == null) {
+      throw new GraphQLError("Created at must be specified with cursor", {
+        extensions: { code: "PAGINATION_ERROR" },
+      })
+    }
+
+    commentsQuery = Prisma.sql`SELECT "c".* FROM (SELECT "id", "postId", "userId", "parentId", "body", to_char("created_at"::timestamp, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') as "created_at", "updated_at" from "Comment") as "c"`
+    const id = paginateArgs.after?.id
+    const created_at = paginateArgs.after?.created_at?.toISOString()
+
+    cursor =
+      orderByType == "NEW"
+        ? Prisma.sql`(${paginateArgs.after}::json IS NULL OR "c"."created_at" <= ${created_at} AND ("c"."id" > ${id} OR "c"."created_at" < ${created_at}))`
+        : Prisma.sql`(${paginateArgs.after}::json IS NULL OR "c"."created_at" >= ${created_at} AND ("c"."id" > ${id} OR "c"."created_at" > ${created_at}))`
+
+    orderBy =
+      orderByType == "NEW"
+        ? Prisma.sql`ORDER BY "c"."created_at" DESC, "c"."id" ASC`
+        : Prisma.sql`ORDER BY "c"."created_at" ASC, "c"."id" ASC`
+  } else {
+    if (paginateArgs.after && paginateArgs.after.voteSum == null) {
+      throw new GraphQLError("Vote sum must be specified with cursor", {
+        extensions: { code: "PAGINATION_ERROR" },
+      })
+    }
+
+    commentsQuery = Prisma.sql`
+      SELECT "c".* FROM (SELECT "id", "postId", "userId", "parentId", "body", "created_at", "updated_at", CAST(COALESCE("B"."votes", 0) AS int) as "voteSum" FROM "Comment"
+      LEFT JOIN (SELECT "commentId", sum("like") as "votes" 
+      FROM "CommentVote" GROUP BY "commentId") "B" ON "Comment"."id" = "B"."commentId") as "c"`
+
+    const id = paginateArgs.after?.id
+    const voteSum = paginateArgs.after?.voteSum
+
+    cursor =
+      orderByType == "TOP"
+        ? Prisma.sql`(${paginateArgs.after}::json IS NULL OR "c"."voteSum" <= ${voteSum} AND ("c"."id" > ${id} OR "c"."voteSum" < ${voteSum}))`
+        : Prisma.sql`(${paginateArgs.after}::json IS NULL OR "c"."voteSum" >= ${voteSum} AND ("c"."id" > ${id} OR "c"."voteSum" > ${voteSum}))`
+
+    orderBy =
+      orderByType == "TOP"
+        ? Prisma.sql`ORDER BY "c"."voteSum" DESC, "c"."id" ASC`
+        : Prisma.sql`ORDER BY "c"."voteSum" ASC, "c"."id" ASC`
+  }
+
+  const where = Prisma.sql`WHERE 1=1 
+    AND (${userId}::text IS NULL OR "c"."userId" = ${userId}) 
+    AND (${postId}::text IS NULL OR "c"."postId" = ${postId}) 
+    AND ((${parentId}::text IS NOT NULL OR "c"."parentId" IS NULL) AND (${parentId}::text IS NULL OR "c"."parentId" = ${parentId}))
+    AND ${cursor}`
+
+  const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
+
+  const nodes: CommentPaginate[] =
+    await prisma.$queryRaw`${commentsQuery} ${where} ${orderBy} ${limit}`
+
+  const edges: Edge<Comment>[] = nodes.map((node) => {
     return {
       node,
       cursor: {

@@ -1,12 +1,20 @@
 import type { Comment } from "../../graphql/types"
-import { useLayoutEffect, useRef, useState } from "react"
-import { useMutation } from "@tanstack/react-query"
-import { CreateCommentReplyInput } from "../../graphql_codegen/graphql"
+import { useContext, useLayoutEffect, useRef, useState } from "react"
+import {
+  InfiniteData,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query"
+import {
+  CommentFeedQuery,
+  CreateCommentReplyInput,
+} from "../../graphql_codegen/graphql"
 import { graphQLClient } from "../../utils/graphql"
 import { toast } from "react-toastify"
 import { graphql } from "../../graphql_codegen/gql"
 import ErrorCard from "../misc/ErrorCard"
 import { ImSpinner11 } from "react-icons/im"
+import { CommentContext } from "../../contexts/CommentContext"
 
 type CommentReplyFormProps = {
   comment: Comment
@@ -38,6 +46,10 @@ const CommentReplyForm = ({ comment, setOpen }: CommentReplyFormProps) => {
 
   const [body, setBody] = useState<string>("")
 
+  const queryClient = useQueryClient()
+
+  const { commentOrderByType } = useContext(CommentContext)
+
   const createCommentReply = useMutation({
     mutationFn: async ({ body, commentId }: CreateCommentReplyInput) => {
       return await graphQLClient.request(createCommentReplyDocument, {
@@ -53,6 +65,45 @@ const CommentReplyForm = ({ comment, setOpen }: CommentReplyFormProps) => {
         setOpen(false)
 
         if (error) setError("")
+
+        queryClient.setQueryData<InfiniteData<CommentFeedQuery>>(
+          ["postCommentFeed", comment.post.id, commentOrderByType],
+          (oldData) => {
+            if (!oldData) return oldData
+
+            const newPages: CommentFeedQuery[] = oldData.pages.map((page) => {
+              return {
+                comments: {
+                  ...page.comments,
+                  edges: page.comments.edges.map((edge) => {
+                    if (edge.node.id == comment.id) {
+                      return {
+                        ...edge,
+                        node: {
+                          ...edge.node,
+                          replyCount: edge.node.replyCount + 1,
+                        },
+                      }
+                    } else {
+                      return edge
+                    }
+                  }),
+                },
+              }
+            })
+
+            return {
+              ...oldData,
+              pages: newPages,
+            }
+          }
+        )
+
+        queryClient.resetQueries([
+          "commentRepliesFeed",
+          comment.id,
+          commentOrderByType,
+        ])
       } else if (
         data.createCommentReply.__typename == "CreateCommentReplyInputError"
       ) {

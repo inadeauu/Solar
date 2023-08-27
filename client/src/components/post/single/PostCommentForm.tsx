@@ -1,6 +1,6 @@
-import { useLayoutEffect, useRef, useState } from "react"
+import { useContext, useLayoutEffect, useRef, useState } from "react"
 import type { Post } from "../../../graphql/types"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../../../utils/graphql"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../../hooks/useAuth"
@@ -9,6 +9,7 @@ import { ImSpinner11 } from "react-icons/im"
 import ErrorCard from "../../misc/ErrorCard"
 import { toast } from "react-toastify"
 import { graphql } from "../../../graphql_codegen/gql"
+import { CommentContext } from "../../../contexts/CommentContext"
 
 type PostCommentFormProps = {
   post: Post
@@ -42,6 +43,10 @@ const PostCommentForm = ({ post }: PostCommentFormProps) => {
   const [openEditor, setOpenEditor] = useState<boolean>(false)
   const [body, setBody] = useState<string>("")
 
+  const queryClient = useQueryClient()
+
+  const { commentOrderByType } = useContext(CommentContext)
+
   const createComment = useMutation({
     mutationFn: async ({ body, postId }: CreateCommentInput) => {
       return await graphQLClient.request(createCommentDocument, {
@@ -57,6 +62,12 @@ const PostCommentForm = ({ post }: PostCommentFormProps) => {
         if (error) setError("")
 
         setOpenEditor(false)
+
+        queryClient.resetQueries([
+          "postCommentFeed",
+          post.id,
+          commentOrderByType,
+        ])
       } else if (data.createComment.__typename == "CreateCommentInputError") {
         setError(data.createComment.errorMsg)
       }

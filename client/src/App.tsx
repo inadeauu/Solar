@@ -10,6 +10,7 @@ import NotFoundPage from "./pages/NotFoundPage"
 import { ToastContainer, Zoom } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import PostPage from "./pages/PostPage"
+import CommentContextProvider from "./contexts/CommentContext"
 
 const App = () => {
   return (
@@ -34,7 +35,14 @@ const App = () => {
             <Route path="create-community" element={<CreateCommunityPage />} />
           </Route>
           <Route path="communities/:title/:id" element={<CommunityPage />} />
-          <Route path="posts/:title/:id" element={<PostPage />} />
+          <Route
+            path="posts/:title/:id"
+            element={
+              <CommentContextProvider>
+                <PostPage />
+              </CommentContextProvider>
+            }
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />

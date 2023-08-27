@@ -4,12 +4,16 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 import { graphQLClient } from "../../utils/graphql"
 import { ImSpinner11 } from "react-icons/im"
 import { CommentReply } from "./CommentReply"
+import { CommentContext } from "../../contexts/CommentContext"
+import { useContext } from "react"
 
 type CommentRepliesProps = {
   comment: Comment
 }
 
 const CommentReplies = ({ comment }: CommentRepliesProps) => {
+  const { commentOrderByType } = useContext(CommentContext)
+
   const {
     data,
     isLoading,
@@ -18,11 +22,11 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ["commentRepliesFeed", comment.id],
+    ["commentRepliesFeed", comment.id, commentOrderByType],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getCommentFeedDocument, {
         input: {
-          filters: { parentId: comment.id },
+          filters: { parentId: comment.id, orderBy: commentOrderByType },
           paginate: { first: 10, after: pageParam },
         },
       })
@@ -43,13 +47,7 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
       {isSuccess &&
         data.pages.map((page) =>
           page.comments.edges.map((edge) => {
-            return (
-              <CommentReply
-                key={edge.node.id}
-                comment={edge.node}
-                parentId={comment.id}
-              />
-            )
+            return <CommentReply key={edge.node.id} comment={edge.node} />
           })
         )}
       {hasNextPage && (

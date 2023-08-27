@@ -1,6 +1,6 @@
 import { Comment } from "@prisma/client"
 import { Resolvers, VoteStatus } from "../../__generated__/resolvers-types"
-import { paginate } from "../paginate"
+import { paginate, paginateComments } from "../paginate"
 import prisma from "../../config/prisma"
 import { GraphQLError } from "graphql"
 
@@ -16,34 +16,9 @@ export const resolvers: Resolvers = {
       return comment
     },
     comments: async (_0, args) => {
-      const filters = args.input.filters
-
-      const comments = paginate<Comment>(args.input.paginate, (options) =>
-        prisma.comment.findMany({
-          where: {
-            AND: [
-              {
-                ...(filters?.userId && {
-                  userId: filters.userId,
-                }),
-              },
-              {
-                ...(filters?.postId && {
-                  postId: filters.postId,
-                }),
-              },
-              {
-                ...(filters?.parentId !== undefined && {
-                  parentId: filters.parentId,
-                }),
-              },
-            ],
-          },
-          orderBy: {
-            id: "asc",
-          },
-          ...options,
-        })
+      const comments = await paginateComments(
+        args.input.paginate,
+        args.input.filters
       )
 
       return comments

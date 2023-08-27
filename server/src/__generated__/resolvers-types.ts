@@ -73,14 +73,23 @@ export type CommentInput = {
   id: Scalars['ID']['input'];
 };
 
+export const CommentOrderByType = {
+  Low: 'LOW',
+  New: 'NEW',
+  Old: 'OLD',
+  Top: 'TOP'
+} as const;
+
+export type CommentOrderByType = typeof CommentOrderByType[keyof typeof CommentOrderByType];
 export type CommentsFilters = {
+  orderBy: CommentOrderByType;
   parentId?: InputMaybe<Scalars['ID']['input']>;
   postId?: InputMaybe<Scalars['ID']['input']>;
   userId?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type CommentsInput = {
-  filters?: InputMaybe<CommentsFilters>;
+  filters: CommentsFilters;
   paginate: PaginateInput;
 };
 
@@ -767,6 +776,7 @@ export type ResolversTypes = ResolversObject<{
   CommentConnection: ResolverTypeWrapper<Omit<CommentConnection, 'edges'> & { edges: Array<ResolversTypes['CommentEdge']> }>;
   CommentEdge: ResolverTypeWrapper<Omit<CommentEdge, 'node'> & { node: ResolversTypes['Comment'] }>;
   CommentInput: CommentInput;
+  CommentOrderByType: CommentOrderByType;
   CommentsFilters: CommentsFilters;
   CommentsInput: CommentsInput;
   CommunitiesFilters: CommunitiesFilters;

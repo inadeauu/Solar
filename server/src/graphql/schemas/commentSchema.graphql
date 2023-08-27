@@ -38,7 +38,7 @@ input CommentInput {
 
 # -- COMMENTS QUERY
 input CommentsInput {
-  filters: CommentsFilters
+  filters: CommentsFilters!
   paginate: PaginateInput!
 }
 
@@ -46,6 +46,7 @@ input CommentsFilters {
   userId: ID
   postId: ID
   parentId: ID
+  orderBy: CommentOrderByType!
 }
 
 # -- CREATECOMMENT MUTATION
@@ -110,6 +111,14 @@ type VoteCommentSuccess implements Success {
   successMsg: String!
   code: Int!
   comment: Comment!
+}
+
+# -- ENUMS
+enum CommentOrderByType {
+  NEW
+  OLD
+  TOP
+  LOW
 }
 
 # -- RESOLVERS

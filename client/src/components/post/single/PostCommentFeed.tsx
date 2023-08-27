@@ -1,11 +1,12 @@
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useInView } from "react-intersection-observer"
 import { graphQLClient } from "../../../utils/graphql"
-import { useEffect } from "react"
+import { useContext, useEffect } from "react"
 import { ImSpinner11 } from "react-icons/im"
 import type { Post } from "../../../graphql/types"
 import Comment from "../../comment/Comment"
 import { getCommentFeedDocument } from "../../../graphql/sharedDocuments"
+import { CommentContext } from "../../../contexts/CommentContext"
 
 type PostCommentFeedProps = {
   post: Post
@@ -13,6 +14,8 @@ type PostCommentFeedProps = {
 
 const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
   const { ref, inView } = useInView()
+
+  const { commentOrderByType } = useContext(CommentContext)
 
   const {
     data,
@@ -22,11 +25,15 @@ const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ["postCommentFeed", post.id],
+    ["postCommentFeed", post.id, commentOrderByType],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getCommentFeedDocument, {
         input: {
-          filters: { postId: post.id, parentId: null },
+          filters: {
+            postId: post.id,
+            parentId: null,
+            orderBy: commentOrderByType,
+          },
           paginate: { first: 10, after: pageParam },
         },
       })

@@ -24,8 +24,6 @@ type Community {
   postCount: Int!
 
   owner: User!
-  members(input: CommunityMembersInput!): UserConnection!
-  posts(input: CommunityPostsInput!): PostConnection!
 }
 
 # -- COMMUNITY QUERY
@@ -86,13 +84,4 @@ type UserJoinCommunitySuccess implements Success {
 # -- ENUMS
 enum CommunityOrderByType {
   memberCount
-}
-
-# -- RESOLVERS
-input CommunityMembersInput {
-  paginate: PaginateInput!
-}
-
-input CommunityPostsInput {
-  paginate: PaginateInput!
 }

@@ -31,7 +31,7 @@ const NavUnauth = () => {
         onClick={() => setOpenMenu((prev) => !prev)}
       >
         <div
-          className={`border-2 border-neutral-300 hover:border-neutral-400 rounded-md pl-2 pr-1 py-1 hover:cursor-pointer flex items-center justify-between ${
+          className={`border border-neutral-300 hover:border-neutral-400 rounded-md pl-2 pr-1 py-1 hover:cursor-pointer flex items-center justify-between ${
             openMenu && "border-neutral-400"
           }`}
         >

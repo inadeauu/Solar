@@ -7,7 +7,7 @@ export const resolvers: Resolvers = {
   Query: {
     user: async (_0, args) => {
       const user = await prisma.user.findUnique({
-        where: { id: args.input.id },
+        where: { username: args.input.username },
       })
 
       return user
@@ -41,46 +41,6 @@ export const resolvers: Resolvers = {
     },
   },
   User: {
-    ownedCommunities: async (user, args) => {
-      const ownedCommunities = await paginate<Community>(
-        args.input.paginate,
-        (options) =>
-          prisma.user
-            .findUnique({ where: { id: user.id } })
-            .ownedCommunities({ orderBy: { id: "asc" }, ...options })
-      )
-
-      return ownedCommunities
-    },
-    inCommunities: async (user, args) => {
-      const inCommunities = await paginate<Community>(
-        args.input.paginate,
-        (options) =>
-          prisma.user
-            .findUnique({ where: { id: user.id } })
-            .inCommunities({ orderBy: { id: "asc" }, ...options })
-      )
-
-      return inCommunities
-    },
-    posts: async (user, args) => {
-      const posts = await paginate<Post>(args.input.paginate, (options) =>
-        prisma.user
-          .findUnique({ where: { id: user.id } })
-          .posts({ orderBy: { id: "asc" }, ...options })
-      )
-
-      return posts
-    },
-    comments: async (user, args) => {
-      const comments = await paginate<Comment>(args.input.paginate, (options) =>
-        prisma.user
-          .findUnique({ where: { id: user.id } })
-          .comments({ orderBy: { id: "asc" }, ...options })
-      )
-
-      return comments
-    },
     postsCount: async (user) => {
       const postsCount = (await prisma.user.findUnique({
         where: { id: user.id },

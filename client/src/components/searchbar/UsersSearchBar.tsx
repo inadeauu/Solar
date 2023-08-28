@@ -43,7 +43,7 @@ const UsersSearchBar = ({ debouncedSearch, search }: UsersSearchBarProps) => {
 
   return (
     <div
-      className={`absolute top-9 bg-white w-full border-r-2 border-b-2 border-l-2 border-neutral-300 flex flex-col ${
+      className={`absolute top-[34px] bg-white w-full border-r border-b border-l border-neutral-300 flex flex-col ${
         !data?.users?.edges && "hidden"
       }`}
     >

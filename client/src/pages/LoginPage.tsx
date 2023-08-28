@@ -177,7 +177,7 @@ const LoginPage = () => {
           <p className="text-sm mt-[1px]">Home</p>
         </Link>
         <form className="flex flex-col xs:w-[60%] xs-max:w-[80%] mx-auto mt-4">
-          <h1 className="xs:text-3xl xs-max:text-2xl font-semibold xs:mb-8 xs-max:mb-6">
+          <h1 className="xs:text-3xl xs-max:text-2xl font-medium xs:mb-8 xs-max:mb-6">
             Log In
           </h1>
           {error && <ErrorCard error={error} className="mb-4" />}
@@ -265,7 +265,7 @@ const LoginPage = () => {
             Don't have an account?{" "}
             <Link
               to="/signup"
-              className="text-blue-600 font-bold hover:underline"
+              className="text-blue-600 font-semibold hover:underline"
             >
               Sign Up
             </Link>

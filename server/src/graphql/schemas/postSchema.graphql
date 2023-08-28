@@ -25,7 +25,6 @@ type Post {
 
   owner: User!
   community: Community!
-  comments(input: PostCommentInput!): CommentConnection!
 }
 
 # -- POST QUERY
@@ -91,9 +90,4 @@ enum PostOrderByType {
   OLD
   TOP
   LOW
-}
-
-# -- RESOLVERS
-input PostCommentInput {
-  paginate: PaginateInput!
 }

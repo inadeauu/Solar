@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react"
+import { useContext, useLayoutEffect, useRef, useState } from "react"
 import { useAuth } from "../../hooks/useAuth"
 import { useNavigate } from "react-router-dom"
 import { CommunityQuery, CreatePostInput } from "../../graphql_codegen/graphql"
@@ -9,10 +9,10 @@ import { ImSpinner11 } from "react-icons/im"
 import ErrorCard from "../misc/ErrorCard"
 import type { Community } from "../../graphql/types"
 import { toast } from "react-toastify"
+import { CommunityContext } from "../../contexts/CommunityContext"
 
 type CommunityPostFormProps = {
   community: Community
-  queryKey: any[]
 }
 
 const createCommunityPostDocument = graphql(/* GraphQL */ `
@@ -32,7 +32,7 @@ const createCommunityPostDocument = graphql(/* GraphQL */ `
   }
 `)
 
-const CommunityPostForm = ({ community, queryKey }: CommunityPostFormProps) => {
+const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
@@ -45,6 +45,8 @@ const CommunityPostForm = ({ community, queryKey }: CommunityPostFormProps) => {
   const [body, setBody] = useState<string>("")
 
   const queryClient = useQueryClient()
+
+  const { postOrderByType } = useContext(CommunityContext)
 
   const createCommunity = useMutation({
     mutationFn: async ({ title, body, communityId }: CreatePostInput) => {
@@ -78,7 +80,11 @@ const CommunityPostForm = ({ community, queryKey }: CommunityPostFormProps) => {
 
         setOpenEditor(false)
 
-        queryClient.resetQueries(queryKey)
+        queryClient.resetQueries([
+          "communityPostFeed",
+          community.id,
+          postOrderByType,
+        ])
       } else if (data.createPost.__typename == "CreatePostInputError") {
         setError(data.createPost.errorMsg)
       }

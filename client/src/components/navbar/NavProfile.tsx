@@ -8,6 +8,7 @@ import { graphql } from "../../graphql_codegen/gql"
 import { graphQLClient } from "../../utils/graphql"
 import { useAuth } from "../../hooks/useAuth"
 import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/Ri"
+import { CiSettings } from "react-icons/ci"
 
 const logoutDocument = graphql(/* GraphQL */ `
   mutation Logout {
@@ -50,7 +51,7 @@ const NavProfile = () => {
       onClick={() => setOpenMenu((prev) => !prev)}
     >
       <div
-        className={`bg-white border-2 border-neutral-300 hover:border-neutral-400 rounded-md pl-2 pr-1 py-1 hover:cursor-pointer flex items-center justify-between ${
+        className={`bg-white border border-neutral-300 hover:border-neutral-400 rounded-md pl-2 pr-1 py-1 hover:cursor-pointer flex items-center justify-between ${
           openMenu && "border-neutral-400"
         }`}
       >
@@ -76,6 +77,15 @@ const NavProfile = () => {
               <BsHouseAdd className="h-5 w-5" />
             </div>
             Create a Community
+          </Link>
+          <Link
+            to={`/settings`}
+            className="flex items-center gap-2 p-2 hover:bg-neutral-200 hover:cursor-pointer"
+          >
+            <div className="w-[15%]">
+              <CiSettings className="h-6 w-6" />
+            </div>
+            Settings
           </Link>
           <div
             className="flex items-center gap-2 p-2 rounded-b-md hover:bg-neutral-200 hover:cursor-pointer"

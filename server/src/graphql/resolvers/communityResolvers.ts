@@ -164,24 +164,6 @@ export const resolvers: Resolvers = {
 
       return owner
     },
-    members: async (community, args) => {
-      const members = await paginate<User>(args.input.paginate, (options) =>
-        prisma.community
-          .findUnique({ where: { id: community.id } })
-          .members({ orderBy: { id: "asc" }, ...options })
-      )
-
-      return members
-    },
-    posts: async (community, args) => {
-      const posts = await paginate<Post>(args.input.paginate, (options) =>
-        prisma.community
-          .findUnique({ where: { id: community.id } })
-          .posts({ orderBy: { id: "asc" }, ...options })
-      )
-
-      return posts
-    },
     memberCount: async (community) => {
       const memberCount =
         (await prisma.community.findUnique({

@@ -1,19 +1,21 @@
 import { Link } from "react-router-dom"
 import moment from "moment"
-import { Ref, useLayoutEffect, useRef, useState } from "react"
+import { Ref, useContext, useLayoutEffect, useRef, useState } from "react"
 import PostFooter from "./PostFooter"
 import type { Post } from "../../../graphql/types"
 import { translator } from "../../../utils/uuid"
+import { CommunityContext } from "../../../contexts/CommunityContext"
 
 type PostProps = {
   post: Post
   innerRef?: Ref<HTMLAnchorElement> | undefined
-  queryKey: any[]
 }
 
-const Post = ({ post, innerRef, queryKey }: PostProps) => {
+const Post = ({ post, innerRef }: PostProps) => {
   const [overflown, setOverflown] = useState<boolean>(false)
   const bodyRef = useRef<HTMLDivElement | null>(null)
+
+  const { postOrderByType } = useContext(CommunityContext)
 
   useLayoutEffect(() => {
     if (!bodyRef.current) return
@@ -55,7 +57,10 @@ const Post = ({ post, innerRef, queryKey }: PostProps) => {
           </span>
         )}
       </div>
-      <PostFooter post={post} queryKey={queryKey} />
+      <PostFooter
+        post={post}
+        queryKey={["communityPostFeed", post.community.id, postOrderByType]}
+      />
     </Link>
   )
 }

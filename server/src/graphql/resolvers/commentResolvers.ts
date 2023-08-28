@@ -231,15 +231,6 @@ export const resolvers: Resolvers = {
 
       return parent
     },
-    children: async (comment, args) => {
-      const children = await paginate<Comment>(args.input.paginate, (options) =>
-        prisma.comment
-          .findUnique({ where: { id: comment.id } })
-          .children({ orderBy: { id: "asc" }, ...options })
-      )
-
-      return children
-    },
     voteStatus: async (comment, _0, { req }) => {
       if (!req.session.userId) return VoteStatus.None
 

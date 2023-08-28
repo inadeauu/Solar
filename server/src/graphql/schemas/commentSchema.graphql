@@ -27,7 +27,6 @@ type Comment {
 
   owner: User!
   post: Post!
-  children(input: CommentChildrenInput!): CommentConnection!
   parent: Comment
 }
 
@@ -119,9 +118,4 @@ enum CommentOrderByType {
   OLD
   TOP
   LOW
-}
-
-# -- RESOLVERS
-input CommentChildrenInput {
-  paginate: PaginateInput!
 }

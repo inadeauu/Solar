@@ -5,17 +5,24 @@ type TextInputProps = {
   error?: boolean
   errorMsg?: string
   success?: boolean
+  className?: string
 } & React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
 >
 
-const TextInput = ({ error, success, errorMsg, ...rest }: TextInputProps) => {
+const TextInput = ({
+  error,
+  success,
+  errorMsg,
+  className,
+  ...rest
+}: TextInputProps) => {
   return (
     <div className={`flex flex-col gap-1 ${error ? "mb-2" : "mb-4"}`}>
       <div className="relative">
         <input
-          className={`rounded-lg border w-full pl-2 pr-8 py-1 outline-none transition-all duration-200 peer placeholder:font-light ${
+          className={`rounded-lg border w-full pl-2 pr-8 py-1 outline-none transition-all duration-200 peer placeholder:font-light ${className} ${
             error
               ? "border-red-400 hover:border-red-600 focus:border-red-600"
               : success

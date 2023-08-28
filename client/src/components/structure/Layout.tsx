@@ -1,6 +1,6 @@
 import AuthProvider from "../../contexts/AuthContext"
-import Navbar from "../navbar/Navbar"
 import { Outlet } from "react-router-dom"
+import Navbar from "../navbar/Navbar"
 
 const Layout = () => {
   return (

@@ -16,11 +16,6 @@ type User {
 
   postsCount: Int!
   commentsCount: Int!
-
-  ownedCommunities(input: UserOwnedCommunitiesInput!): CommunityConnection!
-  inCommunities(input: UserInCommunitiesInput!): CommunityConnection!
-  posts(input: UserPostInput!): PostConnection!
-  comments(input: UserCommentInput!): CommentConnection!
 }
 
 # -- USERS QUERY
@@ -40,7 +35,7 @@ input UsersOrderBy {
 
 # -- USER QUERY
 input UserInput {
-  id: ID!
+  username: String!
 }
 
 # -- ENUMS
@@ -53,21 +48,4 @@ enum Provider {
 enum UserOrderByType {
   username
   postCount
-}
-
-# -- RESOLVERS
-input UserOwnedCommunitiesInput {
-  paginate: PaginateInput!
-}
-
-input UserInCommunitiesInput {
-  paginate: PaginateInput!
-}
-
-input UserPostInput {
-  paginate: PaginateInput!
-}
-
-input UserCommentInput {
-  paginate: PaginateInput!
 }

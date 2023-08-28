@@ -2,16 +2,14 @@ import { useInfiniteQuery } from "@tanstack/react-query"
 import { useInView } from "react-intersection-observer"
 import { graphql } from "../../graphql_codegen/gql"
 import { graphQLClient } from "../../utils/graphql"
-import { useEffect } from "react"
+import { useContext, useEffect } from "react"
 import { ImSpinner11 } from "react-icons/im"
 import Post from "../post/feed/Post"
 import type { Community } from "../../graphql/types"
-import { PostOrderByType } from "../../graphql_codegen/graphql"
+import { CommunityContext } from "../../contexts/CommunityContext"
 
 type CommunityPostFeedProps = {
   community: Community
-  postOrder: PostOrderByType
-  queryKey: any[]
 }
 
 const getPostFeedDocument = graphql(/* GraphQL */ `
@@ -48,12 +46,10 @@ const getPostFeedDocument = graphql(/* GraphQL */ `
   }
 `)
 
-const CommunityPostFeed = ({
-  community,
-  postOrder,
-  queryKey,
-}: CommunityPostFeedProps) => {
+const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
   const { ref, inView } = useInView()
+
+  const { postOrderByType } = useContext(CommunityContext)
 
   const {
     data,
@@ -63,11 +59,11 @@ const CommunityPostFeed = ({
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    queryKey,
+    ["communityPostFeed", community.id, postOrderByType],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getPostFeedDocument, {
         input: {
-          filters: { communityId: community.id, orderBy: postOrder },
+          filters: { communityId: community.id, orderBy: postOrderByType },
           paginate: { first: 10, after: pageParam },
         },
       })
@@ -107,7 +103,6 @@ const CommunityPostFeed = ({
                 innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
                 key={edge.node.id}
                 post={edge.node}
-                queryKey={queryKey}
               />
             )
           })

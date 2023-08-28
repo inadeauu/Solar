@@ -202,7 +202,6 @@ export type AuthUserSuccess = Success & {
 export type Comment = {
   __typename?: 'Comment';
   body: Scalars['String']['output'];
-  children: CommentConnection;
   created_at: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   owner: User;
@@ -212,15 +211,6 @@ export type Comment = {
   updated_at: Scalars['DateTime']['output'];
   voteStatus: VoteStatus;
   voteSum: Scalars['Int']['output'];
-};
-
-
-export type CommentChildrenArgs = {
-  input: CommentChildrenInput;
-};
-
-export type CommentChildrenInput = {
-  paginate: PaginateInput;
 };
 
 export type CommentConnection = {
@@ -278,22 +268,10 @@ export type Community = {
   id: Scalars['ID']['output'];
   inCommunity: Scalars['Boolean']['output'];
   memberCount: Scalars['Int']['output'];
-  members: UserConnection;
   owner: User;
   postCount: Scalars['Int']['output'];
-  posts: PostConnection;
   title: Scalars['String']['output'];
   updated_at: Scalars['DateTime']['output'];
-};
-
-
-export type CommunityMembersArgs = {
-  input: CommunityMembersInput;
-};
-
-
-export type CommunityPostsArgs = {
-  input: CommunityPostsInput;
 };
 
 export type CommunityConnection = {
@@ -312,17 +290,9 @@ export type CommunityInput = {
   id: Scalars['ID']['input'];
 };
 
-export type CommunityMembersInput = {
-  paginate: PaginateInput;
-};
-
 export enum CommunityOrderByType {
   MemberCount = 'memberCount'
 }
-
-export type CommunityPostsInput = {
-  paginate: PaginateInput;
-};
 
 export type CreateCommentInput = {
   body: Scalars['String']['input'];
@@ -547,7 +517,6 @@ export type Post = {
   __typename?: 'Post';
   body: Scalars['String']['output'];
   commentCount: Scalars['Int']['output'];
-  comments: CommentConnection;
   community: Community;
   created_at: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
@@ -556,15 +525,6 @@ export type Post = {
   updated_at: Scalars['DateTime']['output'];
   voteStatus: VoteStatus;
   voteSum: Scalars['Int']['output'];
-};
-
-
-export type PostCommentsArgs = {
-  input: PostCommentInput;
-};
-
-export type PostCommentInput = {
-  paginate: PaginateInput;
 };
 
 export type PostConnection = {
@@ -705,41 +665,13 @@ export type Success = {
 
 export type User = {
   __typename?: 'User';
-  comments: CommentConnection;
   commentsCount: Scalars['Int']['output'];
   created_at: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
-  inCommunities: CommunityConnection;
-  ownedCommunities: CommunityConnection;
-  posts: PostConnection;
   postsCount: Scalars['Int']['output'];
   provider: Provider;
   updated_at: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
-};
-
-
-export type UserCommentsArgs = {
-  input: UserCommentInput;
-};
-
-
-export type UserInCommunitiesArgs = {
-  input: UserInCommunitiesInput;
-};
-
-
-export type UserOwnedCommunitiesArgs = {
-  input: UserOwnedCommunitiesInput;
-};
-
-
-export type UserPostsArgs = {
-  input: UserPostInput;
-};
-
-export type UserCommentInput = {
-  paginate: PaginateInput;
 };
 
 export type UserConnection = {
@@ -754,12 +686,8 @@ export type UserEdge = {
   node: User;
 };
 
-export type UserInCommunitiesInput = {
-  paginate: PaginateInput;
-};
-
 export type UserInput = {
-  id: Scalars['ID']['input'];
+  username: Scalars['String']['input'];
 };
 
 export type UserJoinCommunityInput = {
@@ -779,14 +707,6 @@ export enum UserOrderByType {
   PostCount = 'postCount',
   Username = 'username'
 }
-
-export type UserOwnedCommunitiesInput = {
-  paginate: PaginateInput;
-};
-
-export type UserPostInput = {
-  paginate: PaginateInput;
-};
 
 export type UsersFilters = {
   orderBy?: InputMaybe<UsersOrderBy>;

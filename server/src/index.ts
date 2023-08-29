@@ -47,14 +47,14 @@ const main = async () => {
     })
   )
 
+  routes(app)
+
   app.use(
     helmet({
       crossOriginEmbedderPolicy: isProduction,
       contentSecurityPolicy: isProduction,
     })
   )
-
-  routes(app)
 
   const httpServer = http.createServer(app)
   const armor = new ApolloArmor({

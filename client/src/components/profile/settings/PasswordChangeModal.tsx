@@ -1,13 +1,17 @@
 import { useState } from "react"
-import Modal from "../misc/Modal"
-import TextInput from "../misc/TextInput"
+import Modal from "../../misc/Modal"
+import TextInput from "../../misc/TextInput"
 import { ImSpinner11 } from "react-icons/im"
-import { FieldState, FieldStates, initialFieldState } from "../../types/shared"
+import {
+  FieldState,
+  FieldStates,
+  initialFieldState,
+} from "../../../types/shared"
 import { useMutation } from "@tanstack/react-query"
-import { graphQLClient } from "../../utils/graphql"
-import { setFieldStateSuccess, setFieldStateValue } from "../../utils/form"
-import { graphql } from "../../graphql_codegen"
-import { ChangePasswordInput } from "../../graphql_codegen/graphql"
+import { graphQLClient } from "../../../utils/graphql"
+import { setFieldStateSuccess, setFieldStateValue } from "../../../utils/form"
+import { graphql } from "../../../graphql_codegen"
+import { ChangePasswordInput } from "../../../graphql_codegen/graphql"
 import { toast } from "react-toastify"
 
 const changePasswordDocument = graphql(/* GraphQL */ `

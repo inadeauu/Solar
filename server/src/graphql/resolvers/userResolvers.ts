@@ -162,6 +162,49 @@ export const resolvers: Resolvers = {
         code: 200,
       }
     },
+    deleteUser: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: req.session.userId },
+      })
+
+      if (!user) {
+        throw new GraphQLError("User does not exist", {
+          extensions: { code: "UNAUTHORIZED" },
+        })
+      }
+
+      const usernameError = args.input.username !== user.username
+      const passwordError = !(await bcrypt.compare(
+        args.input.password,
+        user.password
+      ))
+
+      if (usernameError || passwordError) {
+        return {
+          __typename: "DeleteUserInputError",
+          errorMsg: "Invalid input",
+          inputErrors: {
+            username: usernameError ? "Please enter your username" : null,
+            password: passwordError ? "Incorrect password" : null,
+          },
+          code: 400,
+        }
+      }
+
+      await prisma.user.delete({ where: { id: req.session.userId } })
+
+      return {
+        __typename: "DeleteUserSuccess",
+        successMsg: "Successfully deleted account",
+        code: 200,
+      }
+    },
   },
   User: {
     postsCount: async (user) => {

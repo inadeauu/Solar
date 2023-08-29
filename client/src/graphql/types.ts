@@ -3,9 +3,11 @@ import {
   CommentFeedQuery,
   PostFeedQuery,
   SinglePostQuery,
+  GetUserQuery,
 } from "../graphql_codegen/graphql"
 import { Flatten } from "../types/shared"
 
+export type User = NonNullable<GetUserQuery["user"]>
 export type Post =
   | Flatten<PostFeedQuery["posts"]["edges"]>["node"]
   | NonNullable<SinglePostQuery["post"]>

@@ -1,15 +1,17 @@
 import { useState } from "react"
-import { useAuth } from "../../hooks/useAuth"
+import { useAuth } from "../../../hooks/useAuth"
 import UsernameChangeModal from "./UsernameChangeModal"
 import PasswordChangeModal from "./PasswordChangeModal"
+import DeleteAccountModal from "./DeleteAccountModal"
 
 const AccountSettings = () => {
   const { user } = useAuth()
 
-  const [changeUsernameModalOpen, setChangeUsernameModalOpen] =
-    useState<boolean>(false)
+  const [usernameModalOpen, setUsernameModalOpen] = useState<boolean>(false)
 
-  const [changePasswordModalOpen, setChangePasswordModalOpen] =
+  const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false)
+
+  const [deleteAccountModalOpen, setDeleteAccountModalOpen] =
     useState<boolean>(false)
 
   return (
@@ -33,7 +35,7 @@ const AccountSettings = () => {
                   </span>
                 </div>
                 <button
-                  onClick={() => setChangeUsernameModalOpen((prev) => !prev)}
+                  onClick={() => setUsernameModalOpen((prev) => !prev)}
                   className="btn_blue py-1 px-2"
                 >
                   Change
@@ -47,23 +49,41 @@ const AccountSettings = () => {
                   </span>
                 </div>
                 <button
-                  onClick={() => setChangePasswordModalOpen((prev) => !prev)}
+                  onClick={() => setPasswordModalOpen((prev) => !prev)}
                   className="btn_blue py-1 px-2"
                 >
                   Change
                 </button>
               </div>
             </div>
+            <div className="flex flex-col gap-4 text-sm">
+              <div className="flex flex-col gap-[2px]">
+                <span className="text-neutral-500 font-medium text-sm">
+                  Delete Account
+                </span>
+                <hr className="grow" />
+              </div>
+              <button
+                onClick={() => setDeleteAccountModalOpen((prev) => !prev)}
+                className="btn_red py-1 px-2 w-fit text-sm"
+              >
+                Delete Account
+              </button>
+            </div>
           </div>
         </div>
       </div>
       <UsernameChangeModal
-        isOpen={changeUsernameModalOpen}
-        onClose={() => setChangeUsernameModalOpen(false)}
+        isOpen={usernameModalOpen}
+        onClose={() => setUsernameModalOpen(false)}
       />
       <PasswordChangeModal
-        isOpen={changePasswordModalOpen}
-        onClose={() => setChangePasswordModalOpen(false)}
+        isOpen={passwordModalOpen}
+        onClose={() => setPasswordModalOpen(false)}
+      />
+      <DeleteAccountModal
+        isOpen={deleteAccountModalOpen}
+        onClose={() => setDeleteAccountModalOpen(false)}
       />
     </>
   )

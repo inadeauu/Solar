@@ -114,7 +114,7 @@ const PostCommentForm = ({ post }: PostCommentFormProps) => {
             onClick={() => {
               setOpenEditor((prev) => !prev)
             }}
-            className="btn_red py-1 px-3 text-sm self-start"
+            className="btn_red py-1 px-3 self-start"
           >
             Close
           </button>

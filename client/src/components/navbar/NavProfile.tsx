@@ -2,13 +2,15 @@ import { useRef, useState } from "react"
 import { CiLogout } from "react-icons/ci"
 import useClickOutside from "../../hooks/useClickOutside"
 import { BsHouseAdd, BsPerson } from "react-icons/bs"
-import { Link } from "react-router-dom"
-import { useMutation } from "@tanstack/react-query"
+import { Link, useNavigate } from "react-router-dom"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphql } from "../../graphql_codegen/gql"
 import { graphQLClient } from "../../utils/graphql"
 import { useAuth } from "../../hooks/useAuth"
 import { RiArrowDropUpLine, RiArrowDropDownLine } from "react-icons/Ri"
 import { CiSettings } from "react-icons/ci"
+import { AuthUserQuery } from "../../graphql_codegen/graphql"
+import { CgProfile } from "react-icons/cg"
 
 const logoutDocument = graphql(/* GraphQL */ `
   mutation Logout {
@@ -26,6 +28,8 @@ const NavProfile = () => {
   const { user } = useAuth()
   const menuRef = useRef<HTMLDivElement>(null)
   const [openMenu, setOpenMenu] = useState<boolean>(false)
+  const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const logout = useMutation({
     mutationFn: async () => {
@@ -33,7 +37,12 @@ const NavProfile = () => {
     },
     onSuccess: (data) => {
       if (data.logout.__typename == "LogoutSuccess") {
-        window.location.reload()
+        queryClient.setQueryData<AuthUserQuery>(["authUser"], (oldData) =>
+          oldData
+            ? { ...oldData, authUser: { ...oldData.authUser, user: null } }
+            : oldData
+        )
+        navigate("/")
       }
     },
   })
@@ -70,8 +79,17 @@ const NavProfile = () => {
       {openMenu && (
         <div className="absolute right-0 top-11 bg-white w-[200px] border border-neutral-300 rounded-md text-sm font-medium">
           <Link
-            to="/create-community"
+            to={`/profile/${user?.username}`}
             className="flex items-center gap-2 p-2 rounded-t-md hover:bg-neutral-200 hover:cursor-pointer"
+          >
+            <div className="w-[15%]">
+              <CgProfile className="h-5 w-5" />
+            </div>
+            Profile
+          </Link>
+          <Link
+            to="/create-community"
+            className="flex items-center gap-2 p-2 hover:bg-neutral-200 hover:cursor-pointer"
           >
             <div className="w-[15%]">
               <BsHouseAdd className="h-5 w-5" />

@@ -13,6 +13,7 @@ import CommentContextProvider from "./contexts/CommentContext"
 import CommunityContextProvider from "./contexts/CommunityContext"
 import AccountSettingsPage from "./pages/AccountSettingsPage"
 import { ToastContainer, Zoom } from "react-toastify"
+import ProfilePage from "./pages/ProfilePage"
 
 const App = () => {
   return (
@@ -53,6 +54,7 @@ const App = () => {
               </CommentContextProvider>
             }
           />
+          <Route path="profile/:username" element={<ProfilePage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
         <Route path="/login" element={<LoginPage />} />

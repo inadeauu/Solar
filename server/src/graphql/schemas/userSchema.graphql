@@ -12,6 +12,8 @@ type Mutation {
     @rateLimit(limit: 10, duration: 600)
   changePassword(input: ChangePasswordInput!): ChangePasswordResult!
     @rateLimit(limit: 10, duration: 600)
+  deleteUser(input: DeleteUserInput!): DeleteUserResult!
+    @rateLimit(limit: 10, duration: 600)
 }
 
 type User {
@@ -76,12 +78,12 @@ input ChangePasswordInput {
   newPassword: String!
 }
 
+union ChangePasswordResult = ChangePasswordSuccess | ChangePasswordInputError
+
 type ChangePasswordSuccess implements Success {
   successMsg: String!
   code: Int!
 }
-
-union ChangePasswordResult = ChangePasswordSuccess | ChangePasswordInputError
 
 type ChangePasswordInputError implements Error {
   errorMsg: String!
@@ -92,6 +94,30 @@ type ChangePasswordInputError implements Error {
 type ChangePasswordInputErrors {
   currentPassword: String
   newPassword: String
+}
+
+# -- DELETEUSER MUTATION
+input DeleteUserInput {
+  username: String!
+  password: String!
+}
+
+union DeleteUserResult = DeleteUserSuccess | DeleteUserInputError
+
+type DeleteUserSuccess implements Success {
+  successMsg: String!
+  code: Int!
+}
+
+type DeleteUserInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: DeleteUserInputErrors!
+}
+
+type DeleteUserInputErrors {
+  username: String
+  password: String
 }
 
 # -- ENUMS

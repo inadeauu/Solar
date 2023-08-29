@@ -9,7 +9,7 @@ import { ImSpinner11 } from "react-icons/im"
 import TextInput from "../components/misc/TextInput"
 import { api } from "../utils/axios"
 import { graphql } from "../graphql_codegen/gql"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { RegisterUsernameInput } from "../graphql_codegen/graphql"
 import { PiEyeLight, PiEyeSlashLight } from "react-icons/pi"
@@ -66,7 +66,6 @@ const SignupPage = () => {
   const [error, setError] = useState<string>("")
 
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
   const getUsernameError = async (username: string) => {
     let error: string | undefined
@@ -163,8 +162,7 @@ const SignupPage = () => {
     onSuccess: (data) => {
       if (data.registerUsername.__typename == "RegisterUsernameSuccess") {
         toast.success("Successfully registered")
-        if (error) setError("")
-        navigate(-1)
+        navigate("/login")
       } else if (
         data.registerUsername.__typename == "RegisterUsernameInputError"
       ) {
@@ -177,9 +175,6 @@ const SignupPage = () => {
     try {
       const response = await api.get(`/auth/${provider}`)
       window.location.assign(response.data.data.url)
-      queryClient.invalidateQueries({ queryKey: ["authUser"] })
-      if (error) setError("")
-      navigate(-1)
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         setError("Error signing in")

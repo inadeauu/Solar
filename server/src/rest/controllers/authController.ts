@@ -71,6 +71,8 @@ export const googleCallback = async (
   req: Request<{}, {}, {}, LoginCallbackQuery>,
   res: Response<ResponseBody>
 ) => {
+  console.log("called")
+
   const state = req.query.state
   const stateCookie = req.signedCookies.state
 

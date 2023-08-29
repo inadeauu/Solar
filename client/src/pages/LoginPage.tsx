@@ -7,7 +7,7 @@ import { AxiosError } from "axios"
 import ErrorCard from "../components/misc/ErrorCard"
 import { ImSpinner11 } from "react-icons/im"
 import { api } from "../utils/axios"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { graphql } from "../graphql_codegen/gql"
 import TextInput from "../components/misc/TextInput"
@@ -56,7 +56,6 @@ const LoginPage = () => {
   const [error, setError] = useState<string>("")
 
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
 
   const getUsernameError = (username: string) => {
     let error: string | undefined
@@ -102,9 +101,6 @@ const LoginPage = () => {
     try {
       const response = await api.get(`/auth/${provider}`)
       window.location.assign(response.data.data.url)
-      queryClient.invalidateQueries({ queryKey: ["authUser"] })
-      if (error) setError("")
-      navigate(-1)
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         setError("Error logging in")
@@ -120,9 +116,7 @@ const LoginPage = () => {
     },
     onSuccess: (data) => {
       if (data.loginUsername.__typename == "LoginUsernameSuccess") {
-        queryClient.invalidateQueries({ queryKey: ["authUser"] })
-        if (error) setError("")
-        navigate(-1)
+        navigate("/")
       } else if (data.loginUsername.__typename == "LoginUsernameInputError") {
         setError(data.loginUsername.errorMsg)
       }

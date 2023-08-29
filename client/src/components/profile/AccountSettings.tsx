@@ -1,11 +1,15 @@
 import { useState } from "react"
 import { useAuth } from "../../hooks/useAuth"
 import UsernameChangeModal from "./UsernameChangeModal"
+import PasswordChangeModal from "./PasswordChangeModal"
 
 const AccountSettings = () => {
   const { user } = useAuth()
 
   const [changeUsernameModalOpen, setChangeUsernameModalOpen] =
+    useState<boolean>(false)
+
+  const [changePasswordModalOpen, setChangePasswordModalOpen] =
     useState<boolean>(false)
 
   return (
@@ -42,7 +46,12 @@ const AccountSettings = () => {
                     Password must be at least 8 characters long
                   </span>
                 </div>
-                <button className="btn_blue py-1 px-2">Change</button>
+                <button
+                  onClick={() => setChangePasswordModalOpen((prev) => !prev)}
+                  className="btn_blue py-1 px-2"
+                >
+                  Change
+                </button>
               </div>
             </div>
           </div>
@@ -51,6 +60,10 @@ const AccountSettings = () => {
       <UsernameChangeModal
         isOpen={changeUsernameModalOpen}
         onClose={() => setChangeUsernameModalOpen(false)}
+      />
+      <PasswordChangeModal
+        isOpen={changePasswordModalOpen}
+        onClose={() => setChangePasswordModalOpen(false)}
       />
     </>
   )

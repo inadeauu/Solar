@@ -110,6 +110,58 @@ export const resolvers: Resolvers = {
         user: updatedUser,
       }
     },
+    changePassword: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
+      }
+
+      const user = await prisma.user.findFirst({
+        where: { id: req.session.userId },
+      })
+
+      if (!user) {
+        throw new GraphQLError("User does not exist", {
+          extensions: { code: "UNAUTHORIZED" },
+        })
+      }
+
+      const currentPasswordError = !(await bcrypt.compare(
+        args.input.currentPassword,
+        user.password
+      ))
+      const newPasswordError = args.input.newPassword.length < 8
+
+      if (currentPasswordError || newPasswordError) {
+        return {
+          __typename: "ChangePasswordInputError",
+          errorMsg: "Invalid input",
+          inputErrors: {
+            currentPassword: currentPasswordError ? "Incorrect password" : null,
+            newPassword: newPasswordError
+              ? "Password must be at least 8 characters long"
+              : null,
+          },
+          code: 400,
+        }
+      }
+
+      const passwordHash = await bcrypt.hash(args.input.newPassword, 10)
+
+      await prisma.user.update({
+        where: { id: req.session.userId },
+        data: {
+          password: passwordHash,
+        },
+      })
+
+      return {
+        __typename: "ChangePasswordSuccess",
+        successMsg: "Successfully changed password",
+        code: 200,
+      }
+    },
   },
   User: {
     postsCount: async (user) => {

@@ -81,7 +81,6 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
     onSuccess: (data) => {
       if (data.changeUsername.__typename == "ChangeUsernameSuccess") {
         const updatedUser = data.changeUsername.user
-        toast.success("Successfully changed username")
         fieldStates.username = initialFieldState
         fieldStates.password = initialFieldState
         queryClient.setQueryData<AuthUserQuery>(["authUser"], (oldData) => {
@@ -95,6 +94,7 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
               }
             : oldData
         })
+        toast.success("Successfully changed username")
         onClose()
       } else if (data.changeUsername.__typename == "ChangeUsernameInputError") {
         if (data.changeUsername.inputErrors.username) {
@@ -238,7 +238,7 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
           <TextInput
             name="password"
             type="password"
-            placeholder="Password"
+            placeholder="Current Password"
             value={fieldStates.password.value}
             onChange={(e) =>
               setFieldStateValue(setFieldStates, "password", e.target.value)
@@ -286,7 +286,7 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
           {submitting ? (
             <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
           ) : (
-            "Sign Up"
+            "Submit"
           )}
         </button>
       </form>

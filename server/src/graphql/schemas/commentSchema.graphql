@@ -45,6 +45,7 @@ input CommentsFilters {
   userId: ID
   postId: ID
   parentId: ID
+  replies: Boolean
   orderBy: CommentOrderByType!
 }
 

@@ -2,17 +2,18 @@ import { useInView } from "react-intersection-observer"
 import { User } from "../../../../graphql/types"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { graphQLClient } from "../../../../utils/graphql"
-import { CommentOrderByType } from "../../../../graphql_codegen/graphql"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { ImSpinner11 } from "react-icons/im"
 import ProfileComment from "./ProfileComment"
 import { graphql } from "../../../../graphql_codegen/gql"
+import Dropdown from "../../../misc/Dropdown"
+import { getCommentOrderByType } from "../../../../utils/utils"
 
 type ProfileCommentFeedProps = {
   user: User
 }
 
-export const getProfileCommentFeedDocument = graphql(/* GraphQL */ `
+const getProfileCommentFeedDocument = graphql(/* GraphQL */ `
   query ProfileCommentFeed($input: CommentsInput!) {
     comments(input: $input) {
       edges {
@@ -20,6 +21,9 @@ export const getProfileCommentFeedDocument = graphql(/* GraphQL */ `
           body
           created_at
           id
+          parent {
+            id
+          }
           post {
             id
             title
@@ -57,6 +61,11 @@ export const getProfileCommentFeedDocument = graphql(/* GraphQL */ `
 const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
   const { ref, inView } = useInView()
 
+  const [commentOrderBy, setCommentOrderBy] = useState<string>("New")
+  const [commentFilter, setCommentFilter] = useState<string>("Top Level")
+
+  const commentOrderByType = getCommentOrderByType(commentOrderBy)
+
   const {
     data,
     isLoading,
@@ -65,13 +74,14 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ["profileCommentFeed", user.username],
+    ["profileCommentFeed", user.username, commentOrderByType, commentFilter],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getProfileCommentFeedDocument, {
         input: {
           filters: {
             userId: user.id,
-            orderBy: CommentOrderByType.New,
+            orderBy: commentOrderByType,
+            replies: commentFilter == "Reply",
           },
           paginate: { first: 10, after: pageParam },
         },
@@ -103,7 +113,23 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-5">
+      <div className="flex gap-4">
+        <Dropdown
+          className="py-1"
+          width="w-[65px]"
+          items={["New", "Old", "Top", "Low"]}
+          value={commentOrderBy}
+          setValue={setCommentOrderBy}
+        />
+        <Dropdown
+          className="py-1"
+          width="w-[95px]"
+          items={["Top level", "Reply"]}
+          value={commentFilter}
+          setValue={setCommentFilter}
+        />
+      </div>
       {isSuccess &&
         data.pages.map((page) =>
           page.comments.edges.map((edge, i) => {
@@ -121,7 +147,7 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
       {isFetchingNextPage && (
         <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
       )}
-    </>
+    </div>
   )
 }
 

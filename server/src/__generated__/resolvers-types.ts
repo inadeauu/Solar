@@ -128,6 +128,7 @@ export type CommentsFilters = {
   orderBy: CommentOrderByType;
   parentId?: InputMaybe<Scalars['ID']['input']>;
   postId?: InputMaybe<Scalars['ID']['input']>;
+  replies?: InputMaybe<Scalars['Boolean']['input']>;
   userId?: InputMaybe<Scalars['ID']['input']>;
 };
 

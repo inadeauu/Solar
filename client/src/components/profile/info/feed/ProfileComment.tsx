@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom"
 import type { ProfileComment } from "../../../../graphql/types"
 import moment from "moment"
 import { translator } from "../../../../utils/uuid"
+import { BiDownvote, BiUpvote } from "react-icons/bi"
+import { getReply } from "../../../../utils/utils"
 
 type ProfileCommentProps = {
   comment: ProfileComment
@@ -93,6 +95,18 @@ const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
             {moment(comment.created_at).fromNow()}
           </span>
           <p className="text-sm font-light text-neutral-800">{comment.body}</p>
+        </div>
+        <div className="flex items-center text-sm gap-4 mt-2">
+          <div className="flex items-center gap-2">
+            <BiUpvote />
+            {comment.voteSum}
+            <BiDownvote />
+          </div>
+          {!comment.parent && (
+            <div>
+              {comment.replyCount} {getReply(comment.replyCount)}
+            </div>
+          )}
         </div>
       </div>
     </div>

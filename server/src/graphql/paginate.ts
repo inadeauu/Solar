@@ -152,6 +152,7 @@ export const paginateComments = async (
   const userId = filters.userId
   const postId = filters.postId
   const parentId = filters.parentId
+  const allReplies = filters.replies
   const orderByType = filters.orderBy
 
   let commentsQuery: Prisma.Sql
@@ -207,7 +208,11 @@ export const paginateComments = async (
   const where = Prisma.sql`WHERE 1=1 
     AND (${userId}::text IS NULL OR "c"."userId" = ${userId}) 
     AND (${postId}::text IS NULL OR "c"."postId" = ${postId}) 
-    AND ((${parentId}::text IS NOT NULL OR "c"."parentId" IS NULL) AND (${parentId}::text IS NULL OR "c"."parentId" = ${parentId}))
+    AND (CASE 
+        WHEN ${allReplies}::boolean = true THEN "c"."parentId" IS NOT NULL
+        ELSE (${parentId}::text IS NOT NULL OR "c"."parentId" IS NULL) AND (${parentId}::text IS NULL OR "c"."parentId" = ${parentId})
+        END
+    )
     AND ${cursor}`
 
   const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}`

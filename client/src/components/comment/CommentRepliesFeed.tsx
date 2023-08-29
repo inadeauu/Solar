@@ -43,7 +43,7 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 mt-2">
+    <div className="flex flex-col gap-4 mt-2 px-[11px]">
       {isSuccess &&
         data.pages.map((page) =>
           page.comments.edges.map((edge) => {
@@ -52,7 +52,7 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
         )}
       {hasNextPage && (
         <button
-          className="btn_blue w-fit flex text-sm py-[2px] px-2"
+          className="btn_blue w-fit flex text-xs py-1 px-3"
           onClick={() => fetchNextPage()}
           disabled={isFetchingNextPage}
         >

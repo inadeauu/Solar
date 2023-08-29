@@ -83,3 +83,37 @@ export const usernameExistsDocument = graphql(/* GraphQL */ `
     usernameExists(username: $username)
   }
 `)
+
+export const getPostFeedDocument = graphql(/* GraphQL */ `
+  query PostFeed($input: PostsInput!) {
+    posts(input: $input) {
+      edges {
+        node {
+          id
+          body
+          created_at
+          title
+          commentCount
+          voteSum
+          voteStatus
+          community {
+            id
+            title
+          }
+          owner {
+            id
+            username
+          }
+        }
+      }
+      pageInfo {
+        endCursor {
+          id
+          voteSum
+          created_at
+        }
+        hasNextPage
+      }
+    }
+  }
+`)

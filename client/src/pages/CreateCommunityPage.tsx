@@ -149,13 +149,15 @@ const CreateCommunityPage = () => {
   }
 
   return (
-    <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border border-black overflow-auto">
-      <div className="w-fit mx-auto">
-        <h1 className="text-2xl font-medium mb-6">Create a Community</h1>
+    <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border border-neutral-300 overflow-auto">
+      <div className="flex flex-col items-center xs:w-[60%] xs-max:w-[90%] mx-auto">
+        <h1 className="text-2xl font-medium mb-6 xs-max:text-xl">
+          Create a Community
+        </h1>
         <form className="flex flex-col">
           {error && <ErrorCard error={error} className="mb-4" />}
           <label className="flex flex-col gap-2">
-            <p className="text-xl">Title</p>
+            <p className="text-xl xs-max:text-lg">Title</p>
             <TextInput
               name="title"
               type="text"
@@ -189,7 +191,7 @@ const CreateCommunityPage = () => {
               submitCreateCommunity()
               setSubmitting(false)
             }}
-            className="btn_blue py-[6px] mt-4 w-[60%] mx-auto"
+            className="btn_blue py-1 mt-4 px-4 mx-auto"
             disabled={submitting}
           >
             {submitting ? (

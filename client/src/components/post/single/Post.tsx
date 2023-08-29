@@ -60,6 +60,7 @@ const Post = ({ post }: PostProps) => {
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
+                  navigate(`/profile/${post.owner.username}`)
                 }}
               >
                 {post.owner.username}

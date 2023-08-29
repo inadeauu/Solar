@@ -1,21 +1,24 @@
-import { useInfiniteQuery } from "@tanstack/react-query"
 import { useInView } from "react-intersection-observer"
-import { graphQLClient } from "../../utils/graphql"
-import { useContext, useEffect } from "react"
+import { User } from "../../../graphql/types"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { graphQLClient } from "../../../utils/graphql"
+import { getPostFeedDocument } from "../../../graphql/sharedDocuments"
+import { useEffect, useState } from "react"
 import { ImSpinner11 } from "react-icons/im"
-import Post from "../post/feed/Post"
-import type { Community } from "../../graphql/types"
-import { CommunityContext } from "../../contexts/CommunityContext"
-import { getPostFeedDocument } from "../../graphql/sharedDocuments"
+import Post from "../../post/feed/Post"
+import Dropdown from "../../misc/Dropdown"
+import { getPostOrderByType } from "../../../utils/utils"
 
-type CommunityPostFeedProps = {
-  community: Community
+type ProfilePostFeedProps = {
+  user: User
 }
 
-const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
+const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
   const { ref, inView } = useInView()
 
-  const { postOrderByType } = useContext(CommunityContext)
+  const [postOrderBy, setPostOrderBy] = useState<string>("New")
+
+  const postOrderByType = getPostOrderByType(postOrderBy)
 
   const {
     data,
@@ -25,11 +28,14 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ["communityPostFeed", community.id, postOrderByType],
+    ["profilePostFeed", user.username, postOrderByType],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getPostFeedDocument, {
         input: {
-          filters: { communityId: community.id, orderBy: postOrderByType },
+          filters: {
+            userId: user.id,
+            orderBy: postOrderByType,
+          },
           paginate: { first: 10, after: pageParam },
         },
       })
@@ -61,16 +67,23 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
 
   return (
     <div className="flex flex-col gap-5">
+      <Dropdown
+        className="py-1"
+        width="w-[65px]"
+        items={["New", "Old", "Top", "Low"]}
+        value={postOrderBy}
+        setValue={setPostOrderBy}
+      />
       {isSuccess &&
         data.pages.map((page) =>
           page.posts.edges.map((edge, i) => {
             return (
               <Post
-                insideCommunity={true}
+                insideCommunity={false}
                 innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
                 key={edge.node.id}
                 post={edge.node}
-                queryKey={["communityPostFeed", community.id, postOrderByType]}
+                queryKey={["profilePostFeed", user.username, postOrderByType]}
               />
             )
           })
@@ -82,4 +95,4 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
   )
 }
 
-export default CommunityPostFeed
+export default ProfilePostFeed

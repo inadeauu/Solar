@@ -55,6 +55,14 @@ const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
   }
 
+  if (isSuccess && !data.pages[0].comments.edges.length) {
+    return (
+      <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
+        No Comments
+      </span>
+    )
+  }
+
   return (
     <>
       {isSuccess &&

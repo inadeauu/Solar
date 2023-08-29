@@ -1,21 +1,21 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import moment from "moment"
-import { Ref, useContext, useLayoutEffect, useRef, useState } from "react"
+import { Ref, useLayoutEffect, useRef, useState } from "react"
 import PostFooter from "./PostFooter"
 import type { Post } from "../../../graphql/types"
 import { translator } from "../../../utils/uuid"
-import { CommunityContext } from "../../../contexts/CommunityContext"
 
 type PostProps = {
   post: Post
   innerRef?: Ref<HTMLAnchorElement> | undefined
+  queryKey: any[]
+  insideCommunity: boolean
 }
 
-const Post = ({ post, innerRef }: PostProps) => {
+const Post = ({ post, innerRef, queryKey, insideCommunity }: PostProps) => {
   const [overflown, setOverflown] = useState<boolean>(false)
   const bodyRef = useRef<HTMLDivElement | null>(null)
-
-  const { postOrderByType } = useContext(CommunityContext)
+  const navigate = useNavigate()
 
   useLayoutEffect(() => {
     if (!bodyRef.current) return
@@ -32,12 +32,32 @@ const Post = ({ post, innerRef }: PostProps) => {
     >
       <div className="flex flex-col gap-[6px]">
         <span className="text-neutral-500 text-xs">
+          {!insideCommunity && (
+            <>
+              <span
+                className="text-black font-medium hover:underline hover:cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  navigate(
+                    `/communities/${post.community.title}/${translator.fromUUID(
+                      post.community.id
+                    )}`
+                  )
+                }}
+              >
+                {post.community.title}
+              </span>
+              {" • "}
+            </>
+          )}
           Posted by{" "}
           <span
             className="text-black font-medium hover:underline hover:cursor-pointer"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
+              navigate(`/profile/${post.owner.username}`)
             }}
           >
             {post.owner.username}
@@ -57,10 +77,7 @@ const Post = ({ post, innerRef }: PostProps) => {
           </span>
         )}
       </div>
-      <PostFooter
-        post={post}
-        queryKey={["communityPostFeed", post.community.id, postOrderByType]}
-      />
+      <PostFooter post={post} queryKey={queryKey} />
     </Link>
   )
 }

@@ -1,5 +1,6 @@
 import { createContext, useState } from "react"
 import { PostOrderByType } from "../graphql_codegen/graphql"
+import { getPostOrderByType } from "../utils/utils"
 
 type CommunityContextType = {
   postOrderBy: string
@@ -18,25 +19,10 @@ type CommunityProviderProps = {
 const CommunityContextProvider = ({ children }: CommunityProviderProps) => {
   const [postOrderBy, setPostOrderBy] = useState<string>("New")
 
-  const getPostOrderByType = () => {
-    switch (postOrderBy) {
-      case "New":
-        return PostOrderByType.New
-      case "Old":
-        return PostOrderByType.Old
-      case "Top":
-        return PostOrderByType.Top
-      case "Low":
-        return PostOrderByType.Low
-      default:
-        return PostOrderByType.New
-    }
-  }
-
   const value: CommunityContextType = {
     postOrderBy,
     setPostOrderBy,
-    postOrderByType: getPostOrderByType(),
+    postOrderByType: getPostOrderByType(postOrderBy),
   }
 
   return (

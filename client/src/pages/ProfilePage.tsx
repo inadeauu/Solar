@@ -44,7 +44,7 @@ const ProfilePage = () => {
     <section className="flex gap-6">
       <div className="flex flex-col gap-5 md:grow md-max:w-full min-w-0 break-words">
         <ProfileHeader user={data.user} />
-        <ProfileFeed />
+        <ProfileFeed user={data.user} />
       </div>
       <ProfileSidebar user={data.user} />
     </section>

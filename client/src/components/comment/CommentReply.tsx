@@ -3,13 +3,16 @@ import type { Comment } from "../../graphql/types"
 import CommentVote from "./CommentVote"
 import { useContext } from "react"
 import { CommentContext } from "../../contexts/CommentContext"
+import { useNavigate } from "react-router-dom"
 
 type CommentReplyType = {
   comment: Comment
+  parentId: string
 }
 
-export const CommentReply = ({ comment }: CommentReplyType) => {
+export const CommentReply = ({ comment, parentId }: CommentReplyType) => {
   const { commentOrderByType } = useContext(CommentContext)
+  const navigate = useNavigate()
 
   return (
     <div className="flex flex-col gap-1">
@@ -20,6 +23,7 @@ export const CommentReply = ({ comment }: CommentReplyType) => {
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
+              navigate(`/profile/${comment.owner.username}`)
             }}
           >
             {comment.owner.username}
@@ -31,7 +35,7 @@ export const CommentReply = ({ comment }: CommentReplyType) => {
       </div>
       <CommentVote
         comment={comment}
-        queryKey={["commentRepliesFeed", comment.id, commentOrderByType]}
+        queryKey={["commentRepliesFeed", parentId, commentOrderByType]}
       />
     </div>
   )

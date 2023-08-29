@@ -53,7 +53,7 @@ const UsersSearchBar = ({ debouncedSearch, search }: UsersSearchBarProps) => {
             <div
               key={i}
               className="flex flex-col px-2 py-1 hover:bg-neutral-200 cursor-pointer overflow-auto"
-              onMouseDown={() => navigate("/signup")}
+              onMouseDown={() => navigate(`/profile/${edge.node.username}`)}
             >
               <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
                 {edge.node.username}

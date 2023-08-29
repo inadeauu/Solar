@@ -47,7 +47,13 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
       {isSuccess &&
         data.pages.map((page) =>
           page.comments.edges.map((edge) => {
-            return <CommentReply key={edge.node.id} comment={edge.node} />
+            return (
+              <CommentReply
+                key={edge.node.id}
+                comment={edge.node}
+                parentId={comment.id}
+              />
+            )
           })
         )}
       {hasNextPage && (

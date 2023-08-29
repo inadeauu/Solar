@@ -26,7 +26,7 @@ const CommunitySidebar = ({ community }: CommunitySidebarProps) => {
           <span>
             Owner:{" "}
             <Link
-              to="/signup"
+              to={`/profile/${community.owner.username}`}
               className="text-black font-medium hover:underline"
             >
               {community.owner.username}

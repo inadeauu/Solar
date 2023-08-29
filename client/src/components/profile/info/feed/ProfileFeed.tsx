@@ -1,7 +1,7 @@
 import { useState } from "react"
 import ProfilePostFeed from "./ProfilePostFeed"
 import ProfileCommentFeed from "./ProfileCommentFeed"
-import { User } from "../../../graphql/types"
+import { User } from "../../../../graphql/types"
 
 type ProfileFeedProps = {
   user: User

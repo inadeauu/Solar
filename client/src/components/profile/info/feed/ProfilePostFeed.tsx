@@ -1,13 +1,13 @@
 import { useInView } from "react-intersection-observer"
-import { User } from "../../../graphql/types"
+import { User } from "../../../../graphql/types"
 import { useInfiniteQuery } from "@tanstack/react-query"
-import { graphQLClient } from "../../../utils/graphql"
-import { getPostFeedDocument } from "../../../graphql/sharedDocuments"
+import { graphQLClient } from "../../../../utils/graphql"
+import { getPostFeedDocument } from "../../../../graphql/sharedDocuments"
 import { useEffect, useState } from "react"
 import { ImSpinner11 } from "react-icons/im"
-import Post from "../../post/feed/Post"
-import Dropdown from "../../misc/Dropdown"
-import { getPostOrderByType } from "../../../utils/utils"
+import Post from "../../../post/feed/Post"
+import Dropdown from "../../../misc/Dropdown"
+import { getPostOrderByType } from "../../../../utils/utils"
 
 type ProfilePostFeedProps = {
   user: User

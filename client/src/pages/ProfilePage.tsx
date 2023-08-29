@@ -5,7 +5,7 @@ import { graphQLClient } from "../utils/graphql"
 import { ImSpinner11 } from "react-icons/im"
 import ProfileSidebar from "../components/profile/info/ProfileSidebar"
 import ProfileHeader from "../components/profile/info/ProfileHeader"
-import ProfileFeed from "../components/profile/info/ProfileFeed"
+import ProfileFeed from "../components/profile/info/feed/ProfileFeed"
 
 const getUserDocument = graphql(/* GraphQL */ `
   query GetUser($input: UserInput!) {

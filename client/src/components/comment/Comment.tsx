@@ -1,6 +1,7 @@
 import type { Comment } from "../../graphql/types"
 import moment from "moment"
 import CommentFooter from "./CommentFooter"
+import { useNavigate } from "react-router-dom"
 
 type CommentProps = {
   comment: Comment
@@ -8,6 +9,8 @@ type CommentProps = {
 }
 
 const Comment = ({ comment, innerRef }: CommentProps) => {
+  const navigate = useNavigate()
+
   return (
     <div
       ref={innerRef}
@@ -21,6 +24,7 @@ const Comment = ({ comment, innerRef }: CommentProps) => {
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
+                navigate(`/profile/${comment.owner.username}`)
               }}
             >
               {comment.owner.username}

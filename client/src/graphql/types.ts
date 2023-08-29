@@ -4,6 +4,7 @@ import {
   PostFeedQuery,
   SinglePostQuery,
   GetUserQuery,
+  ProfileCommentFeedQuery,
 } from "../graphql_codegen/graphql"
 import { Flatten } from "../types/shared"
 
@@ -13,3 +14,6 @@ export type Post =
   | NonNullable<SinglePostQuery["post"]>
 export type Community = NonNullable<CommunityQuery["community"]>
 export type Comment = Flatten<CommentFeedQuery["comments"]["edges"]>["node"]
+export type ProfileComment = Flatten<
+  ProfileCommentFeedQuery["comments"]["edges"]
+>["node"]

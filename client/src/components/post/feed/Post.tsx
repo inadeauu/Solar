@@ -31,40 +31,42 @@ const Post = ({ post, innerRef, queryKey, insideCommunity }: PostProps) => {
       className="bg-white border border-neutral-300 rounded-lg p-4 hover:cursor-pointer hover:border-black group"
     >
       <div className="flex flex-col gap-[6px]">
-        <span className="text-neutral-500 text-xs">
-          {!insideCommunity && (
-            <>
-              <span
-                className="text-black font-medium hover:underline hover:cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  navigate(
-                    `/communities/${post.community.title}/${translator.fromUUID(
-                      post.community.id
-                    )}`
-                  )
-                }}
-              >
-                {post.community.title}
-              </span>
-              {" • "}
-            </>
-          )}
-          Posted by{" "}
-          <span
-            className="text-black font-medium hover:underline hover:cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              navigate(`/profile/${post.owner.username}`)
-            }}
-          >
-            {post.owner.username}
+        <div className="flex items-center justify-between">
+          <span className="text-neutral-500 text-xs">
+            {!insideCommunity && (
+              <>
+                <span
+                  className="text-black font-medium hover:underline hover:cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    navigate(
+                      `/communities/${
+                        post.community.title
+                      }/${translator.fromUUID(post.community.id)}`
+                    )
+                  }}
+                >
+                  {post.community.title}
+                </span>
+                {" • "}
+              </>
+            )}
+            Posted by{" "}
+            <span
+              className="text-black font-medium hover:underline hover:cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                navigate(`/profile/${post.owner.username}`)
+              }}
+            >
+              {post.owner.username}
+            </span>
+            {" • "}
+            {moment(post.created_at).fromNow()}
           </span>
-          {" • "}
-          {moment(post.created_at).fromNow()}
-        </span>
+        </div>
         <span className="font-semibold text-lg">{post.title}</span>
         {post.body && (
           <div ref={bodyRef} className="max-h-[250px] overflow-hidden">

@@ -17,6 +17,7 @@ import { debounce } from "lodash"
 import { FieldState, FieldStates, initialFieldState } from "../types/shared"
 import { setFieldStateSuccess, setFieldStateValue } from "../utils/form"
 import { toast } from "react-toastify"
+import { usernameExistsDocument } from "../graphql/sharedDocuments"
 
 const usernameRegisterDocument = graphql(/* GraphQL */ `
   mutation RegisterUsername($input: RegisterUsernameInput!) {
@@ -32,12 +33,6 @@ const usernameRegisterDocument = graphql(/* GraphQL */ `
         code
       }
     }
-  }
-`)
-
-const usernameExistsDocument = graphql(/* GraphQL */ `
-  query UsernameExists($username: String!) {
-    usernameExists(username: $username)
   }
 `)
 
@@ -182,7 +177,7 @@ const SignupPage = () => {
     try {
       const response = await api.get(`/auth/${provider}`)
       window.location.assign(response.data.data.url)
-      queryClient.invalidateQueries({ queryKey: ["user"] })
+      queryClient.invalidateQueries({ queryKey: ["authUser"] })
       if (error) setError("")
       navigate(-1)
     } catch (error: unknown) {

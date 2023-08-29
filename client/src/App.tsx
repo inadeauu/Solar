@@ -12,10 +12,24 @@ import PostPage from "./pages/PostPage"
 import CommentContextProvider from "./contexts/CommentContext"
 import CommunityContextProvider from "./contexts/CommunityContext"
 import AccountSettingsPage from "./pages/AccountSettingsPage"
+import { ToastContainer, Zoom } from "react-toastify"
 
 const App = () => {
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover={false}
+        theme="light"
+        transition={Zoom}
+      />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />

@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { useAuth } from "../../hooks/useAuth"
-import Modal from "../misc/Modal"
-import TextInput from "../misc/TextInput"
+import UsernameChangeModal from "./UsernameChangeModal"
 
 const AccountSettings = () => {
   const { user } = useAuth()
@@ -49,15 +48,10 @@ const AccountSettings = () => {
           </div>
         </div>
       </div>
-      <Modal
+      <UsernameChangeModal
         isOpen={changeUsernameModalOpen}
-        onClose={setChangeUsernameModalOpen}
-      >
-        <form className="xs:w-[60%] xs-max:w-[80%]">
-          <h1 className="text-xl font-medium">Account Settings</h1>
-          <TextInput />
-        </form>
-      </Modal>
+        onClose={() => setChangeUsernameModalOpen(false)}
+      />
     </>
   )
 }

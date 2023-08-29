@@ -7,6 +7,11 @@ type Query @rateLimit(limit: 180, duration: 60) {
     @rateLimit(limit: 200, duration: 60)
 }
 
+type Mutation {
+  changeUsername(input: ChangeUsernameInput!): ChangeUsernameResult!
+    @rateLimit(limit: 10, duration: 600)
+}
+
 type User {
   id: ID!
   username: String!
@@ -36,6 +41,31 @@ input UsersOrderBy {
 # -- USER QUERY
 input UserInput {
   username: String!
+}
+
+# -- CHANGEUSERNAME MUTATION
+input ChangeUsernameInput {
+  newUsername: String!
+  password: String!
+}
+
+union ChangeUsernameResult = ChangeUsernameSuccess | ChangeUsernameInputError
+
+type ChangeUsernameSuccess implements Success {
+  successMsg: String!
+  code: Int!
+  user: User!
+}
+
+type ChangeUsernameInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: ChangeUsernameInputErrors!
+}
+
+type ChangeUsernameInputErrors {
+  username: String
+  password: String
 }
 
 # -- ENUMS

@@ -77,3 +77,9 @@ export const getCommentFeedDocument = graphql(/* GraphQL */ `
     }
   }
 `)
+
+export const usernameExistsDocument = graphql(/* GraphQL */ `
+  query UsernameExists($username: String!) {
+    usernameExists(username: $username)
+  }
+`)

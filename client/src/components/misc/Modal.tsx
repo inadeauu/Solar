@@ -1,3 +1,5 @@
+import { AiOutlineClose } from "react-icons/ai"
+
 type ModalProps = {
   isOpen: boolean
   onClose: (...args: any[]) => any
@@ -14,9 +16,15 @@ const Modal = ({ isOpen, onClose, children }: ModalProps) => {
       <div onClick={() => onClose()} className="flex h-full w-full">
         <div
           onClick={(e) => e.stopPropagation()}
-          className="m-auto bg-white border border-neutral-300 rounded-xl max-h-[500px] max-w-[400px] w-[90%] h-[90%] p-4"
+          className="m-auto bg-white border border-neutral-300 rounded-xl max-h-fit max-w-[400px] w-[90%] h-[90%] p-4"
         >
-          {children}
+          <div className="flex flex-col items-center">
+            <AiOutlineClose
+              className="self-end h-5 w-5 hover:cursor-pointer"
+              onClick={() => onClose()}
+            />
+            {children}
+          </div>
         </div>
       </div>
     </div>

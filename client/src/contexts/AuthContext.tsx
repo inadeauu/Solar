@@ -36,7 +36,7 @@ export const AuthContext = createContext<AuthContextType>({} as AuthContextType)
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const { isLoading, data } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["authUser"],
     queryFn: async () => graphQLClient.request(authUserQueryDocument),
   })
 

@@ -102,7 +102,7 @@ const LoginPage = () => {
     try {
       const response = await api.get(`/auth/${provider}`)
       window.location.assign(response.data.data.url)
-      queryClient.invalidateQueries({ queryKey: ["user"] })
+      queryClient.invalidateQueries({ queryKey: ["authUser"] })
       if (error) setError("")
       navigate(-1)
     } catch (error: unknown) {
@@ -120,7 +120,7 @@ const LoginPage = () => {
     },
     onSuccess: (data) => {
       if (data.loginUsername.__typename == "LoginUsernameSuccess") {
-        queryClient.invalidateQueries({ queryKey: ["user"] })
+        queryClient.invalidateQueries({ queryKey: ["authUser"] })
         if (error) setError("")
         navigate(-1)
       } else if (data.loginUsername.__typename == "LoginUsernameInputError") {

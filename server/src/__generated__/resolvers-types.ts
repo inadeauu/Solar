@@ -33,6 +33,33 @@ export type AuthUserSuccess = Success & {
   user?: Maybe<User>;
 };
 
+export type ChangeUsernameInput = {
+  newUsername: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
+export type ChangeUsernameInputError = Error & {
+  __typename?: 'ChangeUsernameInputError';
+  code: Scalars['Int']['output'];
+  errorMsg: Scalars['String']['output'];
+  inputErrors: ChangeUsernameInputErrors;
+};
+
+export type ChangeUsernameInputErrors = {
+  __typename?: 'ChangeUsernameInputErrors';
+  password?: Maybe<Scalars['String']['output']>;
+  username?: Maybe<Scalars['String']['output']>;
+};
+
+export type ChangeUsernameResult = ChangeUsernameInputError | ChangeUsernameSuccess;
+
+export type ChangeUsernameSuccess = Success & {
+  __typename?: 'ChangeUsernameSuccess';
+  code: Scalars['Int']['output'];
+  successMsg: Scalars['String']['output'];
+  user: User;
+};
+
 export type Comment = {
   __typename?: 'Comment';
   body: Scalars['String']['output'];
@@ -281,6 +308,7 @@ export type LogoutSuccess = Success & {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  changeUsername: ChangeUsernameResult;
   createComment: CreateCommentResult;
   createCommentReply: CreateCommentReplyResult;
   createCommunity: CreateCommunityResult;
@@ -291,6 +319,11 @@ export type Mutation = {
   userJoinCommunity: UserJoinCommunityResult;
   voteComment: VoteCommentResult;
   votePost: VotePostResult;
+};
+
+
+export type MutationChangeUsernameArgs = {
+  input: ChangeUsernameInput;
 };
 
 
@@ -667,6 +700,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping of union types */
 export type ResolversUnionTypes<RefType extends Record<string, unknown>> = ResolversObject<{
   AuthUserResult: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } );
+  ChangeUsernameResult: ( ChangeUsernameInputError ) | ( Omit<ChangeUsernameSuccess, 'user'> & { user: RefType['User'] } );
   CreateCommentReplyResult: ( CreateCommentReplyInputError ) | ( CreateCommentReplySuccess );
   CreateCommentResult: ( CreateCommentInputError ) | ( CreateCommentSuccess );
   CreateCommunityResult: ( CreateCommunityInputError ) | ( CreateCommunitySuccess );
@@ -681,8 +715,8 @@ export type ResolversUnionTypes<RefType extends Record<string, unknown>> = Resol
 
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
-  Error: ( CreateCommentInputError ) | ( CreateCommentReplyInputError ) | ( CreateCommunityInputError ) | ( CreatePostInputError ) | ( LoginUsernameInputError ) | ( RegisterUsernameInputError );
-  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( CreateCommentReplySuccess ) | ( CreateCommentSuccess ) | ( CreateCommunitySuccess ) | ( CreatePostSuccess ) | ( LoginUsernameSuccess ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } ) | ( Omit<VoteCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<VotePostSuccess, 'post'> & { post: RefType['Post'] } );
+  Error: ( ChangeUsernameInputError ) | ( CreateCommentInputError ) | ( CreateCommentReplyInputError ) | ( CreateCommunityInputError ) | ( CreatePostInputError ) | ( LoginUsernameInputError ) | ( RegisterUsernameInputError );
+  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( Omit<ChangeUsernameSuccess, 'user'> & { user: RefType['User'] } ) | ( CreateCommentReplySuccess ) | ( CreateCommentSuccess ) | ( CreateCommunitySuccess ) | ( CreatePostSuccess ) | ( LoginUsernameSuccess ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } ) | ( Omit<VoteCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<VotePostSuccess, 'post'> & { post: RefType['Post'] } );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -691,6 +725,11 @@ export type ResolversTypes = ResolversObject<{
   AuthUserResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['AuthUserResult']>;
   AuthUserSuccess: ResolverTypeWrapper<Omit<AuthUserSuccess, 'user'> & { user?: Maybe<ResolversTypes['User']> }>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  ChangeUsernameInput: ChangeUsernameInput;
+  ChangeUsernameInputError: ResolverTypeWrapper<ChangeUsernameInputError>;
+  ChangeUsernameInputErrors: ResolverTypeWrapper<ChangeUsernameInputErrors>;
+  ChangeUsernameResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['ChangeUsernameResult']>;
+  ChangeUsernameSuccess: ResolverTypeWrapper<Omit<ChangeUsernameSuccess, 'user'> & { user: ResolversTypes['User'] }>;
   Comment: ResolverTypeWrapper<CommentModel>;
   CommentConnection: ResolverTypeWrapper<Omit<CommentConnection, 'edges'> & { edges: Array<ResolversTypes['CommentEdge']> }>;
   CommentEdge: ResolverTypeWrapper<Omit<CommentEdge, 'node'> & { node: ResolversTypes['Comment'] }>;
@@ -783,6 +822,11 @@ export type ResolversParentTypes = ResolversObject<{
   AuthUserResult: ResolversUnionTypes<ResolversParentTypes>['AuthUserResult'];
   AuthUserSuccess: Omit<AuthUserSuccess, 'user'> & { user?: Maybe<ResolversParentTypes['User']> };
   Boolean: Scalars['Boolean']['output'];
+  ChangeUsernameInput: ChangeUsernameInput;
+  ChangeUsernameInputError: ChangeUsernameInputError;
+  ChangeUsernameInputErrors: ChangeUsernameInputErrors;
+  ChangeUsernameResult: ResolversUnionTypes<ResolversParentTypes>['ChangeUsernameResult'];
+  ChangeUsernameSuccess: Omit<ChangeUsernameSuccess, 'user'> & { user: ResolversParentTypes['User'] };
   Comment: CommentModel;
   CommentConnection: Omit<CommentConnection, 'edges'> & { edges: Array<ResolversParentTypes['CommentEdge']> };
   CommentEdge: Omit<CommentEdge, 'node'> & { node: ResolversParentTypes['Comment'] };
@@ -871,6 +915,30 @@ export type AuthUserSuccessResolvers<ContextType = Context, ParentType extends R
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successMsg?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type ChangeUsernameInputErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ChangeUsernameInputError'] = ResolversParentTypes['ChangeUsernameInputError']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  inputErrors?: Resolver<ResolversTypes['ChangeUsernameInputErrors'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type ChangeUsernameInputErrorsResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ChangeUsernameInputErrors'] = ResolversParentTypes['ChangeUsernameInputErrors']> = ResolversObject<{
+  password?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  username?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+}>;
+
+export type ChangeUsernameResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ChangeUsernameResult'] = ResolversParentTypes['ChangeUsernameResult']> = ResolversObject<{
+  __resolveType: TypeResolveFn<'ChangeUsernameInputError' | 'ChangeUsernameSuccess', ParentType, ContextType>;
+}>;
+
+export type ChangeUsernameSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['ChangeUsernameSuccess'] = ResolversParentTypes['ChangeUsernameSuccess']> = ResolversObject<{
+  code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  successMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1028,7 +1096,7 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 }
 
 export type ErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'CreateCommentInputError' | 'CreateCommentReplyInputError' | 'CreateCommunityInputError' | 'CreatePostInputError' | 'LoginUsernameInputError' | 'RegisterUsernameInputError', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'ChangeUsernameInputError' | 'CreateCommentInputError' | 'CreateCommentReplyInputError' | 'CreateCommunityInputError' | 'CreatePostInputError' | 'LoginUsernameInputError' | 'RegisterUsernameInputError', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   errorMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 }>;
@@ -1060,6 +1128,7 @@ export type LogoutSuccessResolvers<ContextType = Context, ParentType extends Res
 }>;
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
+  changeUsername?: Resolver<ResolversTypes['ChangeUsernameResult'], ParentType, ContextType, RequireFields<MutationChangeUsernameArgs, 'input'>>;
   createComment?: Resolver<ResolversTypes['CreateCommentResult'], ParentType, ContextType, RequireFields<MutationCreateCommentArgs, 'input'>>;
   createCommentReply?: Resolver<ResolversTypes['CreateCommentReplyResult'], ParentType, ContextType, RequireFields<MutationCreateCommentReplyArgs, 'input'>>;
   createCommunity?: Resolver<ResolversTypes['CreateCommunityResult'], ParentType, ContextType, RequireFields<MutationCreateCommunityArgs, 'input'>>;
@@ -1142,7 +1211,7 @@ export type RegisterUsernameSuccessResolvers<ContextType = Context, ParentType e
 }>;
 
 export type SuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Success'] = ResolversParentTypes['Success']> = ResolversObject<{
-  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'CreateCommentReplySuccess' | 'CreateCommentSuccess' | 'CreateCommunitySuccess' | 'CreatePostSuccess' | 'LoginUsernameSuccess' | 'LogoutSuccess' | 'RegisterUsernameSuccess' | 'UserJoinCommunitySuccess' | 'VoteCommentSuccess' | 'VotePostSuccess', ParentType, ContextType>;
+  __resolveType: TypeResolveFn<'AuthUserSuccess' | 'ChangeUsernameSuccess' | 'CreateCommentReplySuccess' | 'CreateCommentSuccess' | 'CreateCommunitySuccess' | 'CreatePostSuccess' | 'LoginUsernameSuccess' | 'LogoutSuccess' | 'RegisterUsernameSuccess' | 'UserJoinCommunitySuccess' | 'VoteCommentSuccess' | 'VotePostSuccess', ParentType, ContextType>;
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   successMsg?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
 }>;
@@ -1206,6 +1275,10 @@ export type VotePostSuccessResolvers<ContextType = Context, ParentType extends R
 export type Resolvers<ContextType = Context> = ResolversObject<{
   AuthUserResult?: AuthUserResultResolvers<ContextType>;
   AuthUserSuccess?: AuthUserSuccessResolvers<ContextType>;
+  ChangeUsernameInputError?: ChangeUsernameInputErrorResolvers<ContextType>;
+  ChangeUsernameInputErrors?: ChangeUsernameInputErrorsResolvers<ContextType>;
+  ChangeUsernameResult?: ChangeUsernameResultResolvers<ContextType>;
+  ChangeUsernameSuccess?: ChangeUsernameSuccessResolvers<ContextType>;
   Comment?: CommentResolvers<ContextType>;
   CommentConnection?: CommentConnectionResolvers<ContextType>;
   CommentEdge?: CommentEdgeResolvers<ContextType>;

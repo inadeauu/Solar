@@ -1,8 +1,5 @@
 import { Navigate, useParams } from "react-router-dom"
-import { graphql } from "../graphql_codegen/gql"
 import { translator } from "../utils/uuid"
-import { useQuery } from "@tanstack/react-query"
-import { graphQLClient } from "../utils/graphql"
 import { ImSpinner11 } from "react-icons/im"
 import Post from "../components/post/single/Post"
 import PostCommentForm from "../components/post/single/PostCommentForm"
@@ -10,28 +7,7 @@ import PostCommentFeed from "../components/post/single/PostCommentFeed"
 import { useContext } from "react"
 import Dropdown from "../components/misc/Dropdown"
 import { CommentContext } from "../contexts/CommentContext"
-
-const getPostDocument = graphql(/* GraphQL */ `
-  query SinglePost($input: PostInput!) {
-    post(input: $input) {
-      id
-      body
-      created_at
-      title
-      commentCount
-      voteSum
-      voteStatus
-      community {
-        id
-        title
-      }
-      owner {
-        id
-        username
-      }
-    }
-  }
-`)
+import { usePost } from "../graphql/useQuery"
 
 const PostPage = () => {
   const { id } = useParams()
@@ -39,15 +15,7 @@ const PostPage = () => {
 
   const { commentOrderBy, setCommentOrderBy } = useContext(CommentContext)
 
-  const { data, isLoading } = useQuery({
-    queryKey: [uuid],
-    queryFn: () =>
-      graphQLClient.request(getPostDocument, {
-        input: {
-          id: uuid,
-        },
-      }),
-  })
+  const { data, isLoading } = usePost(uuid)
 
   if (isLoading) {
     return <ImSpinner11 className="animate-spin h-12 w-12" />

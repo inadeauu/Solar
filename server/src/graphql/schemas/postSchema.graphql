@@ -10,6 +10,8 @@ type Mutation {
     @rateLimit(limit: 5, duration: 60)
   votePost(input: VotePostInput!): VotePostResult!
     @rateLimit(limit: 120, duration: 60)
+  editPost(input: EditPostInput!): EditPostResult!
+    @rateLimit(limit: 5, duration: 60)
 }
 
 type Post {
@@ -68,6 +70,32 @@ type CreatePostInputErrors {
   title: String
   body: String
   communityId: String
+}
+
+# -- EDITPOST MUTATION
+input EditPostInput {
+  postId: ID!
+  title: String!
+  body: String!
+}
+
+union EditPostResult = EditPostSuccess | EditPostInputError
+
+type EditPostSuccess implements Success {
+  successMsg: String!
+  code: Int!
+  post: Post!
+}
+
+type EditPostInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: EditPostInputErrors!
+}
+
+type EditPostInputErrors {
+  title: String
+  body: String
 }
 
 # -- VOTEPOST MUTATION

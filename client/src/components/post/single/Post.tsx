@@ -6,12 +6,14 @@ import { IoIosArrowDown } from "react-icons/io"
 import { BiComment } from "react-icons/bi"
 import { useNavigate } from "react-router-dom"
 import { translator } from "../../../utils/uuid"
+import { useAuth } from "../../../hooks/useAuth"
 
 type PostProps = {
   post: Post
 }
 
 const Post = ({ post }: PostProps) => {
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [overflown, setOverflown] = useState<boolean>(true)
   const bodyRef = useRef<HTMLDivElement | null>(null)
@@ -33,39 +35,54 @@ const Post = ({ post }: PostProps) => {
         <span className="bg-neutral-50 p-1 rounded-l-lg">
           <PostSidebar post={post} />
         </span>
-        <div className="flex flex-col gap-[6px] break-words min-w-0 px-4 py-2">
-          <span className="text-neutral-500 text-xs flex flex-col gap-[1px]">
-            <div>
-              Posted in{" "}
-              <span
-                className="text-black font-medium hover:underline hover:cursor-pointer"
+        <div className="flex flex-col gap-[6px] break-words min-w-0 w-full px-4 py-2">
+          <div className="flex items-center justify-between">
+            <span className="text-neutral-500 text-xs flex flex-col gap-[1px]">
+              <div>
+                Posted in{" "}
+                <span
+                  className="text-black font-medium hover:underline hover:cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    navigate(
+                      `/communities/${translator.fromUUID(post.community.id)}`
+                    )
+                  }}
+                >
+                  {post.community.title}
+                </span>
+                {" • "}
+                {moment(post.created_at).fromNow()}
+              </div>
+              <div>
+                Posted by{" "}
+                <span
+                  className="text-black font-medium hover:underline hover:cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    navigate(`/profile/${post.owner.username}`)
+                  }}
+                >
+                  {post.owner.username}
+                </span>
+              </div>
+            </span>
+            {user?.id == post.owner.id && (
+              <button
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  navigate(
-                    `/communities/${translator.fromUUID(post.community.id)}`
-                  )
+
+                  navigate(`/posts/${translator.fromUUID(post.id)}/edit`)
                 }}
+                className="btn_blue text-sm py-[2px] px-3"
               >
-                {post.community.title}
-              </span>
-              {" • "}
-              {moment(post.created_at).fromNow()}
-            </div>
-            <div>
-              Posted by{" "}
-              <span
-                className="text-black font-medium hover:underline hover:cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  navigate(`/profile/${post.owner.username}`)
-                }}
-              >
-                {post.owner.username}
-              </span>
-            </div>
-          </span>
+                Edit
+              </button>
+            )}
+          </div>
           <span className="font-semibold text-lg">{post.title}</span>
           {post.body && (
             <div

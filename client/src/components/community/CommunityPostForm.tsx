@@ -48,7 +48,7 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
 
   const { postOrderByType } = useContext(CommunityContext)
 
-  const createCommunity = useMutation({
+  const createPost = useMutation({
     mutationFn: async ({ title, body, communityId }: CreatePostInput) => {
       return await graphQLClient.request(createCommunityPostDocument, {
         input: { title, body, communityId },
@@ -106,7 +106,7 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
 
     if (!title) return
 
-    createCommunity.mutate({ title, body, communityId: community.id })
+    createPost.mutate({ title, body, communityId: community.id })
   }
 
   return (

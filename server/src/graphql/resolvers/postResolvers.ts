@@ -157,6 +157,73 @@ export const resolvers: Resolvers = {
         post: updatedPost,
       }
     },
+    editPost: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
+      }
+
+      const post = await prisma.post.findUnique({
+        where: { id: args.input.postId },
+        include: {
+          owner: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      if (!post) {
+        throw new GraphQLError("Post does not exist", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        })
+      }
+
+      if (post.owner.id !== req.session.userId) {
+        throw new GraphQLError("Unauthorized", {
+          extensions: { code: "UNAUTHORIZED" },
+        })
+      }
+
+      const titleError =
+        args.input.title.trim().length == 0 || args.input.title.length > 200
+      const bodyError = args.input.body && args.input.body.length > 20000
+
+      if (titleError || bodyError) {
+        return {
+          __typename: "EditPostInputError",
+          errorMsg: "Invalid input",
+          code: 400,
+          inputErrors: {
+            title: titleError
+              ? "Title must be between 1 and 200 characters long"
+              : null,
+            body: bodyError
+              ? "Body must be less than 20,000 characters long"
+              : null,
+          },
+        }
+      }
+
+      const updatedPost = await prisma.post.update({
+        where: {
+          id: args.input.postId,
+        },
+        data: {
+          title: args.input.title,
+          body: args.input.body,
+        },
+      })
+
+      return {
+        __typename: "EditPostSuccess",
+        successMsg: "Successfully edited post",
+        code: 200,
+        post: updatedPost,
+      }
+    },
   },
   Post: {
     owner: async (post) => {

@@ -15,6 +15,7 @@ import AccountSettingsPage from "./pages/AccountSettingsPage"
 import { ToastContainer, Zoom } from "react-toastify"
 import ProfilePage from "./pages/ProfilePage"
 import CommunitySettingsPage from "./pages/CommunitySettingsPage"
+import EditPostPage from "./pages/EditPostPage"
 
 const App = () => {
   return (
@@ -42,6 +43,7 @@ const App = () => {
               path="communities/:id/settings"
               element={<CommunitySettingsPage />}
             />
+            <Route path="posts/:id/edit" element={<EditPostPage />} />
           </Route>
           <Route
             path="communities/:id"

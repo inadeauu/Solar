@@ -4,6 +4,7 @@ import { Ref, useLayoutEffect, useRef, useState } from "react"
 import PostFooter from "./PostFooter"
 import type { Post } from "../../../graphql/types"
 import { translator } from "../../../utils/uuid"
+import { useAuth } from "../../../hooks/useAuth"
 
 type PostProps = {
   post: Post
@@ -18,6 +19,7 @@ const Post = ({
   queryKey,
   communityFeed = false,
 }: PostProps) => {
+  const { user } = useAuth()
   const [overflown, setOverflown] = useState<boolean>(false)
   const bodyRef = useRef<HTMLDivElement | null>(null)
   const navigate = useNavigate()
@@ -36,39 +38,54 @@ const Post = ({
       className="bg-white border border-neutral-300 rounded-lg p-4 hover:cursor-pointer hover:border-black group"
     >
       <div className="flex flex-col gap-[6px]">
-        <span className="text-neutral-500 text-xs">
-          {!communityFeed && (
-            <>
-              Posted in{" "}
-              <span
-                className="text-black font-medium hover:underline hover:cursor-pointer"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  navigate(
-                    `/communities/${translator.fromUUID(post.community.id)}`
-                  )
-                }}
-              >
-                {post.community.title}
-              </span>
-              {" • "}
-            </>
-          )}
-          Posted by{" "}
-          <span
-            className="text-black font-medium hover:underline hover:cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              navigate(`/profile/${post.owner.username}`)
-            }}
-          >
-            {post.owner.username}
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-neutral-500 text-xs">
+            {!communityFeed && (
+              <>
+                Posted in{" "}
+                <span
+                  className="text-black font-medium hover:underline hover:cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    navigate(
+                      `/communities/${translator.fromUUID(post.community.id)}`
+                    )
+                  }}
+                >
+                  {post.community.title}
+                </span>
+                {" • "}
+              </>
+            )}
+            Posted by{" "}
+            <span
+              className="text-black font-medium hover:underline hover:cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                navigate(`/profile/${post.owner.username}`)
+              }}
+            >
+              {post.owner.username}
+            </span>
+            {" • "}
+            {moment(post.created_at).fromNow()}
           </span>
-          {" • "}
-          {moment(post.created_at).fromNow()}
-        </span>
+          {user?.id == post.owner.id && (
+            <button
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+
+                navigate(`/posts/${translator.fromUUID(post.id)}/edit`)
+              }}
+              className="btn_blue text-sm py-[2px] px-3"
+            >
+              Edit
+            </button>
+          )}
+        </div>
         <span className="font-semibold text-lg">{post.title}</span>
         {post.body && (
           <div ref={bodyRef} className="max-h-[250px] overflow-hidden">

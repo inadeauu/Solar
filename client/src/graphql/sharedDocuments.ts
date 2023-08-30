@@ -123,3 +123,25 @@ export const communityTitleExistsDocument = graphql(/* GraphQL */ `
     titleExists(title: $title)
   }
 `)
+
+export const getPostDocument = graphql(/* GraphQL */ `
+  query SinglePost($input: PostInput!) {
+    post(input: $input) {
+      id
+      body
+      created_at
+      title
+      commentCount
+      voteSum
+      voteStatus
+      community {
+        id
+        title
+      }
+      owner {
+        id
+        username
+      }
+    }
+  }
+`)

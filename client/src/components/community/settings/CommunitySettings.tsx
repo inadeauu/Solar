@@ -1,4 +1,4 @@
-import { Navigate, useParams } from "react-router-dom"
+import { Navigate, useNavigate, useParams } from "react-router-dom"
 import { useCommunity } from "../../../graphql/useQuery"
 import { ImSpinner11 } from "react-icons/im"
 import { useAuth } from "../../../hooks/useAuth"
@@ -10,6 +10,7 @@ import DeleteCommunityModal from "./DeleteCommunityModal"
 const CommunitySettings = () => {
   const { user } = useAuth()
   const { id } = useParams()
+  const navigate = useNavigate()
 
   const [changeTitleModalOpen, setChangeTitleModalOpen] =
     useState<boolean>(false)
@@ -21,8 +22,10 @@ const CommunitySettings = () => {
 
   if (isLoading) {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
-  } else if (!data?.community || data.community.owner.id !== user?.id) {
+  } else if (!data?.community) {
     return <Navigate to="/404-not-found" />
+  } else if (data.community.owner.id !== user?.id) {
+    navigate(-1)
   }
 
   return (

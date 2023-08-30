@@ -69,7 +69,7 @@ export const resolvers: Resolvers = {
         }
       }
 
-      if (args.input.title.length > 25) {
+      if (args.input.title.trim().length > 25) {
         return {
           __typename: "CreateCommunityInputError",
           errorMsg: "Invalid input",
@@ -112,7 +112,7 @@ export const resolvers: Resolvers = {
       })
 
       if (!community) {
-        throw new GraphQLError("Request failed", {
+        throw new GraphQLError("Community does not exist", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         })
       }
@@ -153,6 +153,127 @@ export const resolvers: Resolvers = {
         successMsg,
         code: 200,
         community: updatedCommunity,
+      }
+    },
+    changeCommunityTitle: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
+      }
+
+      const community = await prisma.community.findFirst({
+        where: { id: args.input.id },
+        include: {
+          owner: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      if (!community) {
+        throw new GraphQLError("Community does not exist", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        })
+      }
+
+      if (community.owner.id !== req.session.userId) {
+        throw new GraphQLError("Unauthorized", {
+          extensions: { code: "UNAUTHORIZED" },
+        })
+      }
+
+      const checkTitle = await prisma.community.findFirst({
+        where: { title: args.input.newTitle },
+      })
+
+      if (checkTitle) {
+        return {
+          __typename: "ChangeCommunityTitleInputError",
+          errorMsg: "Invalid input",
+          inputErrors: {
+            newTitle: "Community title already in use",
+          },
+          code: 400,
+        }
+      }
+
+      if (args.input.newTitle.trim().length > 25) {
+        return {
+          __typename: "ChangeCommunityTitleInputError",
+          errorMsg: "Invalid input",
+          code: 400,
+          inputErrors: {
+            newTitle: "Title must be less than 25 characters long",
+          },
+        }
+      }
+
+      const updatedCommunity = await prisma.community.update({
+        where: { id: args.input.id },
+        data: {
+          title: args.input.newTitle,
+        },
+      })
+
+      return {
+        __typename: "ChangeCommunityTitleSuccess",
+        successMsg: "Successfully changed community title",
+        code: 200,
+        community: updatedCommunity,
+      }
+    },
+    deleteCommunity: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
+      }
+
+      const community = await prisma.community.findFirst({
+        where: { id: args.input.id },
+        include: {
+          owner: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      if (!community) {
+        throw new GraphQLError("Community does not exist", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        })
+      }
+
+      if (community.owner.id !== req.session.userId) {
+        throw new GraphQLError("Unauthorized", {
+          extensions: { code: "UNAUTHORIZED" },
+        })
+      }
+
+      const titleError = args.input.title !== community.title
+
+      if (titleError) {
+        return {
+          __typename: "DeleteCommunityInputError",
+          errorMsg: "Invalid title",
+          inputErrors: {
+            title: "Please enter your community's title",
+          },
+          code: 400,
+        }
+      }
+
+      await prisma.community.delete({ where: { id: args.input.id } })
+
+      return {
+        __typename: "DeleteCommunitySuccess",
+        successMsg: "Successfully deleted community",
+        code: 200,
       }
     },
   },

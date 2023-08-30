@@ -1,14 +1,19 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { pluralize } from "../../utils/utils"
 import JoinCommunityButton from "./CommunityJoinButton"
 import moment from "moment"
 import type { Community } from "../../graphql/types"
+import { useAuth } from "../../hooks/useAuth"
+import { translator } from "../../utils/uuid"
 
 type CommunitySidebarProps = {
   community: Community
 }
 
 const CommunitySidebar = ({ community }: CommunitySidebarProps) => {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+
   return (
     <aside className="p-4 sticky top-[80px] bg-white w-[300px] shrink-0 h-fit rounded-lg border border-neutral-300 md-max:hidden">
       <div className="flex flex-col gap-4 break-words">
@@ -33,7 +38,23 @@ const CommunitySidebar = ({ community }: CommunitySidebarProps) => {
             </Link>
           </span>
         </div>
-        <JoinCommunityButton className="py-[2px]" community={community} />
+        {community.owner.id !== user?.id ? (
+          <JoinCommunityButton className="py-[2px]" community={community} />
+        ) : (
+          <button
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+
+              navigate(
+                `/communities/${translator.fromUUID(community.id)}/settings`
+              )
+            }}
+            className="btn_blue py-[2px]"
+          >
+            Edit
+          </button>
+        )}
       </div>
     </aside>
   )

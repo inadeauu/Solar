@@ -34,8 +34,8 @@ const getPostDocument = graphql(/* GraphQL */ `
 `)
 
 const PostPage = () => {
-  const { title, id } = useParams()
-  const uuid = translator.toUUID(id!)
+  const { id } = useParams()
+  const uuid = translator.toUUID(id || "")
 
   const { commentOrderBy, setCommentOrderBy } = useContext(CommentContext)
 
@@ -51,7 +51,7 @@ const PostPage = () => {
 
   if (isLoading) {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
-  } else if (!data?.post || data.post.title !== title) {
+  } else if (!data?.post) {
     return <Navigate to="/404-not-found" />
   }
 

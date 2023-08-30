@@ -29,7 +29,8 @@ export const resolvers: Resolvers = {
   Mutation: {
     registerUsername: async (_0, args) => {
       const usernameError =
-        args.input.username.length < 5 || args.input.username.length > 15
+        args.input.username.trim().length < 5 ||
+        args.input.username.trim().length > 15
       const passwordError = args.input.password.length < 8
 
       if (usernameError || passwordError) {

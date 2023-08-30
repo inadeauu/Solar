@@ -1,5 +1,4 @@
 import { Navigate, useParams } from "react-router-dom"
-import { translator } from "../utils/uuid"
 import { ImSpinner11 } from "react-icons/im"
 import CommunitySidebar from "../components/community/CommunitySidebar"
 import CommunityPostFeed from "../components/community/CommunityPostFeed"
@@ -9,16 +8,19 @@ import { useCommunity } from "../graphql/useQuery"
 import { useContext } from "react"
 import Dropdown from "../components/misc/Dropdown"
 import { CommunityContext } from "../contexts/CommunityContext"
+import { translator } from "../utils/uuid"
 
 const CommunityPage = () => {
-  const { title, id } = useParams()
-  const { data, isLoading } = useCommunity(translator.toUUID(id!))
+  const { id } = useParams()
+  const { data, isLoading } = useCommunity(translator.toUUID(id || ""))
+
+  console.log(data)
 
   const { postOrderBy, setPostOrderBy } = useContext(CommunityContext)
 
   if (isLoading) {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
-  } else if (!data?.community || data.community.title !== title) {
+  } else if (!data?.community) {
     return <Navigate to="/404-not-found" />
   }
 

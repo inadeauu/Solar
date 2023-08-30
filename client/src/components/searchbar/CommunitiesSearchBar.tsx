@@ -4,7 +4,6 @@ import { graphQLClient } from "../../utils/graphql"
 import { useNavigate } from "react-router-dom"
 import { pluralize } from "../../utils/utils"
 import abbreviate from "number-abbreviate"
-import { AiOutlineSearch } from "react-icons/ai"
 import { translator } from "../../utils/uuid"
 
 type CommunitiesSearchBarProps = {
@@ -29,7 +28,6 @@ const getCommunitySearchResultsDocument = graphql(/* GraphQL */ `
 
 const CommunitiesSearchBar = ({
   debouncedSearch,
-  search,
 }: CommunitiesSearchBarProps) => {
   const navigate = useNavigate()
 
@@ -53,14 +51,12 @@ const CommunitiesSearchBar = ({
     >
       {data?.communities?.edges && data.communities.edges.length ? (
         data.communities.edges.map((edge) => {
-          const id: string = translator.fromUUID(edge.node.id)
-
           return (
             <div
               key={edge.node.id}
               className="flex flex-col px-2 py-1 hover:bg-neutral-200 cursor-pointer overflow-auto"
               onMouseDown={() => {
-                navigate(`/communities/${edge.node.title}/${id}`)
+                navigate(`/communities/${translator.fromUUID(edge.node.id)}`)
               }}
             >
               <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
@@ -76,15 +72,6 @@ const CommunitiesSearchBar = ({
       ) : (
         <span className="px-2 py-1 text-sm">No results</span>
       )}
-      <div
-        className={`px-2 py-2 text-sm text-ellipses hover:bg-neutral-200 border-t border-neutral-300 text-ellipsis whitespace-nowrap overflow-hidden cursor-pointer ${
-          !search && "hidden"
-        }`}
-        onMouseDown={() => navigate("/signup")}
-      >
-        <AiOutlineSearch className="w-4 h-4 inline-block mr-2" />
-        Search for "{search}"
-      </div>
     </div>
   )
 }

@@ -46,6 +46,40 @@ export const getCommunityDocument = graphql(/* GraphQL */ `
   }
 `)
 
+export const getPostFeedDocument = graphql(/* GraphQL */ `
+  query PostFeed($input: PostsInput!) {
+    posts(input: $input) {
+      edges {
+        node {
+          id
+          body
+          created_at
+          title
+          commentCount
+          voteSum
+          voteStatus
+          community {
+            id
+            title
+          }
+          owner {
+            id
+            username
+          }
+        }
+      }
+      pageInfo {
+        endCursor {
+          id
+          voteSum
+          created_at
+        }
+        hasNextPage
+      }
+    }
+  }
+`)
+
 export const getCommentFeedDocument = graphql(/* GraphQL */ `
   query CommentFeed($input: CommentsInput!) {
     comments(input: $input) {
@@ -84,36 +118,8 @@ export const usernameExistsDocument = graphql(/* GraphQL */ `
   }
 `)
 
-export const getPostFeedDocument = graphql(/* GraphQL */ `
-  query PostFeed($input: PostsInput!) {
-    posts(input: $input) {
-      edges {
-        node {
-          id
-          body
-          created_at
-          title
-          commentCount
-          voteSum
-          voteStatus
-          community {
-            id
-            title
-          }
-          owner {
-            id
-            username
-          }
-        }
-      }
-      pageInfo {
-        endCursor {
-          id
-          voteSum
-          created_at
-        }
-        hasNextPage
-      }
-    }
+export const communityTitleExistsDocument = graphql(/* GraphQL */ `
+  query CommunityTitleExists($title: String!) {
+    titleExists(title: $title)
   }
 `)

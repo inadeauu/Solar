@@ -36,15 +36,14 @@ const Post = ({ post }: PostProps) => {
         <div className="flex flex-col gap-[6px] break-words min-w-0 px-4 py-2">
           <span className="text-neutral-500 text-xs flex flex-col gap-[1px]">
             <div>
+              Posted in{" "}
               <span
                 className="text-black font-medium hover:underline hover:cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
                   navigate(
-                    `/communities/${post.community.title}/${translator.fromUUID(
-                      post.community.id
-                    )}`
+                    `/communities/${translator.fromUUID(post.community.id)}`
                   )
                 }}
               >

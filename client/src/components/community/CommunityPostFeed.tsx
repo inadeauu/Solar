@@ -66,7 +66,7 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
           page.posts.edges.map((edge, i) => {
             return (
               <Post
-                insideCommunity={true}
+                communityFeed={true}
                 innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
                 key={edge.node.id}
                 post={edge.node}

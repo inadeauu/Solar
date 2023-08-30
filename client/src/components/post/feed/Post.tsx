@@ -9,10 +9,15 @@ type PostProps = {
   post: Post
   innerRef?: Ref<HTMLAnchorElement> | undefined
   queryKey: any[]
-  insideCommunity: boolean
+  communityFeed?: boolean
 }
 
-const Post = ({ post, innerRef, queryKey, insideCommunity }: PostProps) => {
+const Post = ({
+  post,
+  innerRef,
+  queryKey,
+  communityFeed = false,
+}: PostProps) => {
   const [overflown, setOverflown] = useState<boolean>(false)
   const bodyRef = useRef<HTMLDivElement | null>(null)
   const navigate = useNavigate()
@@ -27,46 +32,43 @@ const Post = ({ post, innerRef, queryKey, insideCommunity }: PostProps) => {
   return (
     <Link
       ref={innerRef}
-      to={`/posts/${post.title}/${translator.fromUUID(post.id)}`}
+      to={`/posts/${translator.fromUUID(post.id)}`}
       className="bg-white border border-neutral-300 rounded-lg p-4 hover:cursor-pointer hover:border-black group"
     >
       <div className="flex flex-col gap-[6px]">
-        <div className="flex items-center justify-between">
-          <span className="text-neutral-500 text-xs">
-            {!insideCommunity && (
-              <>
-                <span
-                  className="text-black font-medium hover:underline hover:cursor-pointer"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    navigate(
-                      `/communities/${
-                        post.community.title
-                      }/${translator.fromUUID(post.community.id)}`
-                    )
-                  }}
-                >
-                  {post.community.title}
-                </span>
-                {" • "}
-              </>
-            )}
-            Posted by{" "}
-            <span
-              className="text-black font-medium hover:underline hover:cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                navigate(`/profile/${post.owner.username}`)
-              }}
-            >
-              {post.owner.username}
-            </span>
-            {" • "}
-            {moment(post.created_at).fromNow()}
+        <span className="text-neutral-500 text-xs">
+          {!communityFeed && (
+            <>
+              Posted in{" "}
+              <span
+                className="text-black font-medium hover:underline hover:cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  navigate(
+                    `/communities/${translator.fromUUID(post.community.id)}`
+                  )
+                }}
+              >
+                {post.community.title}
+              </span>
+              {" • "}
+            </>
+          )}
+          Posted by{" "}
+          <span
+            className="text-black font-medium hover:underline hover:cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              navigate(`/profile/${post.owner.username}`)
+            }}
+          >
+            {post.owner.username}
           </span>
-        </div>
+          {" • "}
+          {moment(post.created_at).fromNow()}
+        </span>
         <span className="font-semibold text-lg">{post.title}</span>
         {post.body && (
           <div ref={bodyRef} className="max-h-[250px] overflow-hidden">

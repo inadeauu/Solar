@@ -56,7 +56,7 @@ export const resolvers: Resolvers = {
 
       if (!user) {
         throw new GraphQLError("User does not exist", {
-          extensions: { code: "UNAUTHORIZED" },
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
         })
       }
 
@@ -76,7 +76,8 @@ export const resolvers: Resolvers = {
       }
 
       const usernameError =
-        args.input.newUsername.length < 5 || args.input.newUsername.length > 15
+        args.input.newUsername.trim().length < 5 ||
+        args.input.newUsername.trim().length > 15
       const passwordError = !(await bcrypt.compare(
         args.input.password,
         user.password
@@ -123,7 +124,7 @@ export const resolvers: Resolvers = {
 
       if (!user) {
         throw new GraphQLError("User does not exist", {
-          extensions: { code: "UNAUTHORIZED" },
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
         })
       }
 
@@ -175,7 +176,7 @@ export const resolvers: Resolvers = {
 
       if (!user) {
         throw new GraphQLError("User does not exist", {
-          extensions: { code: "UNAUTHORIZED" },
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
         })
       }
 

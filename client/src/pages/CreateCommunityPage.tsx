@@ -11,12 +11,7 @@ import { FieldState, FieldStates, initialFieldState } from "../types/shared"
 import { setFieldStateSuccess, setFieldStateValue } from "../utils/form"
 import { toast } from "react-toastify"
 import ErrorCard from "../components/misc/ErrorCard"
-
-const communityTitleExistsDocument = graphql(/* GraphQL */ `
-  query CommunityTitleExists($title: String!) {
-    titleExists(title: $title)
-  }
-`)
+import { communityTitleExistsDocument } from "../graphql/sharedDocuments"
 
 const createCommunityDocument = graphql(/* GraphQL */ `
   mutation CreateCommunity($input: CreateCommunityInput!) {

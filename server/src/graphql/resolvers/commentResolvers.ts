@@ -34,11 +34,18 @@ export const resolvers: Resolvers = {
 
       const bodyError =
         args.input.body.trim().length <= 0 || args.input.body.length > 2000
+
       const post = await prisma.post.findUnique({
         where: { id: args.input.postId },
       })
 
-      if (bodyError || !post) {
+      if (!post) {
+        throw new GraphQLError("Post does not exist", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        })
+      }
+
+      if (bodyError) {
         return {
           __typename: "CreateCommentInputError",
           errorMsg: "Invalid input",
@@ -47,7 +54,6 @@ export const resolvers: Resolvers = {
             body: bodyError
               ? "Body must be less than 2000 characters long"
               : null,
-            postId: !post ? "Invalid post ID" : null,
           },
         }
       }
@@ -81,7 +87,13 @@ export const resolvers: Resolvers = {
         where: { id: args.input.commentId },
       })
 
-      if (!parentComment || parentComment.parentId) {
+      if (!parentComment) {
+        throw new GraphQLError("Parent comment does not exist", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        })
+      }
+
+      if (bodyError || parentComment.parentId) {
         return {
           __typename: "CreateCommentReplyInputError",
           errorMsg: "Invalid input",
@@ -90,10 +102,7 @@ export const resolvers: Resolvers = {
             body: bodyError
               ? "Body must be less than 2000 characters long"
               : null,
-            commentId:
-              !parentComment || parentComment.parentId
-                ? "Invalid comment ID"
-                : null,
+            commentId: parentComment.parentId ? "Invalid comment ID" : null,
           },
         }
       }
@@ -125,7 +134,7 @@ export const resolvers: Resolvers = {
       })
 
       if (!comment) {
-        throw new GraphQLError("Request failed", {
+        throw new GraphQLError("Comment does not exist", {
           extensions: { code: "INTERNAL_SERVER_ERROR" },
         })
       }

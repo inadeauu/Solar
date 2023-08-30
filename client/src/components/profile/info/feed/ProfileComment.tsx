@@ -37,11 +37,7 @@ const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                navigate(
-                  `/posts/${comment.post.title}/${translator.fromUUID(
-                    comment.post.id
-                  )}`
-                )
+                navigate(`/posts/${translator.fromUUID(comment.post.id)}`)
               }}
             >
               {comment.post.title}
@@ -53,11 +49,7 @@ const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                navigate(
-                  `/communities/${
-                    comment.post.community.title
-                  }/${translator.fromUUID(comment.post.community.id)}`
-                )
+                navigate(`/communities/${comment.post.community.title}`)
               }}
             >
               {comment.post.community.title}

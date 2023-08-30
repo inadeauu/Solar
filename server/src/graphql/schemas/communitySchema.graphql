@@ -11,6 +11,11 @@ type Mutation {
     @rateLimit(limit: 5, duration: 60)
   userJoinCommunity(input: UserJoinCommunityInput!): UserJoinCommunityResult!
     @rateLimit(limit: 20, duration: 60)
+  changeCommunityTitle(
+    input: ChangeCommunityTitleInput!
+  ): ChangeCommunityTitleResult! @rateLimit(limit: 10, duration: 600)
+  deleteCommunity(input: DeleteCommunityInput!): DeleteCommunityResult!
+    @rateLimit(limit: 10, duration: 600)
 }
 
 type Community {
@@ -65,6 +70,55 @@ type CreateCommunityInputError implements Error {
 }
 
 type CreateCommunityInputErrors {
+  title: String
+}
+
+# -- CHANGETITLE MUTATION
+input ChangeCommunityTitleInput {
+  id: ID!
+  newTitle: String!
+}
+
+union ChangeCommunityTitleResult =
+    ChangeCommunityTitleSuccess
+  | ChangeCommunityTitleInputError
+
+type ChangeCommunityTitleSuccess implements Success {
+  successMsg: String!
+  code: Int!
+  community: Community!
+}
+
+type ChangeCommunityTitleInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: ChangeCommunityTitleInputErrors!
+}
+
+type ChangeCommunityTitleInputErrors {
+  newTitle: String!
+}
+
+# -- DELETECOMMUNITY MUTATION
+input DeleteCommunityInput {
+  id: ID!
+  title: String!
+}
+
+union DeleteCommunityResult = DeleteCommunitySuccess | DeleteCommunityInputError
+
+type DeleteCommunitySuccess implements Success {
+  successMsg: String!
+  code: Int!
+}
+
+type DeleteCommunityInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: DeleteCommunityInputErrors
+}
+
+type DeleteCommunityInputErrors {
   title: String
 }
 

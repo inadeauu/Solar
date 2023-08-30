@@ -14,6 +14,7 @@ import CommunityContextProvider from "./contexts/CommunityContext"
 import AccountSettingsPage from "./pages/AccountSettingsPage"
 import { ToastContainer, Zoom } from "react-toastify"
 import ProfilePage from "./pages/ProfilePage"
+import CommunitySettingsPage from "./pages/CommunitySettingsPage"
 
 const App = () => {
   return (
@@ -37,9 +38,13 @@ const App = () => {
           <Route element={<ProtectedRoute />}>
             <Route path="create-community" element={<CreateCommunityPage />} />
             <Route path="settings" element={<AccountSettingsPage />} />
+            <Route
+              path="communities/:id/settings"
+              element={<CommunitySettingsPage />}
+            />
           </Route>
           <Route
-            path="communities/:title/:id"
+            path="communities/:id"
             element={
               <CommunityContextProvider>
                 <CommunityPage />
@@ -47,7 +52,7 @@ const App = () => {
             }
           />
           <Route
-            path="posts/:title/:id"
+            path="posts/:id"
             element={
               <CommentContextProvider>
                 <PostPage />

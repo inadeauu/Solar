@@ -4,15 +4,15 @@ import { CommunityQuery } from "../graphql_codegen/graphql"
 import { getCommunityDocument } from "./sharedDocuments"
 
 export const useCommunity = (
-  communityId: string | undefined,
+  id: string | undefined,
   options?: UseQueryOptions<CommunityQuery>
 ) =>
   useQuery<CommunityQuery>(
-    [communityId],
+    ["community", id],
     () =>
       graphQLClient.request(getCommunityDocument, {
         input: {
-          id: communityId ?? "",
+          id: id ?? "",
         },
       }),
     options

@@ -147,7 +147,7 @@ const LoginPage = () => {
 
   return (
     <div className="flex h-screen">
-      <div className="bg-white m-auto rounded-xl max-h-[450px] max-w-[550px] w-[90%] h-[90%] p-4 overflow-scroll border border-black">
+      <div className="bg-white m-auto rounded-xl max-h-[400px] max-w-[550px] w-[90%] h-[90%] p-4 overflow-scroll border border-black">
         <Link to="/" className="flex gap-2 hover:underline">
           <AiOutlineHome className="w-5 h-5" />
           <p className="text-sm mt-[1px]">Home</p>

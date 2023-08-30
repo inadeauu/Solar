@@ -276,6 +276,7 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
             }}
             error={fieldStates.username.error}
             errorMsg={fieldStates.username.errorMsg}
+            success={fieldStates.username.success}
           />
         </div>
         <button

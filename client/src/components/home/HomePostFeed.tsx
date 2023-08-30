@@ -1,19 +1,14 @@
-import { useInView } from "react-intersection-observer"
-import { User } from "../../../../graphql/types"
-import { useInfiniteQuery } from "@tanstack/react-query"
-import { graphQLClient } from "../../../../utils/graphql"
-import { getPostFeedDocument } from "../../../../graphql/sharedDocuments"
 import { useEffect, useState } from "react"
+import { useInView } from "react-intersection-observer"
+import { getPostOrderByType } from "../../utils/utils"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import { graphQLClient } from "../../utils/graphql"
+import { getPostFeedDocument } from "../../graphql/sharedDocuments"
 import { ImSpinner11 } from "react-icons/im"
-import Post from "../../../post/feed/Post"
-import Dropdown from "../../../misc/Dropdown"
-import { getPostOrderByType } from "../../../../utils/utils"
+import Dropdown from "../misc/Dropdown"
+import Post from "../post/feed/Post"
 
-type ProfilePostFeedProps = {
-  user: User
-}
-
-const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
+const HomeFeed = () => {
   const { ref, inView } = useInView()
 
   const [postOrderBy, setPostOrderBy] = useState<string>("New")
@@ -28,12 +23,11 @@ const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ["profilePostFeed", user.username, postOrderByType],
+    ["homePostFeed", postOrderByType],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getPostFeedDocument, {
         input: {
           filters: {
-            userId: user.id,
             orderBy: postOrderByType,
           },
           paginate: { first: 10, after: pageParam },
@@ -83,7 +77,7 @@ const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
                 innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
                 key={edge.node.id}
                 post={edge.node}
-                queryKey={["profilePostFeed", user.username, postOrderByType]}
+                queryKey={["homePostFeed", postOrderByType]}
               />
             )
           })
@@ -95,4 +89,4 @@ const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
   )
 }
 
-export default ProfilePostFeed
+export default HomeFeed

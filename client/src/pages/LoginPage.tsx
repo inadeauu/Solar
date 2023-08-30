@@ -1,12 +1,8 @@
 import { AiOutlineHome } from "react-icons/ai"
-import { FcGoogle } from "react-icons/fc"
-import { BsGithub } from "react-icons/bs"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { AxiosError } from "axios"
 import ErrorCard from "../components/misc/ErrorCard"
 import { ImSpinner11 } from "react-icons/im"
-import { api } from "../utils/axios"
 import { useMutation } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
 import { graphql } from "../graphql_codegen/gql"
@@ -97,17 +93,6 @@ const LoginPage = () => {
     }
   }
 
-  const socialSignIn = async (provider: string) => {
-    try {
-      const response = await api.get(`/auth/${provider}`)
-      window.location.assign(response.data.data.url)
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        setError("Error logging in")
-      }
-    }
-  }
-
   const usernameSignIn = useMutation({
     mutationFn: async ({ username, password }: LoginUsernameInput) => {
       return graphQLClient.request(usernameLoginDocument, {
@@ -160,12 +145,9 @@ const LoginPage = () => {
     })
   }
 
-  const inputStyle =
-    "flex justify-center items-center gap-3 border border-neutral-500 rounded-full py-2 hover:bg-neutral-100 transition-colors duration-200 xs-max:text-sm"
-
   return (
     <div className="flex h-screen">
-      <div className="bg-white m-auto rounded-xl max-h-[550px] max-w-[550px] w-[90%] h-[90%] p-4 overflow-scroll border border-black">
+      <div className="bg-white m-auto rounded-xl max-h-[450px] max-w-[550px] w-[90%] h-[90%] p-4 overflow-scroll border border-black">
         <Link to="/" className="flex gap-2 hover:underline">
           <AiOutlineHome className="w-5 h-5" />
           <p className="text-sm mt-[1px]">Home</p>
@@ -175,33 +157,6 @@ const LoginPage = () => {
             Log In
           </h1>
           {error && <ErrorCard error={error} className="mb-4" />}
-          <div className="flex flex-col gap-5">
-            <button
-              type="button"
-              className={inputStyle}
-              onClick={() => socialSignIn("google")}
-            >
-              <FcGoogle className="h-5 w-5" />
-              Continue with Google
-            </button>
-            <button
-              type="button"
-              className={inputStyle}
-              onClick={() => socialSignIn("github")}
-            >
-              <BsGithub className="h-5 w-5" />
-              Continue with Github
-            </button>
-          </div>
-          <div className="flex my-3 items-center">
-            <hr className="grow h-[2px] bg-black" />
-            <div className="rounded-full p-3 border border-black relative">
-              <p className="absolute translate-x-[-50%] translate-y-[-50%] text-sm font-light">
-                or
-              </p>
-            </div>
-            <hr className="grow h-[2px] bg-black" />
-          </div>
           <TextInput
             name="username"
             type="text"
@@ -246,7 +201,7 @@ const LoginPage = () => {
               submitUsernameLogin()
               setSubmitting(false)
             }}
-            className="btn_blue py-2 mt-2 w-[60%] mx-auto"
+            className="btn_blue py-1 px-10 mt-2 mx-auto"
             disabled={submitting}
           >
             {submitting ? (

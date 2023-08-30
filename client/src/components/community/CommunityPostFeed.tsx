@@ -54,7 +54,7 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
   if (isSuccess && !data.pages[0].posts.edges.length) {
     return (
       <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-        No posts
+        No Posts
       </span>
     )
   }

@@ -59,9 +59,18 @@ const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
 
   if (isSuccess && !data.pages[0].posts.edges.length) {
     return (
-      <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-        No Posts
-      </span>
+      <div className="flex flex-col gap-5">
+        <Dropdown
+          className="py-1"
+          width="w-[65px]"
+          items={["New", "Old", "Top", "Low"]}
+          value={postOrderBy}
+          setValue={setPostOrderBy}
+        />
+        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
+          No Posts
+        </span>
+      </div>
     )
   }
 

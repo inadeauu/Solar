@@ -106,9 +106,27 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
 
   if (isSuccess && !data.pages[0].comments.edges.length) {
     return (
-      <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-        No Comments
-      </span>
+      <div className="flex flex-col gap-5">
+        <div className="flex gap-4">
+          <Dropdown
+            className="py-1"
+            width="w-[65px]"
+            items={["New", "Old", "Top", "Low"]}
+            value={commentOrderBy}
+            setValue={setCommentOrderBy}
+          />
+          <Dropdown
+            className="py-1"
+            width="w-[95px]"
+            items={["Top level", "Reply"]}
+            value={commentFilter}
+            setValue={setCommentFilter}
+          />
+        </div>
+        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
+          No Comments
+        </span>
+      </div>
     )
   }
 

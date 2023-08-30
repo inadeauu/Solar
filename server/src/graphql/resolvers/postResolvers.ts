@@ -224,6 +224,44 @@ export const resolvers: Resolvers = {
         post: updatedPost,
       }
     },
+    deletePost: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
+      }
+
+      const post = await prisma.post.findUnique({
+        where: { id: args.input.postId },
+        include: {
+          owner: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      if (!post) {
+        throw new GraphQLError("Post does not exist", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        })
+      }
+
+      if (post.owner.id !== req.session.userId) {
+        throw new GraphQLError("Unauthorized", {
+          extensions: { code: "UNAUTHORIZED" },
+        })
+      }
+
+      await prisma.post.delete({ where: { id: args.input.postId } })
+
+      return {
+        __typename: "DeletePostSuccess",
+        successMsg: "Successfully deleted post",
+        code: 200,
+      }
+    },
   },
   Post: {
     owner: async (post) => {

@@ -12,6 +12,8 @@ type Mutation {
     @rateLimit(limit: 120, duration: 60)
   editPost(input: EditPostInput!): EditPostResult!
     @rateLimit(limit: 5, duration: 60)
+  deletePost(input: DeletePostInput!): DeletePostResult!
+    @rateLimit(limit: 5, duration: 60)
 }
 
 type Post {
@@ -96,6 +98,18 @@ type EditPostInputError implements Error {
 type EditPostInputErrors {
   title: String
   body: String
+}
+
+# -- DELETEPOST MUTATION
+input DeletePostInput {
+  postId: ID!
+}
+
+union DeletePostResult = DeletePostSuccess
+
+type DeletePostSuccess implements Success {
+  successMsg: String!
+  code: Int!
 }
 
 # -- VOTEPOST MUTATION

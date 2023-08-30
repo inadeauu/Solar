@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useLayoutEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { ImSpinner11 } from "react-icons/im"
@@ -151,6 +151,16 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
     deletePost.mutate({ postId: post.id })
   }
 
+  const updateTextAreaHeight = () => {
+    if (!textAreaRef.current) return
+    textAreaRef.current.style.height = "100px"
+    textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`
+  }
+
+  useLayoutEffect(() => {
+    updateTextAreaHeight()
+  }, [body])
+
   return (
     <>
       <div className="bg-white border border-neutral-300 rounded-lg p-4">
@@ -217,12 +227,9 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
                   setDeletePostModalOpen(true)
                 }}
                 className="btn_red px-3 py-1"
+                disabled={submittingDelete}
               >
-                {submittingDelete ? (
-                  <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" />
-                ) : (
-                  "Delete"
-                )}
+                Delete
               </button>
               <button
                 type="button"

@@ -13,6 +13,10 @@ type Mutation {
   ): CreateCommentReplyResult! @rateLimit(limit: 10, duration: 60)
   voteComment(input: VoteCommentInput!): VoteCommentResult!
     @rateLimit(limit: 120, duration: 60)
+  editComment(input: EditCommentInput!): EditCommentResult!
+    @rateLimit(limit: 5, duration: 60)
+  deleteComment(input: DeleteCommentInput!): DeleteCommentResult!
+    @rateLimit(limit: 5, duration: 60)
 }
 
 type Comment {
@@ -96,6 +100,42 @@ type CreateCommentReplyInputError implements Error {
 type CreateCommentReplyInputErrors {
   body: String
   commentId: String
+}
+
+# -- EDITCOMMENT MUTATION
+union EditCommentResult = EditCommentSuccess | EditCommentInputError
+
+input EditCommentInput {
+  commentId: ID!
+  body: String!
+}
+
+type EditCommentSuccess implements Success {
+  successMsg: String!
+  code: Int!
+  comment: Comment!
+}
+
+type EditCommentInputError implements Error {
+  errorMsg: String!
+  code: Int!
+  inputErrors: EditCommentInputErrors!
+}
+
+type EditCommentInputErrors {
+  body: String
+}
+
+# -- DELETECOMMENT MUTATION
+input DeleteCommentInput {
+  commentId: ID!
+}
+
+union DeleteCommentResult = DeleteCommentSuccess
+
+type DeleteCommentSuccess implements Success {
+  successMsg: String!
+  code: Int!
 }
 
 # -- VOTECOMMENT MUTATION

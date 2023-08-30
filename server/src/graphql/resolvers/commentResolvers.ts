@@ -213,6 +213,104 @@ export const resolvers: Resolvers = {
         comment: updatedComment,
       }
     },
+    editComment: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
+      }
+
+      const comment = await prisma.comment.findUnique({
+        where: { id: args.input.commentId },
+        include: {
+          owner: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      if (!comment) {
+        throw new GraphQLError("Comment does not exist", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        })
+      }
+
+      if (comment.owner.id !== req.session.userId) {
+        throw new GraphQLError("Unauthorized", {
+          extensions: { code: "UNAUTHORIZED" },
+        })
+      }
+
+      const bodyError =
+        args.input.body.trim().length <= 0 || args.input.body.length > 2000
+
+      if (bodyError) {
+        return {
+          __typename: "EditCommentInputError",
+          errorMsg: "Invalid input",
+          code: 400,
+          inputErrors: {
+            body: "Body must be less than 2000 characters long",
+          },
+        }
+      }
+
+      const updatedComment = await prisma.comment.update({
+        where: {
+          id: args.input.commentId,
+        },
+        data: {
+          body: args.input.body,
+        },
+      })
+
+      return {
+        __typename: "EditCommentSuccess",
+        successMsg: "Successfully edited comment",
+        code: 200,
+        comment: updatedComment,
+      }
+    },
+    deleteComment: async (_0, args, { req }) => {
+      if (!req.session.userId) {
+        throw new GraphQLError("Not signed in", {
+          extensions: { code: "UNAUTHENTICATED" },
+        })
+      }
+
+      const comment = await prisma.comment.findUnique({
+        where: { id: args.input.commentId },
+        include: {
+          owner: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+
+      if (!comment) {
+        throw new GraphQLError("Post does not exist", {
+          extensions: { code: "INTERNAL_SERVER_ERROR" },
+        })
+      }
+
+      if (comment.owner.id !== req.session.userId) {
+        throw new GraphQLError("Unauthorized", {
+          extensions: { code: "UNAUTHORIZED" },
+        })
+      }
+
+      await prisma.comment.delete({ where: { id: args.input.commentId } })
+
+      return {
+        __typename: "DeleteCommentSuccess",
+        successMsg: "Successfully deleted comment",
+        code: 200,
+      }
+    },
   },
   Comment: {
     owner: async (comment) => {

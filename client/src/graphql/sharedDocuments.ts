@@ -145,3 +145,23 @@ export const getPostDocument = graphql(/* GraphQL */ `
     }
   }
 `)
+
+export const getCommentDocumnet = graphql(/* GraphQL */ `
+  query SingleComment($input: CommentInput!) {
+    comment(input: $input) {
+      body
+      created_at
+      id
+      post {
+        id
+      }
+      owner {
+        id
+        username
+      }
+      voteSum
+      voteStatus
+      replyCount
+    }
+  }
+`)

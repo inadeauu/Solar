@@ -29,17 +29,12 @@ type User {
 
 # -- USERS QUERY
 input UsersInput {
-  filters: UsersFilters
+  filters: UsersFilters!
   paginate: PaginateInput!
 }
 
 input UsersFilters {
   usernameContains: String
-  orderBy: UsersOrderBy
-}
-
-input UsersOrderBy {
-  type: UserOrderByType!
 }
 
 # -- USER QUERY
@@ -125,9 +120,4 @@ enum Provider {
   USERNAME
   GOOGLE
   GITHUB
-}
-
-enum UserOrderByType {
-  username
-  postCount
 }

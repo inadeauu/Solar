@@ -25,7 +25,7 @@ const ProfileCommunityFeed = ({ user }: ProfileCommunityFeedProps) => {
     fetchNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery(
-    ["profilePostFeed", user.username, communityFilter],
+    ["profileCommunityFeed", user.username, communityFilter],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getCommunityFeedDocument, {
         input: {

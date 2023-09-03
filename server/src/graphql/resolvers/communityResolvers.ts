@@ -1,7 +1,7 @@
 import { Community, Post, User } from "@prisma/client"
 import { Resolvers } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
-import { paginate, paginateCommunities } from "../paginate"
+import { paginateCommunities } from "../paginate"
 import { GraphQLError } from "graphql"
 
 const checkCommunityTitleExists = async (title: string) => {
@@ -21,11 +21,10 @@ export const resolvers: Resolvers = {
 
       return community
     },
-    communities: async (_0, args, { req }) => {
+    communities: async (_0, args) => {
       const filters = args.input?.filters
 
       const communities = await paginateCommunities(
-        req.session.userId,
         args.input.paginate,
         filters
       )

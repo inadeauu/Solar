@@ -1,6 +1,6 @@
 import { Comment } from "@prisma/client"
 import { Resolvers, VoteStatus } from "../../__generated__/resolvers-types"
-import { paginate, paginateComments } from "../paginate"
+import { paginateComments } from "../paginate"
 import prisma from "../../config/prisma"
 import { GraphQLError } from "graphql"
 

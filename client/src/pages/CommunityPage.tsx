@@ -14,8 +14,6 @@ const CommunityPage = () => {
   const { id } = useParams()
   const { data, isLoading } = useCommunity(translator.toUUID(id || ""))
 
-  console.log(data)
-
   const { postOrderBy, setPostOrderBy } = useContext(CommunityContext)
 
   if (isLoading) {

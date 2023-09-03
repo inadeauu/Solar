@@ -1,7 +1,6 @@
 import prisma from "../../config/prisma"
-import { User } from "@prisma/client"
 import { Resolvers } from "../../__generated__/resolvers-types"
-import { paginate } from "../paginate"
+import { paginateUsers } from "../paginate"
 import { GraphQLError } from "graphql"
 import bcrypt from "bcrypt"
 
@@ -15,22 +14,7 @@ export const resolvers: Resolvers = {
       return user
     },
     users: async (_0, args) => {
-      const filters = args.input?.filters
-      const orderBy = filters?.orderBy
-
-      const users = await paginate<User>(args.input.paginate, (options) =>
-        prisma.user.findMany({
-          where: {
-            username: {
-              contains: filters?.usernameContains ?? undefined,
-            },
-          },
-          orderBy: {
-            id: "asc",
-          },
-          ...options,
-        })
-      )
+      const users = await paginateUsers(args.input.paginate, args.input.filters)
 
       return users
     },

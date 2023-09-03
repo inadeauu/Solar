@@ -797,24 +797,13 @@ export type UserJoinCommunitySuccess = Success & {
   successMsg: Scalars['String']['output'];
 };
 
-export const UserOrderByType = {
-  PostCount: 'postCount',
-  Username: 'username'
-} as const;
-
-export type UserOrderByType = typeof UserOrderByType[keyof typeof UserOrderByType];
 export type UsersFilters = {
-  orderBy?: InputMaybe<UsersOrderBy>;
   usernameContains?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UsersInput = {
-  filters?: InputMaybe<UsersFilters>;
+  filters: UsersFilters;
   paginate: PaginateInput;
-};
-
-export type UsersOrderBy = {
-  type: UserOrderByType;
 };
 
 export type VoteCommentInput = {
@@ -1068,10 +1057,8 @@ export type ResolversTypes = ResolversObject<{
   UserJoinCommunityInput: UserJoinCommunityInput;
   UserJoinCommunityResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['UserJoinCommunityResult']>;
   UserJoinCommunitySuccess: ResolverTypeWrapper<Omit<UserJoinCommunitySuccess, 'community'> & { community: ResolversTypes['Community'] }>;
-  UserOrderByType: UserOrderByType;
   UsersFilters: UsersFilters;
   UsersInput: UsersInput;
-  UsersOrderBy: UsersOrderBy;
   VoteCommentInput: VoteCommentInput;
   VoteCommentResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['VoteCommentResult']>;
   VoteCommentSuccess: ResolverTypeWrapper<Omit<VoteCommentSuccess, 'comment'> & { comment: ResolversTypes['Comment'] }>;
@@ -1198,7 +1185,6 @@ export type ResolversParentTypes = ResolversObject<{
   UserJoinCommunitySuccess: Omit<UserJoinCommunitySuccess, 'community'> & { community: ResolversParentTypes['Community'] };
   UsersFilters: UsersFilters;
   UsersInput: UsersInput;
-  UsersOrderBy: UsersOrderBy;
   VoteCommentInput: VoteCommentInput;
   VoteCommentResult: ResolversUnionTypes<ResolversParentTypes>['VoteCommentResult'];
   VoteCommentSuccess: Omit<VoteCommentSuccess, 'comment'> & { comment: ResolversParentTypes['Comment'] };

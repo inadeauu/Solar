@@ -67,19 +67,21 @@ const CommunityJoinButton = ({
         input.communityId,
       ])
 
-      queryClient.setQueryData<CommunityQuery>([input.communityId], (oldData) =>
-        oldData
-          ? {
-              ...oldData,
-              community: {
-                ...oldData.community!,
-                memberCount: !oldData.community!.inCommunity
-                  ? oldData.community!.memberCount + 1
-                  : oldData.community!.memberCount - 1,
-                inCommunity: !oldData.community!.inCommunity,
-              },
-            }
-          : oldData
+      queryClient.setQueryData<CommunityQuery>(
+        ["community", input.communityId],
+        (oldData) =>
+          oldData
+            ? {
+                ...oldData,
+                community: {
+                  ...oldData.community!,
+                  memberCount: !oldData.community!.inCommunity
+                    ? oldData.community!.memberCount + 1
+                    : oldData.community!.memberCount - 1,
+                  inCommunity: !oldData.community!.inCommunity,
+                },
+              }
+            : oldData
       )
 
       return { previous_community, updated_at: new Date().toISOString() }
@@ -89,7 +91,7 @@ const CommunityJoinButton = ({
 
       if (last_updated.current <= context!.updated_at && !rollback.current) {
         queryClient.setQueryData(
-          [input.communityId],
+          ["community", input.communityId],
           context!.previous_community
         )
       } else if (sent_requests.current == 1 && rollback.current) {

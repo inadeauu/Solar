@@ -960,23 +960,13 @@ export type UserJoinCommunitySuccess = Success & {
   successMsg: Scalars['String']['output'];
 };
 
-export enum UserOrderByType {
-  PostCount = 'postCount',
-  Username = 'username'
-}
-
 export type UsersFilters = {
-  orderBy?: InputMaybe<UsersOrderBy>;
   usernameContains?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UsersInput = {
-  filters?: InputMaybe<UsersFilters>;
+  filters: UsersFilters;
   paginate: PaginateInput;
-};
-
-export type UsersOrderBy = {
-  type: UserOrderByType;
 };
 
 export type VoteCommentInput = {

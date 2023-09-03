@@ -1,10 +1,11 @@
-import { Comment, Community, Post, Prisma, PrismaPromise } from "@prisma/client"
+import { Comment, Community, Post, Prisma, User } from "@prisma/client"
 import { GraphQLError } from "graphql"
 import prisma from "../config/prisma"
 import {
   CommentsFilters,
   CommunitiesFilters,
   PostsFilters,
+  UsersFilters,
 } from "../__generated__/resolvers-types"
 
 type Cursor = {
@@ -17,14 +18,6 @@ type Cursor = {
 interface PaginateArgs {
   first: number
   after?: Cursor
-}
-
-interface PrismaPaginateArgs {
-  cursor?: {
-    id: string
-  }
-  take: number
-  skip?: number
 }
 
 interface Edge<T> {
@@ -257,8 +250,9 @@ export const paginateComments = async (
   }
 }
 
+type CommunityPaginate = Community & { isMember: boolean }
+
 export const paginateCommunities = async (
-  userId: string | undefined,
   paginateArgs: PaginateArgs,
   filters: CommunitiesFilters
 ): Promise<PaginateReturn<Community>> => {
@@ -274,7 +268,7 @@ export const paginateCommunities = async (
     })
   }
 
-  const communitiesQuery = Prisma.sql`SELECT "c".*, "B".member FROM "Community" as "c" LEFT JOIN (SELECT "A" as "member", "B" as "communityId" from "_UserInCommunities" GROUP BY "member", "communityId") "B" on "B"."communityId" = "c"."id"`
+  const communitiesQuery = Prisma.sql`SELECT "c".* FROM (SELECT "Community".*, CASE WHEN "B"."B" IS NOT NULL THEN true ELSE false END as "isMember" FROM "Community" LEFT JOIN (SELECT * from "_UserInCommunities" WHERE "B" = ${memberId} GROUP BY "A", "B") "B" on "B"."A" = "Community"."id") as "c"`
 
   const id = paginateArgs.after?.id
   const title = paginateArgs.after?.title
@@ -283,17 +277,17 @@ export const paginateCommunities = async (
   const where = Prisma.sql`WHERE 1=1 
     AND (${titleContains}::text IS NULL OR "c"."title" LIKE ${titleContains}::text || '%') 
     AND (${ownerId}::text IS NULL OR "c"."userId" = ${ownerId})
-    AND (${memberId}::text IS NULL OR "B"."member" = ${memberId})
+    AND (${memberId}::text IS NULL OR "c"."isMember")
     AND ${cursor}`
 
   const orderBy = Prisma.sql`ORDER BY "c"."title" ASC`
 
   const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
 
-  const nodes: Community[] =
+  const nodes: CommunityPaginate[] =
     await prisma.$queryRaw`${communitiesQuery} ${where} ${orderBy} ${limit}`
 
-  const edges: Edge<Community>[] = nodes.map((node) => {
+  const edges: Edge<CommunityPaginate>[] = nodes.map((node) => {
     return {
       node,
       cursor: {
@@ -325,20 +319,46 @@ export const paginateCommunities = async (
   }
 }
 
-export const paginate = async <Node extends { id: string }>(
+export const paginateUsers = async (
   paginateArgs: PaginateArgs,
-  prismaFunc: (options: PrismaPaginateArgs) => PrismaPromise<Array<Node> | null>
-): Promise<PaginateReturn<Node>> => {
+  filters: UsersFilters
+): Promise<PaginateReturn<User>> => {
   checkPaginationArgs(paginateArgs)
 
-  const cursor = paginateArgs.after ? { id: paginateArgs.after.id } : undefined
-  const take = paginateArgs.first + 1
-  const skip = cursor ? 1 : undefined
+  const usernameContains = filters.usernameContains
 
-  const nodes: Node[] = (await prismaFunc({ cursor, take, skip })) ?? []
+  if (paginateArgs.after && paginateArgs.after.title == null) {
+    throw new GraphQLError("Created at must be specified with title", {
+      extensions: { code: "PAGINATION_ERROR" },
+    })
+  }
 
-  const edges: Edge<Node>[] = nodes.map((node) => {
-    return { node, cursor: { id: node.id } }
+  const usersQuery = Prisma.sql`SELECT "u".* FROM "User" as "u"`
+
+  const id = paginateArgs.after?.id
+  const title = paginateArgs.after?.title
+  const cursor = Prisma.sql`(${paginateArgs.after}::json IS NULL OR "u"."username" <= ${title} AND ("u"."id" > ${id} OR "u"."username" < ${title}))`
+
+  const where = Prisma.sql`WHERE 1=1 
+    AND (${usernameContains}::text IS NULL OR "u"."username" LIKE ${usernameContains}::text || '%') 
+    AND ${cursor}`
+
+  const orderBy = Prisma.sql`ORDER BY "u"."username" ASC`
+
+  const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
+
+  const nodes: User[] =
+    await prisma.$queryRaw`${usersQuery} ${where} ${orderBy} ${limit}`
+
+  const edges: Edge<User>[] = nodes.map((node) => {
+    return {
+      node,
+      cursor: {
+        id: node.id,
+        title: node.username,
+        created_at: node.created_at,
+      },
+    }
   })
 
   const hasNextPage = nodes.length > paginateArgs.first
@@ -349,7 +369,7 @@ export const paginate = async <Node extends { id: string }>(
   }
 
   const endCursor =
-    nodes.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
+    edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
 
   const pageInfo: PageInfo = {
     endCursor,

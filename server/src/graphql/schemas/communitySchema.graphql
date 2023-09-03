@@ -38,17 +38,14 @@ input CommunityInput {
 
 # -- COMMUNITIES QUERY
 input CommunitiesInput {
-  filters: CommunitiesFilters
+  filters: CommunitiesFilters!
   paginate: PaginateInput!
 }
 
 input CommunitiesFilters {
   titleContains: String
-  orderBy: CommunitiesOrderBy
-}
-
-input CommunitiesOrderBy {
-  type: CommunityOrderByType!
+  ownerId: String
+  memberId: String
 }
 
 # -- CREATECOMMUNITY MUTATION
@@ -133,9 +130,4 @@ type UserJoinCommunitySuccess implements Success {
   successMsg: String!
   code: Int!
   community: Community!
-}
-
-# -- ENUMS
-enum CommunityOrderByType {
-  memberCount
 }

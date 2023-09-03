@@ -2,12 +2,13 @@ import { useState } from "react"
 import ProfilePostFeed from "./ProfilePostFeed"
 import ProfileCommentFeed from "./ProfileCommentFeed"
 import { User } from "../../../../graphql/types"
+import ProfileCommunityFeed from "./ProfileCommunityFeed"
 
 type ProfileFeedProps = {
   user: User
 }
 
-const TABS = ["Posts", "Comments"]
+const TABS = ["Posts", "Comments", "Communities"]
 
 const ProfileFeed = ({ user }: ProfileFeedProps) => {
   const [currentTab, setCurrentTab] = useState<string>("Posts")
@@ -34,8 +35,10 @@ const ProfileFeed = ({ user }: ProfileFeedProps) => {
       </div>
       {currentTab == "Posts" ? (
         <ProfilePostFeed user={user} />
-      ) : (
+      ) : currentTab == "Comments" ? (
         <ProfileCommentFeed user={user} />
+      ) : (
+        <ProfileCommunityFeed user={user} />
       )}
     </div>
   )

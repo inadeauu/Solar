@@ -164,17 +164,14 @@ export type CommentsInput = {
 };
 
 export type CommunitiesFilters = {
-  orderBy?: InputMaybe<CommunitiesOrderBy>;
+  memberId?: InputMaybe<Scalars['String']['input']>;
+  ownerId?: InputMaybe<Scalars['String']['input']>;
   titleContains?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CommunitiesInput = {
-  filters?: InputMaybe<CommunitiesFilters>;
+  filters: CommunitiesFilters;
   paginate: PaginateInput;
-};
-
-export type CommunitiesOrderBy = {
-  type: CommunityOrderByType;
 };
 
 export type Community = {
@@ -205,11 +202,6 @@ export type CommunityInput = {
   id: Scalars['ID']['input'];
 };
 
-export const CommunityOrderByType = {
-  MemberCount: 'memberCount'
-} as const;
-
-export type CommunityOrderByType = typeof CommunityOrderByType[keyof typeof CommunityOrderByType];
 export type CreateCommentInput = {
   body: Scalars['String']['input'];
   postId: Scalars['ID']['input'];
@@ -317,12 +309,14 @@ export type Cursor = {
   __typename?: 'Cursor';
   created_at?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
+  title?: Maybe<Scalars['String']['output']>;
   voteSum?: Maybe<Scalars['Int']['output']>;
 };
 
 export type CursorInput = {
   created_at?: InputMaybe<Scalars['DateTime']['input']>;
   id: Scalars['ID']['input'];
+  title?: InputMaybe<Scalars['String']['input']>;
   voteSum?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -986,12 +980,10 @@ export type ResolversTypes = ResolversObject<{
   CommentsInput: CommentsInput;
   CommunitiesFilters: CommunitiesFilters;
   CommunitiesInput: CommunitiesInput;
-  CommunitiesOrderBy: CommunitiesOrderBy;
   Community: ResolverTypeWrapper<CommunityModel>;
   CommunityConnection: ResolverTypeWrapper<Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversTypes['CommunityEdge']> }>;
   CommunityEdge: ResolverTypeWrapper<Omit<CommunityEdge, 'node'> & { node: ResolversTypes['Community'] }>;
   CommunityInput: CommunityInput;
-  CommunityOrderByType: CommunityOrderByType;
   CreateCommentInput: CreateCommentInput;
   CreateCommentInputError: ResolverTypeWrapper<CreateCommentInputError>;
   CreateCommentInputErrors: ResolverTypeWrapper<CreateCommentInputErrors>;
@@ -1118,7 +1110,6 @@ export type ResolversParentTypes = ResolversObject<{
   CommentsInput: CommentsInput;
   CommunitiesFilters: CommunitiesFilters;
   CommunitiesInput: CommunitiesInput;
-  CommunitiesOrderBy: CommunitiesOrderBy;
   Community: CommunityModel;
   CommunityConnection: Omit<CommunityConnection, 'edges'> & { edges: Array<ResolversParentTypes['CommunityEdge']> };
   CommunityEdge: Omit<CommunityEdge, 'node'> & { node: ResolversParentTypes['Community'] };
@@ -1441,6 +1432,7 @@ export type CreatePostSuccessResolvers<ContextType = Context, ParentType extends
 export type CursorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Cursor'] = ResolversParentTypes['Cursor']> = ResolversObject<{
   created_at?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  title?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   voteSum?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

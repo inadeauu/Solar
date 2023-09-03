@@ -13,12 +13,14 @@ input PaginateInput {
 
 input CursorInput {
   id: ID!
+  title: String
   voteSum: Int
   created_at: DateTime
 }
 
 type Cursor {
   id: ID!
+  title: String
   voteSum: Int
   created_at: DateTime
 }

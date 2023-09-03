@@ -112,6 +112,36 @@ export const getCommentFeedDocument = graphql(/* GraphQL */ `
   }
 `)
 
+export const getCommunityFeedDocument = graphql(/* GraphQL */ `
+  query CommunityFeed($input: CommunitiesInput!) {
+    communities(input: $input) {
+      edges {
+        node {
+          created_at
+          id
+          inCommunity
+          memberCount
+          owner {
+            id
+            username
+          }
+          postCount
+          title
+          updated_at
+        }
+      }
+      pageInfo {
+        endCursor {
+          id
+          created_at
+          title
+        }
+        hasNextPage
+      }
+    }
+  }
+`)
+
 export const usernameExistsDocument = graphql(/* GraphQL */ `
   query UsernameExists($username: String!) {
     usernameExists(username: $username)

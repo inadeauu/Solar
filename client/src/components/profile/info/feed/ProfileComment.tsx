@@ -20,7 +20,7 @@ const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
     >
       <div className="flex flex-col gap-[2px] px-[5px]">
         <div className="flex flex-col gap-[2px] text-neutral-500 text-xs">
-          <span className="line-clamp-1">
+          <span className="line-clamp-1 break-all">
             <span
               className="text-black font-medium hover:underline hover:cursor-pointer"
               onClick={(e) => {

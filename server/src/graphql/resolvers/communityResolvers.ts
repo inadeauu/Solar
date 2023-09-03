@@ -1,10 +1,7 @@
 import { Community, Post, User } from "@prisma/client"
-import {
-  CommunityOrderByType,
-  Resolvers,
-} from "../../__generated__/resolvers-types"
+import { Resolvers } from "../../__generated__/resolvers-types"
 import prisma from "../../config/prisma"
-import { paginate } from "../paginate"
+import { paginate, paginateCommunities } from "../paginate"
 import { GraphQLError } from "graphql"
 
 const checkCommunityTitleExists = async (title: string) => {
@@ -24,24 +21,13 @@ export const resolvers: Resolvers = {
 
       return community
     },
-    communities: async (_0, args) => {
+    communities: async (_0, args, { req }) => {
       const filters = args.input?.filters
-      const orderBy = filters?.orderBy
 
-      const communities = await paginate<Community>(
+      const communities = await paginateCommunities(
+        req.session.userId,
         args.input.paginate,
-        (options) =>
-          prisma.community.findMany({
-            where: {
-              title: {
-                contains: filters?.titleContains ?? undefined,
-              },
-            },
-            orderBy: {
-              id: "asc",
-            },
-            ...options,
-          })
+        filters
       )
 
       return communities

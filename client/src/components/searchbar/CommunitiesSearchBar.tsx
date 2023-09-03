@@ -1,30 +1,15 @@
 import { useQuery } from "@tanstack/react-query"
-import { graphql } from "../../graphql_codegen/gql"
 import { graphQLClient } from "../../utils/graphql"
 import { useNavigate } from "react-router-dom"
 import { pluralize } from "../../utils/utils"
 import abbreviate from "number-abbreviate"
 import { translator } from "../../utils/uuid"
+import { getCommunityFeedDocument } from "../../graphql/sharedDocuments"
 
 type CommunitiesSearchBarProps = {
   debouncedSearch: string
   search: string
 }
-
-const getCommunitySearchResultsDocument = graphql(/* GraphQL */ `
-  query CommunitiesSearch($input: CommunitiesInput!) {
-    communities(input: $input) {
-      edges {
-        node {
-          id
-          memberCount
-          title
-          created_at
-        }
-      }
-    }
-  }
-`)
 
 const CommunitiesSearchBar = ({
   debouncedSearch,
@@ -34,7 +19,7 @@ const CommunitiesSearchBar = ({
   const { data } = useQuery({
     queryKey: [debouncedSearch],
     queryFn: () =>
-      graphQLClient.request(getCommunitySearchResultsDocument, {
+      graphQLClient.request(getCommunityFeedDocument, {
         input: {
           filters: { titleContains: debouncedSearch },
           paginate: { first: 5 },

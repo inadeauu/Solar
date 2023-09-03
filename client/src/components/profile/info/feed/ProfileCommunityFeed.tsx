@@ -54,23 +54,6 @@ const ProfileCommunityFeed = ({ user }: ProfileCommunityFeedProps) => {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
   }
 
-  if (isSuccess && !data.pages[0].communities.edges.length) {
-    return (
-      <div className="flex flex-col gap-5">
-        <Dropdown
-          className="py-1"
-          width="w-[95px]"
-          items={["Owns", "Member of"]}
-          value={communityFilter}
-          setValue={setCommunityFilter}
-        />
-        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-          No Communities
-        </span>
-      </div>
-    )
-  }
-
   return (
     <div className="flex flex-col gap-5">
       <Dropdown
@@ -80,7 +63,7 @@ const ProfileCommunityFeed = ({ user }: ProfileCommunityFeedProps) => {
         value={communityFilter}
         setValue={setCommunityFilter}
       />
-      {isSuccess &&
+      {isSuccess && data.pages[0].communities.edges.length ? (
         data.pages.map((page) =>
           page.communities.edges.map((edge, i) => {
             return (
@@ -93,7 +76,12 @@ const ProfileCommunityFeed = ({ user }: ProfileCommunityFeedProps) => {
               />
             )
           })
-        )}
+        )
+      ) : (
+        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
+          No Communities
+        </span>
+      )}
       {isFetchingNextPage && (
         <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
       )}

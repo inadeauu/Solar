@@ -57,23 +57,6 @@ const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
   }
 
-  if (isSuccess && !data.pages[0].posts.edges.length) {
-    return (
-      <div className="flex flex-col gap-5">
-        <Dropdown
-          className="py-1"
-          width="w-[65px]"
-          items={["New", "Old", "Top", "Low"]}
-          value={postOrderBy}
-          setValue={setPostOrderBy}
-        />
-        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-          No Posts
-        </span>
-      </div>
-    )
-  }
-
   return (
     <div className="flex flex-col gap-5">
       <Dropdown
@@ -83,7 +66,7 @@ const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
         value={postOrderBy}
         setValue={setPostOrderBy}
       />
-      {isSuccess &&
+      {isSuccess && data.pages[0].posts.edges.length ? (
         data.pages.map((page) =>
           page.posts.edges.map((edge, i) => {
             return (
@@ -95,7 +78,12 @@ const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
               />
             )
           })
-        )}
+        )
+      ) : (
+        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
+          No Posts
+        </span>
+      )}
       {isFetchingNextPage && (
         <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
       )}

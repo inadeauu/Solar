@@ -44,7 +44,7 @@ const CommunitySettings = () => {
               <div className="flex items-center justify-between gap-4">
                 <div className="flex flex-col">
                   <span className="text-[16px] font-medium">Title</span>
-                  <span className="text-[13px] text-neutral-500">
+                  <span className="text-[13px] text-neutral-500 break-all">
                     Current community title: {data?.community?.title}
                   </span>
                 </div>

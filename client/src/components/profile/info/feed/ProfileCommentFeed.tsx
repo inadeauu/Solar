@@ -104,32 +104,6 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
   }
 
-  if (isSuccess && !data.pages[0].comments.edges.length) {
-    return (
-      <div className="flex flex-col gap-5">
-        <div className="flex gap-4">
-          <Dropdown
-            className="py-1"
-            width="w-[65px]"
-            items={["New", "Old", "Top", "Low"]}
-            value={commentOrderBy}
-            setValue={setCommentOrderBy}
-          />
-          <Dropdown
-            className="py-1"
-            width="w-[95px]"
-            items={["Top level", "Reply"]}
-            value={commentFilter}
-            setValue={setCommentFilter}
-          />
-        </div>
-        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-          No Comments
-        </span>
-      </div>
-    )
-  }
-
   return (
     <div className="flex flex-col gap-5">
       <div className="flex gap-4">
@@ -148,7 +122,7 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
           setValue={setCommentFilter}
         />
       </div>
-      {isSuccess &&
+      {isSuccess && data.pages[0].comments.edges.length ? (
         data.pages.map((page) =>
           page.comments.edges.map((edge, i) => {
             return (
@@ -161,7 +135,12 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
               />
             )
           })
-        )}
+        )
+      ) : (
+        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
+          No Comments
+        </span>
+      )}
       {isFetchingNextPage && (
         <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
       )}

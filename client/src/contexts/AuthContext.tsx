@@ -44,8 +44,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     user: data?.authUser.user,
   }
 
-  console.log(data?.authUser.user?.id)
-
   return (
     <AuthContext.Provider value={value}>
       {isLoading ? (

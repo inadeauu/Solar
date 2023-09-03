@@ -36,8 +36,8 @@ const Post = ({ post }: PostProps) => {
           <PostSidebar post={post} />
         </span>
         <div className="flex flex-col gap-[6px] break-words min-w-0 w-full px-4 py-2">
-          <div className="flex items-center justify-between">
-            <span className="text-neutral-500 text-xs flex flex-col gap-[1px]">
+          <div className="flex items-center justify-between gap-4">
+            <span className="text-neutral-500 text-xs flex flex-col gap-[1px] min-w-0">
               <div>
                 Posted in{" "}
                 <span
@@ -83,7 +83,7 @@ const Post = ({ post }: PostProps) => {
               </button>
             )}
           </div>
-          <span className="font-semibold text-lg">{post.title}</span>
+          <span className="font-medium text-lg">{post.title}</span>
           {post.body && (
             <div
               ref={bodyRef}

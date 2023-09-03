@@ -30,7 +30,7 @@ const AccountSettings = () => {
               <div className="flex items-center justify-between gap-4">
                 <div className="flex flex-col">
                   <span className="text-[16px] font-medium">Username</span>
-                  <span className="text-[13px] text-neutral-500">
+                  <span className="text-[13px] text-neutral-500 break-all">
                     Current username: {user?.username}
                   </span>
                 </div>

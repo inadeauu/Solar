@@ -20,8 +20,8 @@ export const CommentReply = ({ comment, parentId }: CommentReplyType) => {
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-col gap-[6px] px-[5px]">
-        <div className="flex items-center justify-between">
-          <span className="text-neutral-500 text-xs">
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-neutral-500 text-xs min-w-0 break-words">
             <span
               className="text-black font-medium hover:underline hover:cursor-pointer"
               onClick={(e) => {

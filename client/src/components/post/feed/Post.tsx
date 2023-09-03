@@ -39,7 +39,7 @@ const Post = ({
     >
       <div className="flex flex-col gap-[6px]">
         <div className="flex items-center justify-between gap-4">
-          <span className="text-neutral-500 text-xs">
+          <span className="text-neutral-500 text-xs min-w-0">
             {!communityFeed && (
               <>
                 Posted in{" "}
@@ -86,7 +86,7 @@ const Post = ({
             </button>
           )}
         </div>
-        <span className="font-semibold text-lg">{post.title}</span>
+        <span className="font-medium text-lg">{post.title}</span>
         {post.body && (
           <div ref={bodyRef} className="max-h-[250px] overflow-hidden">
             <p className="text-sm font-light text-neutral-800">{post.body}</p>

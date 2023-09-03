@@ -118,22 +118,11 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
     },
     onSuccess: (data) => {
       if (data.deletePost.__typename == "DeletePostSuccess") {
-        queryClient.setQueryData<SinglePostQuery>(
-          ["post", post.id],
-          (oldData) => {
-            return oldData
-              ? {
-                  ...oldData,
-                  post: null,
-                }
-              : oldData
-          }
-        )
         setTitle("")
         setBody("")
         if (error) setError("")
         toast.success("Successfully deleted post")
-        navigate(-1)
+        navigate("/")
       }
     },
   })

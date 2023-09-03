@@ -43,7 +43,7 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
 
       const previous_post = queryClient.getQueryData<SinglePostQuery>([post.id])
 
-      queryClient.setQueryData<SinglePostQuery>([post.id], (oldData) =>
+      queryClient.setQueryData<SinglePostQuery>(["post", post.id], (oldData) =>
         oldData
           ? {
               ...oldData,
@@ -71,11 +71,11 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
       if (!error.current) error.current = true
 
       if (last_updated.current <= context!.updated_at && !rollback.current) {
-        queryClient.setQueryData<SinglePostQuery>([post.id], {
+        queryClient.setQueryData<SinglePostQuery>(["post", post.id], {
           post: previous_post.current,
         })
       } else if (sent_requests.current == 1 && rollback.current) {
-        queryClient.setQueryData<SinglePostQuery>([post.id], {
+        queryClient.setQueryData<SinglePostQuery>(["post", post.id], {
           post: rollback.current,
         })
       }
@@ -84,11 +84,11 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
       rollback.current = data.votePost.post
 
       if (last_updated.current <= context!.updated_at) {
-        queryClient.setQueryData<SinglePostQuery>([post.id], {
+        queryClient.setQueryData<SinglePostQuery>(["post", post.id], {
           post: rollback.current,
         })
       } else if (sent_requests.current == 1 && error.current) {
-        queryClient.setQueryData<SinglePostQuery>([post.id], {
+        queryClient.setQueryData<SinglePostQuery>(["post", post.id], {
           post: rollback.current,
         })
       }

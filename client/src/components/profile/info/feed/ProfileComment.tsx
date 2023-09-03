@@ -4,6 +4,7 @@ import moment from "moment"
 import { translator } from "../../../../utils/uuid"
 import { BiDownvote, BiUpvote } from "react-icons/bi"
 import { getReply } from "../../../../utils/utils"
+import { useAuth } from "../../../../hooks/useAuth"
 
 type ProfileCommentProps = {
   comment: ProfileComment
@@ -11,6 +12,7 @@ type ProfileCommentProps = {
 }
 
 const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
+  const { user } = useAuth()
   const navigate = useNavigate()
 
   return (
@@ -20,7 +22,7 @@ const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
     >
       <div className="flex flex-col gap-[2px] px-[5px]">
         <div className="flex flex-col gap-[2px] text-neutral-500 text-xs">
-          <span className="line-clamp-1 break-all">
+          <span>
             <span
               className="text-black font-medium hover:underline hover:cursor-pointer"
               onClick={(e) => {
@@ -33,7 +35,7 @@ const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
             </span>{" "}
             commented on{" "}
             <span
-              className="hover:underline text-neutral-700 hover:cursor-pointer"
+              className="hover:underline text-neutral-700 hover:cursor-pointer break-all line-clamp-1"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -44,12 +46,17 @@ const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
             </span>
           </span>
           <div>
+            Posted in{" "}
             <span
               className="text-black font-semibold hover:underline hover:cursor-pointer"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
-                navigate(`/communities/${comment.post.community.title}`)
+                navigate(
+                  `/communities/${translator.fromUUID(
+                    comment.post.community.id
+                  )}`
+                )
               }}
             >
               {comment.post.community.title}
@@ -88,16 +95,28 @@ const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
           </span>
           <p className="text-sm font-light text-neutral-800">{comment.body}</p>
         </div>
-        <div className="flex items-center text-sm gap-4 mt-2">
-          <div className="flex items-center gap-2">
-            <BiUpvote />
-            {comment.voteSum}
-            <BiDownvote />
-          </div>
-          {!comment.parent && (
-            <div>
-              {comment.replyCount} {getReply(comment.replyCount)}
+        <div className="flex items-center text-sm gap-4 mt-2 justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <BiUpvote />
+              {comment.voteSum}
+              <BiDownvote />
             </div>
+            {!comment.parent && (
+              <div>
+                {comment.replyCount} {getReply(comment.replyCount)}
+              </div>
+            )}
+          </div>
+          {user?.id == comment.owner.id && (
+            <button
+              onClick={() => {
+                navigate(`/comments/${translator.fromUUID(comment.id)}/edit`)
+              }}
+              className="btn_blue text-sm py-1 px-3"
+            >
+              Edit
+            </button>
           )}
         </div>
       </div>

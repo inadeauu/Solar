@@ -15,7 +15,7 @@ const ProfileFeed = ({ user }: ProfileFeedProps) => {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex gap-5 bg-white px-4 py-2 border border-neutral-300 rounded-lg">
+      <div className="flex gap-5 bg-white px-4 py-2 border border-neutral-300 rounded-lg flex-wrap">
         {TABS.map((tab) => (
           <div
             key={tab}

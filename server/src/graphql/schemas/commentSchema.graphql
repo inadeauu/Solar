@@ -1,6 +1,6 @@
 scalar DateTime
 
-type Query @rateLimit(limit: 180, duration: 60) {
+type Query @rateLimit(limit: 300, duration: 60) {
   comment(input: CommentInput!): Comment
   comments(input: CommentsInput!): CommentConnection!
 }
@@ -14,9 +14,9 @@ type Mutation {
   voteComment(input: VoteCommentInput!): VoteCommentResult!
     @rateLimit(limit: 120, duration: 60)
   editComment(input: EditCommentInput!): EditCommentResult!
-    @rateLimit(limit: 5, duration: 60)
+    @rateLimit(limit: 10, duration: 60)
   deleteComment(input: DeleteCommentInput!): DeleteCommentResult!
-    @rateLimit(limit: 5, duration: 60)
+    @rateLimit(limit: 10, duration: 60)
 }
 
 type Comment {

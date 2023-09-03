@@ -287,7 +287,7 @@ export const paginateCommunities = async (
   const nodes: CommunityPaginate[] =
     await prisma.$queryRaw`${communitiesQuery} ${where} ${orderBy} ${limit}`
 
-  const edges: Edge<CommunityPaginate>[] = nodes.map((node) => {
+  const edges: Edge<Community>[] = nodes.map((node) => {
     return {
       node,
       cursor: {

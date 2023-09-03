@@ -1,21 +1,21 @@
 scalar DateTime
 
-type Query @rateLimit(limit: 180, duration: 60) {
+type Query @rateLimit(limit: 300, duration: 60) {
   community(input: CommunityInput!): Community
   communities(input: CommunitiesInput!): CommunityConnection!
-  titleExists(title: String!): Boolean! @rateLimit(limit: 200, duration: 60)
+  titleExists(title: String!): Boolean!
 }
 
 type Mutation {
   createCommunity(input: CreateCommunityInput!): CreateCommunityResult!
-    @rateLimit(limit: 5, duration: 60)
+    @rateLimit(limit: 10, duration: 60)
   userJoinCommunity(input: UserJoinCommunityInput!): UserJoinCommunityResult!
-    @rateLimit(limit: 20, duration: 60)
+    @rateLimit(limit: 30, duration: 60)
   changeCommunityTitle(
     input: ChangeCommunityTitleInput!
-  ): ChangeCommunityTitleResult! @rateLimit(limit: 10, duration: 600)
+  ): ChangeCommunityTitleResult! @rateLimit(limit: 20, duration: 300)
   deleteCommunity(input: DeleteCommunityInput!): DeleteCommunityResult!
-    @rateLimit(limit: 10, duration: 600)
+    @rateLimit(limit: 20, duration: 300)
 }
 
 type Community {

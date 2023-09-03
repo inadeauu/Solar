@@ -1,19 +1,19 @@
 scalar DateTime
 
-type Query @rateLimit(limit: 180, duration: 60) {
+type Query @rateLimit(limit: 300, duration: 60) {
   post(input: PostInput!): Post
   posts(input: PostsInput!): PostConnection!
 }
 
 type Mutation {
   createPost(input: CreatePostInput!): CreatePostResult!
-    @rateLimit(limit: 5, duration: 60)
+    @rateLimit(limit: 10, duration: 60)
   votePost(input: VotePostInput!): VotePostResult!
     @rateLimit(limit: 120, duration: 60)
   editPost(input: EditPostInput!): EditPostResult!
-    @rateLimit(limit: 5, duration: 60)
+    @rateLimit(limit: 10, duration: 60)
   deletePost(input: DeletePostInput!): DeletePostResult!
-    @rateLimit(limit: 5, duration: 60)
+    @rateLimit(limit: 10, duration: 60)
 }
 
 type Post {

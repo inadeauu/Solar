@@ -1,19 +1,18 @@
 scalar DateTime
 
-type Query @rateLimit(limit: 180, duration: 60) {
+type Query @rateLimit(limit: 300, duration: 60) {
   user(input: UserInput!): User
   users(input: UsersInput!): UserConnection!
   usernameExists(username: String!): Boolean!
-    @rateLimit(limit: 200, duration: 60)
 }
 
 type Mutation {
   changeUsername(input: ChangeUsernameInput!): ChangeUsernameResult!
-    @rateLimit(limit: 10, duration: 600)
+    @rateLimit(limit: 10, duration: 60)
   changePassword(input: ChangePasswordInput!): ChangePasswordResult!
-    @rateLimit(limit: 10, duration: 600)
+    @rateLimit(limit: 10, duration: 60)
   deleteUser(input: DeleteUserInput!): DeleteUserResult!
-    @rateLimit(limit: 10, duration: 600)
+    @rateLimit(limit: 10, duration: 60)
 }
 
 type User {

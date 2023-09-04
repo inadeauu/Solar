@@ -8,7 +8,6 @@ import cors from "cors"
 import http from "http"
 import helmet from "helmet"
 import session from "express-session"
-import routes from "./rest/routes"
 import { corsOptions } from "./config/corsOptions"
 import { env } from "./config/env"
 import { expressMiddleware } from "@apollo/server/express4"
@@ -46,8 +45,6 @@ const main = async () => {
       },
     })
   )
-
-  routes(app)
 
   app.use(
     helmet({

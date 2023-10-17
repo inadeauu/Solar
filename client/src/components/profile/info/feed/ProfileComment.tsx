@@ -35,7 +35,7 @@ const ProfileComment = ({ comment, innerRef }: ProfileCommentProps) => {
             </span>{" "}
             commented on{" "}
             <span
-              className="hover:underline text-neutral-700 hover:cursor-pointer break-all line-clamp-1"
+              className="hover:underline text-neutral-700 hover:cursor-pointer break-all"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()

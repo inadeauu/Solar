@@ -62,7 +62,7 @@ export const resolvers: Resolvers = {
 
       return {
         __typename: "CreatePostSuccess",
-        successMsg: "Succesfully created post",
+        successMsg: "Successfully created post",
         code: 200,
       }
     },

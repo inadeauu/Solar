@@ -12,7 +12,7 @@ const Navbar = () => {
     <header className="border-b border-neutral-300 bg-white h-16 sticky top-0 z-[1000]">
       <nav className="flex mx-auto items-center max-w-4xl justify-between h-full xs:px-4 xs-max:px-2 gap-6">
         <Link to="/" className="text-3xl font-semibold xs-max:hidden">
-          Social
+          Solar
         </Link>
         <Link to="/" className="xs:hidden">
           <AiOutlineHome className="w-8 h-8" />

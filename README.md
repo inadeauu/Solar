@@ -17,6 +17,10 @@
   </ol>
 </ol>
 
+<h2>Demo</h2>
+<p>Click here to view a demo of the website.</p>
+https://github.com/inadeauu/solar/assets/123025115/e977d03d-fae2-4d07-8409-65d802bad24e
+
 <h2>Local Install Instructions</h2>
 <p>To locally install and run this project on your machine:</p>
 <ol>

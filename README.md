@@ -1,6 +1,6 @@
 <h1>Solar, a Reddit-Inspired Social Media Web Application</h1>
 <p>Solar is a responsive web application based off of Reddit.</p>
-<p>Tech stack: React, Typescript, Tailwind CSS, Prisma (ORM), Node, GraphQL, and PostgreSQL.</p>
+<p>Tech stack: React, Typescript, Tailwind CSS, Prisma (ORM), Express, GraphQL, and PostgreSQL.</p>
 <p>Features:</p>
 <ol>
   <li>Username and password sign up and login</li>

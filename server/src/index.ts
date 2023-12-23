@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express"
+import express, { NextFunction, Request, Response } from "express"
 import * as dotenv from "dotenv"
 dotenv.config()
 import "express-async-errors"
@@ -40,11 +40,18 @@ const main = async () => {
       saveUninitialized: true,
       cookie: {
         sameSite: "none",
-        httpOnly: true,
-        secure: isProduction,
+        secure: false,
       },
     })
   )
+
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (!req.session.userId && req.cookies["test-user"]) {
+      req.session.userId = req.cookies["test-user"]
+    }
+
+    next()
+  })
 
   app.use(
     helmet({

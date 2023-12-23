@@ -56,6 +56,7 @@ const NavProfile = () => {
   return (
     <div
       ref={menuRef}
+      data-testid="navbar-profile"
       className="relative"
       onClick={() => setOpenMenu((prev) => !prev)}
     >

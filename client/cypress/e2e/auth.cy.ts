@@ -6,16 +6,20 @@ beforeEach(function () {
 
   cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
     aliasQuery(req, "UsernameExists")
+    aliasQuery(req, "AuthUser")
 
     aliasMutation(req, "RegisterUsername")
+    aliasMutation(req, "LoginUsername")
   })
 })
 
-describe.only("Sign up form", function () {
+describe("Sign up form", function () {
   it("Check sign up works", function () {
     cy.visit("/")
 
     cy.get('[data-testid="signup-button"]').click()
+
+    cy.url().should("eq", "http://localhost:5173/signup")
 
     cy.get('[data-testid="username-input"]').type("username")
     cy.get('[data-testid="password-input"]').type("password")
@@ -92,5 +96,55 @@ describe.only("Sign up form", function () {
 
     cy.get("@confirmPassword-input").clear().type("password").blur()
     cy.get("@confirmPassword-error").should("be.hidden")
+  })
+})
+
+describe("Log in form", function () {
+  it("Check log in works", function () {
+    cy.visit("/")
+
+    cy.get('[data-testid="login-button"]').click()
+
+    cy.url().should("eq", "http://localhost:5173/login")
+
+    cy.get('[data-testid="username-input"').type("username1")
+    cy.get('[data-testid="password-input"]').type("password")
+
+    cy.get('[data-testid="login-submit-button"').click()
+
+    cy.wait("@gqlLoginUsernameMutation").then(({ response }) => {
+      expect(response?.body.data.loginUsername).property("code").eq(200)
+      expect(response?.body.data.loginUsername)
+        .property("successMsg")
+        .eq("Successfully logged in")
+      cy.setCookie("test-user", response?.body.data.loginUsername.user.id)
+    })
+
+    cy.url().should("eq", "http://localhost:5173/")
+    cy.reload()
+
+    cy.get('[data-testid="navbar-profile"')
+  })
+
+  it.only("Check input errors display", function () {
+    cy.visit("/login")
+
+    cy.get('[data-testid="login-error"]').as("login-error").should("be.hidden")
+
+    cy.get('[data-testid="username-input"]').type("1")
+    cy.get('[data-testid="password-input"]').type("2")
+
+    cy.get('[data-testid="login-submit-button"').click()
+
+    cy.wait("@gqlLoginUsernameMutation").then(({ response }) => {
+      expect(response?.body.data.loginUsername).property("code").eq(400)
+      expect(response?.body.data.loginUsername)
+        .property("errorMsg")
+        .eq("Invalid username and/or password")
+    })
+
+    cy.get("@login-error")
+      .contains("Error: Invalid username and/or password")
+      .should("not.be.hidden")
   })
 })

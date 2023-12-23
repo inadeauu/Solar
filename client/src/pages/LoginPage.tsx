@@ -18,6 +18,9 @@ const usernameLoginDocument = graphql(/* GraphQL */ `
       ... on LoginUsernameSuccess {
         __typename
         successMsg
+        user {
+          id
+        }
         code
       }
       ... on Error {
@@ -156,7 +159,11 @@ const LoginPage = () => {
           <h1 className="xs:text-3xl xs-max:text-2xl font-medium xs:mb-8 xs-max:mb-6">
             Log In
           </h1>
-          {error && <ErrorCard error={error} className="mb-4" />}
+          <ErrorCard
+            error={error}
+            className={`mb-4 ${!error && "hidden"}`}
+            data-testid="login-error"
+          />
           <TextInput
             name="username"
             type="text"
@@ -197,6 +204,7 @@ const LoginPage = () => {
           </div>
           <button
             type="button"
+            data-testid="login-submit-button"
             onClick={() => {
               submitUsernameLogin()
               setSubmitting(false)

@@ -47,6 +47,7 @@ input LoginUsernameInput {
 type LoginUsernameSuccess implements Success {
   successMsg: String
   code: Int!
+  user: User!
 }
 
 type LoginUsernameInputError implements Error {

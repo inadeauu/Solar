@@ -3,12 +3,12 @@ import { Provider } from "@prisma/client"
 export const users = [
   {
     username: "username1",
-    password: "password",
+    password: "$2b$10$tYMJbsTSEx/YaQUTpsMIMOI0HasnNplBWNB/zbTQY9zdVOQ06o5lC",
     provider: Provider.USERNAME,
   },
   {
     username: "username2",
-    password: "password",
+    password: "$2b$10$BRCtrv3HsQUkCnMJoaSOWewJG3OpaTTggJGZLQzib1Wj69qb5rx16",
     provider: Provider.USERNAME,
   },
 ]

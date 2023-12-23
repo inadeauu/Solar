@@ -101,6 +101,7 @@ export const resolvers: Resolvers = {
       return {
         __typename: "LoginUsernameSuccess",
         successMsg: "Successfully logged in",
+        user: user,
         code: 200,
       }
     },

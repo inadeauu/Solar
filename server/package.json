@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "generate": "graphql-codegen --config codegen.yml --watch",
-    "dev": "concurrently \"nodemon --config nodemon.json src/index.ts\" \"npm run generate\""
+    "dev": "concurrently \"nodemon --config nodemon.json src/index.ts\" \"npm run generate\"",
+    "seed": "ts-node prisma/seed.ts",
+    "resetDb": "ts-node prisma/resetDb.ts"
   },
   "author": "",
   "license": "ISC",

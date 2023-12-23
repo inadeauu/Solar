@@ -8,7 +8,8 @@
     "dev": "concurrently \"vite\" \"npm run generate\"",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cypress:open": "cypress open"
   },
   "dependencies": {
     "@tanstack/react-query": "^4.32.0",
@@ -32,6 +33,7 @@
     "@graphql-codegen/client-preset": "^4.1.0",
     "@parcel/watcher": "^2.2.0",
     "@tanstack/eslint-plugin-query": "^4.29.25",
+    "@types/jest": "^29.5.11",
     "@types/js-cookie": "^3.0.3",
     "@types/lodash": "^4.14.196",
     "@types/react": "^18.2.15",
@@ -41,6 +43,7 @@
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.14",
     "concurrently": "^8.2.0",
+    "cypress": "^13.6.1",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",

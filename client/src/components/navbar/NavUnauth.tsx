@@ -18,10 +18,18 @@ const NavUnauth = () => {
   return (
     <>
       <div className="flex gap-2 xs-max:hidden">
-        <Link to="/signup" className="btn_blue px-3 py-1 whitespace-nowrap">
+        <Link
+          to="/signup"
+          className="btn_blue px-3 py-1 whitespace-nowrap"
+          data-testid="signup-button"
+        >
           Sign Up
         </Link>
-        <Link to="/login" className="btn_blue px-3 py-1 whitespace-nowrap">
+        <Link
+          to="/login"
+          className="btn_blue px-3 py-1 whitespace-nowrap"
+          data-testid="login-button"
+        >
           Log In
         </Link>
       </div>
@@ -49,6 +57,7 @@ const NavUnauth = () => {
             <Link
               to="/signup"
               className="flex items-center gap-2 p-2 rounded-t-md hover:bg-neutral-200 hover:cursor-pointer"
+              data-testid="signup-button"
             >
               <div className="w-[25%]">
                 <BsPersonPlus className="w-5 h-5" />
@@ -58,6 +67,7 @@ const NavUnauth = () => {
             <Link
               to="/login"
               className="flex items-center gap-2 p-2 rounded-b-md hover:bg-neutral-200 hover:cursor-pointer"
+              data-testid="login-button"
             >
               <div className="w-[25%]">
                 <FiLogIn className="w-4 h-4 mr-auto" />

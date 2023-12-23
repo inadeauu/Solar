@@ -306,6 +306,7 @@ const SignupPage = () => {
           />
           <button
             type="button"
+            data-testid="signup-form-submit"
             onClick={() => {
               submitUsernameSignUp()
               setSubmitting(false)

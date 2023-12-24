@@ -6,14 +6,10 @@ type Query @rateLimit(limit: 300, duration: 60) {
 }
 
 type Mutation {
-  createPost(input: CreatePostInput!): CreatePostResult!
-    @rateLimit(limit: 10, duration: 60)
-  votePost(input: VotePostInput!): VotePostResult!
-    @rateLimit(limit: 120, duration: 60)
-  editPost(input: EditPostInput!): EditPostResult!
-    @rateLimit(limit: 10, duration: 60)
-  deletePost(input: DeletePostInput!): DeletePostResult!
-    @rateLimit(limit: 10, duration: 60)
+  createPost(input: CreatePostInput!): CreatePostResult! @rateLimit(limit: 100, duration: 60)
+  votePost(input: VotePostInput!): VotePostResult! @rateLimit(limit: 120, duration: 60)
+  editPost(input: EditPostInput!): EditPostResult! @rateLimit(limit: 100, duration: 60)
+  deletePost(input: DeletePostInput!): DeletePostResult! @rateLimit(limit: 100, duration: 60)
 }
 
 type Post {

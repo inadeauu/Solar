@@ -29,6 +29,7 @@
     "short-uuid": "^4.2.2"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.12.15",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/client-preset": "^4.1.0",
     "@parcel/watcher": "^2.2.0",
@@ -36,6 +37,7 @@
     "@types/jest": "^29.5.11",
     "@types/js-cookie": "^3.0.3",
     "@types/lodash": "^4.14.196",
+    "@types/node": "^20.10.5",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
@@ -50,6 +52,7 @@
     "postcss": "^8.4.27",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.0.2",
-    "vite": "^4.4.5"
+    "vite": "^4.4.5",
+    "vite-plugin-istanbul": "^5.0.0"
   }
 }

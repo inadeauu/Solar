@@ -7,15 +7,11 @@ type Query @rateLimit(limit: 300, duration: 60) {
 }
 
 type Mutation {
-  createCommunity(input: CreateCommunityInput!): CreateCommunityResult!
-    @rateLimit(limit: 10, duration: 60)
-  userJoinCommunity(input: UserJoinCommunityInput!): UserJoinCommunityResult!
-    @rateLimit(limit: 30, duration: 60)
-  changeCommunityTitle(
-    input: ChangeCommunityTitleInput!
-  ): ChangeCommunityTitleResult! @rateLimit(limit: 20, duration: 300)
-  deleteCommunity(input: DeleteCommunityInput!): DeleteCommunityResult!
-    @rateLimit(limit: 20, duration: 300)
+  createCommunity(input: CreateCommunityInput!): CreateCommunityResult! @rateLimit(limit: 100, duration: 60)
+  userJoinCommunity(input: UserJoinCommunityInput!): UserJoinCommunityResult! @rateLimit(limit: 300, duration: 60)
+  changeCommunityTitle(input: ChangeCommunityTitleInput!): ChangeCommunityTitleResult!
+    @rateLimit(limit: 200, duration: 300)
+  deleteCommunity(input: DeleteCommunityInput!): DeleteCommunityResult! @rateLimit(limit: 200, duration: 300)
 }
 
 type Community {
@@ -76,9 +72,7 @@ input ChangeCommunityTitleInput {
   newTitle: String!
 }
 
-union ChangeCommunityTitleResult =
-    ChangeCommunityTitleSuccess
-  | ChangeCommunityTitleInputError
+union ChangeCommunityTitleResult = ChangeCommunityTitleSuccess | ChangeCommunityTitleInputError
 
 type ChangeCommunityTitleSuccess implements Success {
   successMsg: String!

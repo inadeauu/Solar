@@ -3,17 +3,13 @@ type Query {
 }
 
 type Mutation {
-  registerUsername(input: RegisterUsernameInput!): RegisterUsernameResult!
-    @rateLimit(limit: 10, duration: 600)
-  loginUsername(input: LoginUsernameInput!): LoginUsernameResult!
-    @rateLimit(limit: 200, duration: 3600)
+  registerUsername(input: RegisterUsernameInput!): RegisterUsernameResult! @rateLimit(limit: 100, duration: 600)
+  loginUsername(input: LoginUsernameInput!): LoginUsernameResult! @rateLimit(limit: 200, duration: 3600)
   logout: LogoutResult! @rateLimit(limit: 200, duration: 3600)
 }
 
 # -- REGISTERUSERNAME MUTATION
-union RegisterUsernameResult =
-    RegisterUsernameSuccess
-  | RegisterUsernameInputError
+union RegisterUsernameResult = RegisterUsernameSuccess | RegisterUsernameInputError
 
 input RegisterUsernameInput {
   username: String!

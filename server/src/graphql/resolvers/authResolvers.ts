@@ -28,9 +28,7 @@ export const resolvers: Resolvers = {
   },
   Mutation: {
     registerUsername: async (_0, args) => {
-      const usernameError =
-        args.input.username.trim().length < 5 ||
-        args.input.username.trim().length > 15
+      const usernameError = args.input.username.trim().length < 5 || args.input.username.trim().length > 15
       const passwordError = args.input.password.length < 8
 
       if (usernameError || passwordError) {
@@ -38,12 +36,8 @@ export const resolvers: Resolvers = {
           __typename: "RegisterUsernameInputError",
           errorMsg: "Invalid input",
           inputErrors: {
-            username: usernameError
-              ? "Username must be between 5 and 15 characters long"
-              : null,
-            password: passwordError
-              ? "Password must be at least 8 characters long"
-              : null,
+            username: usernameError ? "Username must be between 5 and 15 characters long" : null,
+            password: passwordError ? "Password must be at least 8 characters long" : null,
           },
           code: 400,
         }
@@ -59,6 +53,7 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           inputErrors: {
             username: "Username already in use",
+            password: null,
           },
           code: 400,
         }
@@ -85,10 +80,7 @@ export const resolvers: Resolvers = {
         where: { username: args.input.username },
       })
 
-      if (
-        !user ||
-        !(await bcrypt.compare(args.input.password, user.password))
-      ) {
+      if (!user || !(await bcrypt.compare(args.input.password, user.password))) {
         return {
           __typename: "LoginUsernameInputError",
           errorMsg: "Invalid username and/or password",

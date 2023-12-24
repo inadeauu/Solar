@@ -40,10 +40,7 @@ const App = () => {
           <Route element={<ProtectedRoute />}>
             <Route path="create-community" element={<CreateCommunityPage />} />
             <Route path="settings" element={<AccountSettingsPage />} />
-            <Route
-              path="communities/:id/settings"
-              element={<CommunitySettingsPage />}
-            />
+            <Route path="communities/:id/settings" element={<CommunitySettingsPage />} />
             <Route path="posts/:id/edit" element={<EditPostPage />} />
             <Route path="comments/:id/edit" element={<EditCommentPage />} />
           </Route>

@@ -196,9 +196,15 @@ const LoginPage = () => {
               onClick={() => setShowPass((prev) => !prev)}
             >
               {showPass ? (
-                <PiEyeLight className="w-7 h-7" />
+                <PiEyeLight
+                  data-testid="show-password-icon"
+                  className="w-7 h-7"
+                />
               ) : (
-                <PiEyeSlashLight className="w-7 h-7" />
+                <PiEyeSlashLight
+                  data-testid="hide-password-icon"
+                  className="w-7 h-7"
+                />
               )}
             </div>
           </div>

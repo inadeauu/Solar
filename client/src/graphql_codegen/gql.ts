@@ -13,6 +13,10 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "\n  query AuthUserTest {\n    authUser {\n      ... on AuthUserSuccess {\n        __typename\n        successMsg\n        code\n        user {\n          id\n        }\n      }\n    }\n  }\n": types.AuthUserTestDocument,
+    "\n  mutation RegisterUsernameTest($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on RegisterUsernameInputError {\n        __typename\n        errorMsg\n        code\n        inputErrors {\n          username\n          password\n        }\n      }\n    }\n  }\n": types.RegisterUsernameTestDocument,
+    "\n  mutation LoginUsernameTest($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        user {\n          id\n        }\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.LoginUsernameTestDocument,
+    "\n  mutation LogoutTest {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.LogoutTestDocument,
     "\n  mutation CreateCommentReply($input: CreateCommentReplyInput!) {\n    createCommentReply(input: $input) {\n      ... on CreateCommentReplySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.CreateCommentReplyDocument,
     "\n  mutation EditComment($input: EditCommentInput!) {\n    editComment(input: $input) {\n      ... on EditCommentSuccess {\n        __typename\n        successMsg\n        code\n        comment {\n          body\n          created_at\n          id\n          post {\n            id\n          }\n          owner {\n            id\n            username\n          }\n          voteSum\n          voteStatus\n          replyCount\n        }\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.EditCommentDocument,
     "\n  mutation DeleteComment($input: DeleteCommentInput!) {\n    deleteComment(input: $input) {\n      ... on DeleteCommentSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.DeleteCommentDocument,
@@ -60,6 +64,22 @@ const documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query AuthUserTest {\n    authUser {\n      ... on AuthUserSuccess {\n        __typename\n        successMsg\n        code\n        user {\n          id\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query AuthUserTest {\n    authUser {\n      ... on AuthUserSuccess {\n        __typename\n        successMsg\n        code\n        user {\n          id\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation RegisterUsernameTest($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on RegisterUsernameInputError {\n        __typename\n        errorMsg\n        code\n        inputErrors {\n          username\n          password\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation RegisterUsernameTest($input: RegisterUsernameInput!) {\n    registerUsername(input: $input) {\n      ... on RegisterUsernameSuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on RegisterUsernameInputError {\n        __typename\n        errorMsg\n        code\n        inputErrors {\n          username\n          password\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation LoginUsernameTest($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        user {\n          id\n        }\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation LoginUsernameTest($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        user {\n          id\n        }\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation LogoutTest {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation LogoutTest {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

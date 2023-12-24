@@ -26,6 +26,8 @@ export interface Context {
 const main = async () => {
   const app = express()
 
+  require("@cypress/code-coverage/middleware/express")(app)
+
   const isProduction: boolean = process.env.NODE_ENV === "production"
 
   app.use(cors(corsOptions))
@@ -73,10 +75,7 @@ const main = async () => {
     csrfPrevention: true,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
     formatError: (formattedError, error) => {
-      if (
-        unwrapResolverError(error) instanceof
-        Prisma.PrismaClientKnownRequestError
-      ) {
+      if (unwrapResolverError(error) instanceof Prisma.PrismaClientKnownRequestError) {
         return {
           ...formattedError,
           message: "Request failed",
@@ -104,9 +103,7 @@ const main = async () => {
     })
   )
 
-  await new Promise<void>((resolve) =>
-    httpServer.listen({ port: 4000 }, resolve)
-  )
+  await new Promise<void>((resolve) => httpServer.listen({ port: 4000 }, resolve))
 
   console.log("Server running on: http://localhost:4000")
 }

@@ -6,17 +6,11 @@ type Query @rateLimit(limit: 300, duration: 60) {
 }
 
 type Mutation {
-  createComment(input: CreateCommentInput!): CreateCommentResult!
-    @rateLimit(limit: 10, duration: 60)
-  createCommentReply(
-    input: CreateCommentReplyInput!
-  ): CreateCommentReplyResult! @rateLimit(limit: 10, duration: 60)
-  voteComment(input: VoteCommentInput!): VoteCommentResult!
-    @rateLimit(limit: 120, duration: 60)
-  editComment(input: EditCommentInput!): EditCommentResult!
-    @rateLimit(limit: 10, duration: 60)
-  deleteComment(input: DeleteCommentInput!): DeleteCommentResult!
-    @rateLimit(limit: 10, duration: 60)
+  createComment(input: CreateCommentInput!): CreateCommentResult! @rateLimit(limit: 100, duration: 60)
+  createCommentReply(input: CreateCommentReplyInput!): CreateCommentReplyResult! @rateLimit(limit: 100, duration: 60)
+  voteComment(input: VoteCommentInput!): VoteCommentResult! @rateLimit(limit: 120, duration: 60)
+  editComment(input: EditCommentInput!): EditCommentResult! @rateLimit(limit: 100, duration: 60)
+  deleteComment(input: DeleteCommentInput!): DeleteCommentResult! @rateLimit(limit: 100, duration: 60)
 }
 
 type Comment {
@@ -77,9 +71,7 @@ type CreateCommentInputErrors {
 }
 
 # -- CREATECOMMENTREPLY MUTATION
-union CreateCommentReplyResult =
-    CreateCommentReplySuccess
-  | CreateCommentReplyInputError
+union CreateCommentReplyResult = CreateCommentReplySuccess | CreateCommentReplyInputError
 
 input CreateCommentReplyInput {
   body: String!

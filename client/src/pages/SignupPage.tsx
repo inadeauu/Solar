@@ -53,8 +53,7 @@ enum FieldErrorMsgs {
 }
 
 const SignupPage = () => {
-  const [fieldStates, setFieldStates] =
-    useState<FormFieldStates>(initialFieldStates)
+  const [fieldStates, setFieldStates] = useState<FormFieldStates>(initialFieldStates)
   const [validatingUsername, setValidatingUsername] = useState<boolean>(false)
   const [submitting, setSubmitting] = useState<boolean>(false)
 
@@ -159,9 +158,7 @@ const SignupPage = () => {
       if (data.registerUsername.__typename == "RegisterUsernameSuccess") {
         toast.success("Successfully registered")
         navigate("/login")
-      } else if (
-        data.registerUsername.__typename == "RegisterUsernameInputError"
-      ) {
+      } else if (data.registerUsername.__typename == "RegisterUsernameInputError") {
         setError(data.registerUsername.errorMsg)
       }
     },
@@ -190,28 +187,13 @@ const SignupPage = () => {
       : fieldStates.confirmPassword.errorMsg
 
     usernameSubmitError !== fieldStates.username.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "username",
-        false,
-        usernameSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "username", false, usernameSubmitError)
 
     passwordSubmitError !== fieldStates.password.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "password",
-        false,
-        passwordSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "password", false, passwordSubmitError)
 
     confPasswordSubmitError !== fieldStates.confirmPassword.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "confirmPassword",
-        false,
-        confPasswordSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "confirmPassword", false, confPasswordSubmitError)
 
     if (usernameSubmitError || passwordSubmitError || confPasswordSubmitError) {
       return
@@ -231,9 +213,7 @@ const SignupPage = () => {
           <p className="text-sm mt-[1px]">Home</p>
         </Link>
         <form className="flex flex-col xs:w-[60%] xs-max:w-[80%] mx-auto mt-4">
-          <h1 className="xs:text-3xl xs-max:text-2xl font-medium xs:mb-8 xs-max:mb-6">
-            Sign Up
-          </h1>
+          <h1 className="xs:text-3xl xs-max:text-2xl font-medium xs:mb-8 xs-max:mb-6">Sign Up</h1>
           {error && <ErrorCard error={error} className="mb-4" />}
           <TextInput
             name="username"
@@ -241,21 +221,12 @@ const SignupPage = () => {
             placeholder="Username"
             value={fieldStates.username.value}
             onChange={(e) => {
-              setFieldStateValue(
-                setFieldStates,
-                "username",
-                e.target.value.trim()
-              )
+              setFieldStateValue(setFieldStates, "username", e.target.value.trim())
               validateUsername(e.target.value.trim())
             }}
             onBlur={(e) => {
               if (!e.target.value) {
-                setFieldStateSuccess(
-                  setFieldStates,
-                  "username",
-                  false,
-                  FieldErrorMsgs.REQUIRED
-                )
+                setFieldStateSuccess(setFieldStates, "username", false, FieldErrorMsgs.REQUIRED)
               }
             }}
             error={fieldStates.username.error}
@@ -268,9 +239,7 @@ const SignupPage = () => {
               type={showPass ? "text" : "password"}
               placeholder="Password"
               value={fieldStates.password.value}
-              onChange={(e) =>
-                setFieldStateValue(setFieldStates, "password", e.target.value)
-              }
+              onChange={(e) => setFieldStateValue(setFieldStates, "password", e.target.value)}
               onBlur={(e) => validatePassword(e.target.value)}
               error={fieldStates.password.error}
               errorMsg={fieldStates.password.errorMsg}
@@ -281,9 +250,9 @@ const SignupPage = () => {
               onClick={() => setShowPass((prev) => !prev)}
             >
               {showPass ? (
-                <PiEyeLight className="w-7 h-7" />
+                <PiEyeLight data-testid="show-password-icon" className="w-7 h-7" />
               ) : (
-                <PiEyeSlashLight className="w-7 h-7" />
+                <PiEyeSlashLight data-testid="hide-password-icon" className="w-7 h-7" />
               )}
             </div>
           </div>
@@ -292,13 +261,7 @@ const SignupPage = () => {
             type={showPass ? "text" : "password"}
             placeholder="Confirm Password"
             value={fieldStates.confirmPassword.value}
-            onChange={(e) =>
-              setFieldStateValue(
-                setFieldStates,
-                "confirmPassword",
-                e.target.value
-              )
-            }
+            onChange={(e) => setFieldStateValue(setFieldStates, "confirmPassword", e.target.value)}
             onBlur={(e) => validateConfPassword(e.target.value)}
             error={fieldStates.confirmPassword.error}
             errorMsg={fieldStates.confirmPassword.errorMsg}
@@ -314,18 +277,11 @@ const SignupPage = () => {
             className="btn_blue py-1 px-10 mt-2 mx-auto"
             disabled={submitting}
           >
-            {submitting ? (
-              <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
-            ) : (
-              "Sign Up"
-            )}
+            {submitting ? <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" /> : "Sign Up"}
           </button>
           <p className="text-xs mt-4">
             Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-blue-600 font-semibold hover:underline"
-            >
+            <Link to="/login" className="text-blue-600 font-semibold hover:underline">
               Log In
             </Link>
           </p>

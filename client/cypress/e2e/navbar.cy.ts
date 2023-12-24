@@ -1,4 +1,5 @@
 import { aliasMutation } from "../../src/utils/graphql-test-utils"
+import { translator } from "../../src/utils/uuid"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -121,5 +122,85 @@ describe("Navbar, authenticated", function () {
       .should((res) => expect(res.successMsg).to.eq("Successfully logged out"))
 
     cy.get("@nav-menu-container").should("not.exist")
+  })
+})
+
+describe.only("Search bar", function () {
+  it("Switch search types", function () {
+    cy.visit("/")
+
+    cy.get('[data-testid="searchbar-dropdown"]').as("dropdown").click()
+    cy.get('[data-testid="searchbar-Users"]').as("search-users").click()
+    cy.get('[data-testid="searchbar-input"]')
+      .as("searchbar-input")
+      .invoke("attr", "placeholder")
+      .should("eq", "Search Users")
+
+    cy.get("@dropdown").click()
+    cy.get('[data-testid="searchbar-Communities"]').as("search-communities").click()
+    cy.get("@searchbar-input").invoke("attr", "placeholder").should("eq", "Search Communities")
+  })
+
+  it("Search communities", function () {
+    cy.visit("/")
+
+    cy.get('[data-testid="searchbar-input"]')
+      .as("searchbar-input")
+      .invoke("attr", "placeholder")
+      .should("eq", "Search Communities")
+
+    cy.get("@searchbar-input").type("abc")
+    cy.get('[data-testid="communities-results"]').as("communities-results").children().should("have.length", 1)
+    cy.get("@communities-results").eq(0).should("have.text", "No results")
+    cy.get("@searchbar-input").clear()
+
+    cy.get("@searchbar-input").type("Community")
+    cy.get("@communities-results").children().should("have.length", 2)
+    cy.get("@communities-results")
+      .children()
+      .then((results) => {
+        expect(results.eq(0).children().eq(0)).to.contain.text("Community 1")
+        expect(results.eq(0).children().eq(1)).to.contain.text("1 Member")
+
+        expect(results.eq(1).children().eq(0)).to.contain.text("Community 2")
+        expect(results.eq(1).children().eq(1)).to.contain.text("2 Members")
+      })
+
+    cy.get("@communities-results").children().eq(0).click()
+    cy.url().should(
+      "eq",
+      `http://localhost:5173/communities/${translator.fromUUID("351146cd-1612-4a44-94da-e33d27bedf39")}`
+    )
+  })
+
+  it("Search users", function () {
+    cy.visit("/")
+
+    cy.get('[data-testid="searchbar-input"]').as("searchbar-input")
+    cy.get('[data-testid="searchbar-dropdown"]').as("dropdown").click()
+    cy.get('[data-testid="searchbar-Users"]').as("search-users").click()
+
+    cy.get("@searchbar-input").type("123")
+    cy.get('[data-testid="users-results"]').as("users-results").children().should("have.length", 1)
+    cy.get("@users-results").eq(0).should("have.text", "No results")
+    cy.get("@searchbar-input").clear()
+
+    cy.get("@searchbar-input").type("username")
+    cy.get("@users-results").children().should("have.length", 3)
+    cy.get("@users-results")
+      .children()
+      .then((results) => {
+        expect(results.eq(0).children().eq(0)).to.contain.text("username1")
+        expect(results.eq(0).children().eq(1)).to.contain.text("2 Posts • 2 Comments")
+
+        expect(results.eq(1).children().eq(0)).to.contain.text("username2")
+        expect(results.eq(1).children().eq(1)).to.contain.text("2 Posts • 2 Comments")
+
+        expect(results.eq(2).children().eq(0)).to.contain.text("username3")
+        expect(results.eq(2).children().eq(1)).to.contain.text("1 Post • 1 Comment")
+      })
+
+    cy.get("@users-results").children().eq(0).click()
+    cy.url().should("eq", `http://localhost:5173/profile/username1`)
   })
 })

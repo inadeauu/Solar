@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import { communities, posts, users, comments } from "./seedData"
+import { communities, posts, users, comments, inCommunities } from "./seedData"
 
 const prisma = new PrismaClient()
 
@@ -18,6 +18,21 @@ async function main() {
 
   for (const comment of comments) {
     await prisma.comment.create({ data: comment })
+  }
+
+  for (const union of inCommunities) {
+    await prisma.user.update({
+      where: {
+        id: union.userId,
+      },
+      data: {
+        inCommunities: {
+          connect: {
+            id: union.communityId,
+          },
+        },
+      },
+    })
   }
 }
 

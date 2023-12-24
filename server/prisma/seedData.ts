@@ -17,6 +17,14 @@ export const users = [
     created_at: "2022-05-24T15:42:53.985Z",
     updated_at: "2022-05-24T15:42:53.985Z",
   },
+  {
+    id: "f734d0b4-20a1-4b7b-9d95-f5ad532582df",
+    username: "username3",
+    password: "$2b$10$BRCtrv3HsQUkCnMJoaSOWewJG3OpaTTggJGZLQzib1Wj69qb5rx16",
+    provider: Provider.USERNAME,
+    created_at: "2022-02-24T16:42:12.432Z",
+    updated_at: "2022-02-24T16:42:12.432Z",
+  },
 ]
 
 export const communities = [
@@ -73,6 +81,15 @@ export const posts = [
     created_at: "2023-11-28T11:52:12.876Z",
     updated_at: "2023-11-28T11:52:12.876Z",
   },
+  {
+    id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3",
+    userId: "f734d0b4-20a1-4b7b-9d95-f5ad532582df",
+    communityId: "351146cd-1612-4a44-94da-e33d27bedf39",
+    title: "Post 5",
+    body: "Post body 5",
+    created_at: "2023-10-30T14:52:12.876Z",
+    updated_at: "2023-10-30T14:52:12.876Z",
+  },
 ]
 
 export const comments = [
@@ -111,5 +128,21 @@ export const comments = [
     body: "Comment 4",
     created_at: "2023-12-20T14:52:12.876Z",
     updated_at: "2023-12-20T14:52:12.876Z",
+  },
+  {
+    id: "cb7250c3-e572-4dc7-9063-5c064b5a5ddb",
+    postId: "d98d07e1-e017-4359-bca5-20b95355181e",
+    userId: "f734d0b4-20a1-4b7b-9d95-f5ad532582df",
+    parentId: null,
+    body: "Comment 5",
+    created_at: "2023-12-22T16:32:10.876Z",
+    updated_at: "2023-12-22T16:32:10.876Z",
+  },
+]
+
+export const inCommunities = [
+  {
+    userId: "8d2efb36-a726-425c-ad12-98f2683c5d86",
+    communityId: "41094cb6-470d-4409-85b4-484fd43dd41d",
   },
 ]

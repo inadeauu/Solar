@@ -17,6 +17,7 @@ const SearchBar = () => {
     <div className="flex items-stretch gap-2 w-[50%]">
       <div ref={searchRef} className="flex flex-col w-full relative">
         <input
+          data-testid="searchbar-input"
           value={search}
           placeholder={`Search ${searchType}`}
           className={`px-2 py-1 rounded-md border border-neutral-300 outline-none bg-neutral-50 hover:border-blue-400 focus:border-blue-400 w-full xs-max:placeholder:text-xs placeholder-shown:text-ellipsis ${
@@ -33,15 +34,13 @@ const SearchBar = () => {
         {debouncedSearch &&
           showResults &&
           (searchType == "Communities" ? (
-            <CommunitiesSearchBar
-              debouncedSearch={debouncedSearch}
-              search={search}
-            />
+            <CommunitiesSearchBar debouncedSearch={debouncedSearch} search={search} />
           ) : (
             <UsersSearchBar debouncedSearch={debouncedSearch} search={search} />
           ))}
       </div>
       <Dropdown
+        name="searchbar"
         className={`${showResults && "sm-max:hidden"}`}
         width="w-[110px]"
         items={["Communities", "Users"]}

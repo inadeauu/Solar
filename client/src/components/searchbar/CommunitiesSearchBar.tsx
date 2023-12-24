@@ -11,9 +11,7 @@ type CommunitiesSearchBarProps = {
   search: string
 }
 
-const CommunitiesSearchBar = ({
-  debouncedSearch,
-}: CommunitiesSearchBarProps) => {
+const CommunitiesSearchBar = ({ debouncedSearch }: CommunitiesSearchBarProps) => {
   const navigate = useNavigate()
 
   const { data } = useQuery({
@@ -30,6 +28,7 @@ const CommunitiesSearchBar = ({
 
   return (
     <div
+      data-testid="communities-results"
       className={`absolute top-[34px] bg-white w-full border-r border-b border-l border-neutral-300 flex flex-col ${
         !data?.communities?.edges && "hidden"
       }`}
@@ -44,12 +43,9 @@ const CommunitiesSearchBar = ({
                 navigate(`/communities/${translator.fromUUID(edge.node.id)}`)
               }}
             >
-              <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
-                {edge.node.title}
-              </span>
+              <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">{edge.node.title}</span>
               <span className="text-xs text-neutral-500 xs-max:text-[10px] xs:text-xs">
-                {abbreviate(edge.node.memberCount, 1)}{" "}
-                {pluralize(edge.node.memberCount, "Member")}
+                {abbreviate(edge.node.memberCount, 1)} {pluralize(edge.node.memberCount, "Member")}
               </span>
             </div>
           )

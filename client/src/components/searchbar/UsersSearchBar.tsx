@@ -42,6 +42,7 @@ const UsersSearchBar = ({ debouncedSearch }: UsersSearchBarProps) => {
 
   return (
     <div
+      data-testid="users-results"
       className={`absolute top-[34px] bg-white w-full border-r border-b border-l border-neutral-300 flex flex-col ${
         !data?.users?.edges && "hidden"
       }`}
@@ -54,14 +55,10 @@ const UsersSearchBar = ({ debouncedSearch }: UsersSearchBarProps) => {
               className="flex flex-col px-2 py-1 hover:bg-neutral-200 cursor-pointer overflow-auto"
               onMouseDown={() => navigate(`/profile/${edge.node.username}`)}
             >
-              <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">
-                {edge.node.username}
-              </span>
+              <span className="text-sm text-ellipsis whitespace-nowrap overflow-hidden">{edge.node.username}</span>
               <p className="flex items-center gap-1 text-neutral-500 xs-max:text-[10px] xs:text-xs">
-                {abbreviate(edge.node.postsCount, 1)}{" "}
-                {pluralize(edge.node.postsCount, "Post")} •{" "}
-                {abbreviate(edge.node.commentsCount, 1)}{" "}
-                {pluralize(edge.node.commentsCount, "Comment")}
+                {abbreviate(edge.node.postsCount, 1)} {pluralize(edge.node.postsCount, "Post")} •{" "}
+                {abbreviate(edge.node.commentsCount, 1)} {pluralize(edge.node.commentsCount, "Comment")}
               </p>
             </div>
           ))

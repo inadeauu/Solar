@@ -38,9 +38,7 @@ const NavProfile = () => {
     onSuccess: (data) => {
       if (data.logout.__typename == "LogoutSuccess") {
         queryClient.setQueryData<AuthUserQuery>(["authUser"], (oldData) =>
-          oldData
-            ? { ...oldData, authUser: { ...oldData.authUser, user: null } }
-            : oldData
+          oldData ? { ...oldData, authUser: { ...oldData.authUser, user: null } } : oldData
         )
         navigate("/")
       }
@@ -55,8 +53,8 @@ const NavProfile = () => {
 
   return (
     <div
+      data-testid="nav-profile-menu-container"
       ref={menuRef}
-      data-testid="navbar-profile"
       className="relative"
       onClick={() => setOpenMenu((prev) => !prev)}
     >
@@ -66,20 +64,20 @@ const NavProfile = () => {
         }`}
       >
         <BsPerson className="w-7 h-7 hover:cursor-pointer sm:hidden" />
-        <span className="text-[12px] font-semibold sm-max:hidden">
+        <span data-testid="nav-profile-username" className="text-[12px] font-semibold sm-max:hidden">
           {user?.username}
         </span>
         <span className="pointer-events-none">
-          {openMenu ? (
-            <RiArrowDropUpLine className="w-6 h-6" />
-          ) : (
-            <RiArrowDropDownLine className="w-6 h-6" />
-          )}
+          {openMenu ? <RiArrowDropUpLine className="w-6 h-6" /> : <RiArrowDropDownLine className="w-6 h-6" />}
         </span>
       </div>
       {openMenu && (
-        <div className="absolute right-0 top-11 bg-white w-[200px] border border-neutral-300 rounded-md text-sm font-medium">
+        <div
+          data-testid="nav-profile-menu"
+          className="absolute right-0 top-11 bg-white w-[200px] border border-neutral-300 rounded-md text-sm font-medium"
+        >
           <Link
+            data-testid="profile-button"
             to={`/profile/${user?.username}`}
             className="flex items-center gap-2 p-2 rounded-t-md hover:bg-neutral-200 hover:cursor-pointer"
           >
@@ -89,6 +87,7 @@ const NavProfile = () => {
             Profile
           </Link>
           <Link
+            data-testid="create-community-button"
             to="/create-community"
             className="flex items-center gap-2 p-2 hover:bg-neutral-200 hover:cursor-pointer"
           >
@@ -98,6 +97,7 @@ const NavProfile = () => {
             Create a Community
           </Link>
           <Link
+            data-testid="settings-button"
             to={`/settings`}
             className="flex items-center gap-2 p-2 hover:bg-neutral-200 hover:cursor-pointer"
           >
@@ -107,6 +107,7 @@ const NavProfile = () => {
             Settings
           </Link>
           <div
+            data-testid="logout-button"
             className="flex items-center gap-2 p-2 rounded-b-md hover:bg-neutral-200 hover:cursor-pointer"
             onClick={() => logout.mutate()}
           >

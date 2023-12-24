@@ -10,7 +10,10 @@ const Navbar = () => {
 
   return (
     <header className="border-b border-neutral-300 bg-white h-16 sticky top-0 z-[1000]">
-      <nav className="flex mx-auto items-center max-w-4xl justify-between h-full xs:px-4 xs-max:px-2 gap-6">
+      <nav
+        data-testid="navbar"
+        className="flex mx-auto items-center max-w-4xl justify-between h-full xs:px-4 xs-max:px-2 gap-6"
+      >
         <Link to="/" className="text-3xl font-semibold xs-max:hidden">
           Solar
         </Link>

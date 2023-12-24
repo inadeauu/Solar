@@ -18,22 +18,15 @@ const NavUnauth = () => {
   return (
     <>
       <div className="flex gap-2 xs-max:hidden">
-        <Link
-          to="/signup"
-          className="btn_blue px-3 py-1 whitespace-nowrap"
-          data-testid="signup-button"
-        >
+        <Link data-testid="signup-button" to="/signup" className="btn_blue px-3 py-1 whitespace-nowrap">
           Sign Up
         </Link>
-        <Link
-          to="/login"
-          className="btn_blue px-3 py-1 whitespace-nowrap"
-          data-testid="login-button"
-        >
+        <Link data-testid="login-button" to="/login" className="btn_blue px-3 py-1 whitespace-nowrap">
           Log In
         </Link>
       </div>
       <div
+        data-testid="nav-menu-container"
         ref={menuRef}
         className="relative xs:hidden"
         onClick={() => setOpenMenu((prev) => !prev)}
@@ -45,19 +38,18 @@ const NavUnauth = () => {
         >
           <BsPerson className="w-7 h-7 hover:cursor-pointer lg:hidden" />
           <span className="pointer-events-none">
-            {openMenu ? (
-              <RiArrowDropUpLine className="w-6 h-6" />
-            ) : (
-              <RiArrowDropDownLine className="w-6 h-6" />
-            )}
+            {openMenu ? <RiArrowDropUpLine className="w-6 h-6" /> : <RiArrowDropDownLine className="w-6 h-6" />}
           </span>
         </div>
         {openMenu && (
-          <div className="absolute right-0 top-11 bg-neutral-50 w-[110px] border border-neutral-300 rounded-md text-sm font-medium">
+          <div
+            data-testid="nav-menu"
+            className="absolute right-0 top-11 bg-neutral-50 w-[110px] border border-neutral-300 rounded-md text-sm font-medium"
+          >
             <Link
               to="/signup"
               className="flex items-center gap-2 p-2 rounded-t-md hover:bg-neutral-200 hover:cursor-pointer"
-              data-testid="signup-button"
+              data-testid="menu-signup-button"
             >
               <div className="w-[25%]">
                 <BsPersonPlus className="w-5 h-5" />
@@ -67,7 +59,7 @@ const NavUnauth = () => {
             <Link
               to="/login"
               className="flex items-center gap-2 p-2 rounded-b-md hover:bg-neutral-200 hover:cursor-pointer"
-              data-testid="login-button"
+              data-testid="menu-login-button"
             >
               <div className="w-[25%]">
                 <FiLogIn className="w-4 h-4 mr-auto" />

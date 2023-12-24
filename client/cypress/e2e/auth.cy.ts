@@ -112,7 +112,7 @@ describe("Sign up form", function () {
 })
 
 describe("Log in form", function () {
-  it("Check log in works", function () {
+  it.only("Check log in works", function () {
     cy.visit("/")
 
     cy.get('[data-testid="login-button"]').click()
@@ -133,7 +133,7 @@ describe("Log in form", function () {
     cy.url().should("eq", "http://localhost:5173/")
     cy.reload()
 
-    cy.get('[data-testid="navbar-profile"')
+    cy.get('[data-testid="nav-profile-menu-container"')
   })
 
   it("Check input errors display", function () {

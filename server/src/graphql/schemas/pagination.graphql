@@ -45,6 +45,7 @@ type PostEdge {
 type PostConnection {
   edges: [PostEdge!]!
   pageInfo: PageInfo!
+  orderBy: String
 }
 
 # -- COMMUNITY

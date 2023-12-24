@@ -623,6 +623,7 @@ export type Post = {
 export type PostConnection = {
   __typename?: 'PostConnection';
   edges: Array<PostEdge>;
+  orderBy?: Maybe<Scalars['String']['output']>;
   pageInfo: PageInfo;
 };
 
@@ -1617,6 +1618,7 @@ export type PostResolvers<ContextType = Context, ParentType extends ResolversPar
 
 export type PostConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['PostConnection'] = ResolversParentTypes['PostConnection']> = ResolversObject<{
   edges?: Resolver<Array<ResolversTypes['PostEdge']>, ParentType, ContextType>;
+  orderBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

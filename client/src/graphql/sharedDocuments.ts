@@ -76,6 +76,7 @@ export const getPostFeedDocument = graphql(/* GraphQL */ `
         }
         hasNextPage
       }
+      orderBy
     }
   }
 `)

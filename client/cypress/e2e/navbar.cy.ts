@@ -125,7 +125,7 @@ describe("Navbar, authenticated", function () {
   })
 })
 
-describe.only("Search bar", function () {
+describe("Search bar", function () {
   it("Switch search types", function () {
     cy.visit("/")
 

@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import { communities, posts, users, comments, inCommunities } from "./seedData"
+import { communities, posts, users, comments, inCommunities, votedPosts } from "./seedData"
 
 const prisma = new PrismaClient()
 
@@ -32,6 +32,12 @@ async function main() {
           },
         },
       },
+    })
+  }
+
+  for (const postVote of votedPosts) {
+    await prisma.postVote.create({
+      data: postVote,
     })
   }
 }

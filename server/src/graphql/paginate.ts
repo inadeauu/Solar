@@ -1,12 +1,7 @@
 import { Comment, Community, Post, Prisma, User } from "@prisma/client"
 import { GraphQLError } from "graphql"
 import prisma from "../config/prisma"
-import {
-  CommentsFilters,
-  CommunitiesFilters,
-  PostsFilters,
-  UsersFilters,
-} from "../__generated__/resolvers-types"
+import { CommentsFilters, CommunitiesFilters, PostsFilters, UsersFilters } from "../__generated__/resolvers-types"
 
 type Cursor = {
   id: string
@@ -33,6 +28,7 @@ interface PageInfo {
 export interface PaginateReturn<T> {
   edges: Array<Edge<T>>
   pageInfo: PageInfo
+  orderBy?: string
 }
 
 type PostPaginate = Post & { voteSum: number }
@@ -104,8 +100,7 @@ export const paginatePosts = async (
 
   const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
 
-  const nodes: PostPaginate[] =
-    await prisma.$queryRaw`${postsQuery} ${where} ${orderBy} ${limit}`
+  const nodes: PostPaginate[] = await prisma.$queryRaw`${postsQuery} ${where} ${orderBy} ${limit}`
 
   const edges: Edge<Post>[] = nodes.map((node) => {
     return {
@@ -125,8 +120,7 @@ export const paginatePosts = async (
     nodes.pop()
   }
 
-  const endCursor =
-    edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
+  const endCursor = edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
 
   const pageInfo: PageInfo = {
     endCursor,
@@ -136,6 +130,7 @@ export const paginatePosts = async (
   return {
     edges,
     pageInfo,
+    orderBy: filters.orderBy,
   }
 }
 
@@ -215,8 +210,7 @@ export const paginateComments = async (
 
   const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
 
-  const nodes: CommentPaginate[] =
-    await prisma.$queryRaw`${commentsQuery} ${where} ${orderBy} ${limit}`
+  const nodes: CommentPaginate[] = await prisma.$queryRaw`${commentsQuery} ${where} ${orderBy} ${limit}`
 
   const edges: Edge<Comment>[] = nodes.map((node) => {
     return {
@@ -236,8 +230,7 @@ export const paginateComments = async (
     nodes.pop()
   }
 
-  const endCursor =
-    edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
+  const endCursor = edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
 
   const pageInfo: PageInfo = {
     endCursor,
@@ -284,8 +277,7 @@ export const paginateCommunities = async (
 
   const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
 
-  const nodes: CommunityPaginate[] =
-    await prisma.$queryRaw`${communitiesQuery} ${where} ${orderBy} ${limit}`
+  const nodes: CommunityPaginate[] = await prisma.$queryRaw`${communitiesQuery} ${where} ${orderBy} ${limit}`
 
   const edges: Edge<Community>[] = nodes.map((node) => {
     return {
@@ -305,8 +297,7 @@ export const paginateCommunities = async (
     nodes.pop()
   }
 
-  const endCursor =
-    edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
+  const endCursor = edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
 
   const pageInfo: PageInfo = {
     endCursor,
@@ -347,8 +338,7 @@ export const paginateUsers = async (
 
   const limit = Prisma.sql`LIMIT ${paginateArgs.first + 1}`
 
-  const nodes: User[] =
-    await prisma.$queryRaw`${usersQuery} ${where} ${orderBy} ${limit}`
+  const nodes: User[] = await prisma.$queryRaw`${usersQuery} ${where} ${orderBy} ${limit}`
 
   const edges: Edge<User>[] = nodes.map((node) => {
     return {
@@ -368,8 +358,7 @@ export const paginateUsers = async (
     nodes.pop()
   }
 
-  const endCursor =
-    edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
+  const endCursor = edges.length && hasNextPage ? edges[edges.length - 1].cursor : undefined
 
   const pageInfo: PageInfo = {
     endCursor,

@@ -2,11 +2,7 @@ import { useCallback, useState } from "react"
 import Modal from "../../misc/Modal"
 import TextInput from "../../misc/TextInput"
 import { ImSpinner11 } from "react-icons/im"
-import {
-  FieldState,
-  FieldStates,
-  initialFieldState,
-} from "../../../types/shared"
+import { FieldState, FieldStates, initialFieldState } from "../../../types/shared"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../../../utils/graphql"
 import { debounce } from "lodash"
@@ -14,13 +10,10 @@ import { setFieldStateSuccess, setFieldStateValue } from "../../../utils/form"
 import { toast } from "react-toastify"
 import { communityTitleExistsDocument } from "../../../graphql/sharedDocuments"
 import { graphql } from "../../../graphql_codegen/gql"
-import {
-  ChangeCommunityTitleInput,
-  CommunityQuery,
-} from "../../../graphql_codegen/graphql"
+import { ChangeCommunityTitleInput, CommunityQuery } from "../../../graphql_codegen/graphql"
 
 const changeCommunityTitleDocument = graphql(/* GraphQL */ `
-  mutation Mutation($input: ChangeCommunityTitleInput!) {
+  mutation ChangeCommunityTitle($input: ChangeCommunityTitleInput!) {
     changeCommunityTitle(input: $input) {
       ... on ChangeCommunityTitleSuccess {
         __typename
@@ -72,13 +65,8 @@ enum FieldErrorMsgs {
   TITLE_TAKEN = "Title in use",
 }
 
-const CommunityTitleChangeModal = ({
-  communityId,
-  isOpen,
-  onClose,
-}: CommunityTitleChangeModalProps) => {
-  const [fieldStates, setFieldStates] =
-    useState<FormFieldStates>(initialFieldStates)
+const CommunityTitleChangeModal = ({ communityId, isOpen, onClose }: CommunityTitleChangeModalProps) => {
+  const [fieldStates, setFieldStates] = useState<FormFieldStates>(initialFieldStates)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [validatingTitle, setValidatingTitle] = useState<boolean>(false)
 
@@ -91,34 +79,22 @@ const CommunityTitleChangeModal = ({
       })
     },
     onSuccess: (data) => {
-      if (
-        data.changeCommunityTitle.__typename == "ChangeCommunityTitleSuccess"
-      ) {
+      if (data.changeCommunityTitle.__typename == "ChangeCommunityTitleSuccess") {
         const updatedCommunity = data.changeCommunityTitle.community
         fieldStates.title = initialFieldState
-        queryClient.setQueryData<CommunityQuery>(
-          ["community", updatedCommunity.id],
-          (oldData) => {
-            return oldData
-              ? {
-                  ...oldData,
-                  community: updatedCommunity,
-                }
-              : oldData
-          }
-        )
+        queryClient.setQueryData<CommunityQuery>(["community", updatedCommunity.id], (oldData) => {
+          return oldData
+            ? {
+                ...oldData,
+                community: updatedCommunity,
+              }
+            : oldData
+        })
         toast.success("Successfully changed title")
         onClose()
-      } else if (
-        data.changeCommunityTitle.__typename == "ChangeCommunityTitleInputError"
-      ) {
+      } else if (data.changeCommunityTitle.__typename == "ChangeCommunityTitleInputError") {
         if (data.changeCommunityTitle.inputErrors.newTitle) {
-          setFieldStateSuccess(
-            setFieldStates,
-            "title",
-            false,
-            data.changeCommunityTitle.inputErrors.newTitle
-          )
+          setFieldStateSuccess(setFieldStates, "title", false, data.changeCommunityTitle.inputErrors.newTitle)
         }
       }
     },
@@ -132,12 +108,9 @@ const CommunityTitleChangeModal = ({
     } else if (title.length > 25) {
       error = FieldErrorMsgs.TITLE_LENGTH
     } else {
-      const response = await graphQLClient.request(
-        communityTitleExistsDocument,
-        {
-          title,
-        }
-      )
+      const response = await graphQLClient.request(communityTitleExistsDocument, {
+        title,
+      })
 
       if (response.titleExists) {
         error = FieldErrorMsgs.TITLE_TAKEN
@@ -197,6 +170,7 @@ const CommunityTitleChangeModal = ({
 
   return (
     <Modal
+      testid="change-community-title-modal"
       isOpen={isOpen}
       onClose={() => {
         fieldStates.title = initialFieldState
@@ -207,7 +181,7 @@ const CommunityTitleChangeModal = ({
         <h1 className="text-xl font-medium mb-4">Change Community Title</h1>
         <div className="flex flex-col">
           <TextInput
-            name="title"
+            name="new-title"
             type="text"
             placeholder="New Title"
             value={fieldStates.title.value}
@@ -217,12 +191,7 @@ const CommunityTitleChangeModal = ({
             }}
             onBlur={(e) => {
               if (!e.target.value) {
-                setFieldStateSuccess(
-                  setFieldStates,
-                  "title",
-                  false,
-                  FieldErrorMsgs.REQUIRED
-                )
+                setFieldStateSuccess(setFieldStates, "title", false, FieldErrorMsgs.REQUIRED)
               }
             }}
             error={fieldStates.title.error}
@@ -231,6 +200,7 @@ const CommunityTitleChangeModal = ({
           />
         </div>
         <button
+          data-testid="change-title-modal-submit"
           type="button"
           onClick={() => {
             submitEditCommunityTitle()
@@ -239,11 +209,7 @@ const CommunityTitleChangeModal = ({
           className="btn_blue py-1 px-2 mt-2 self-end text-sm disabled:bg-blue-300"
           disabled={submitting}
         >
-          {submitting ? (
-            <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
-          ) : (
-            "Submit"
-          )}
+          {submitting ? <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" /> : "Submit"}
         </button>
       </form>
     </Modal>

@@ -31,14 +31,14 @@ export const communities = [
   {
     id: "351146cd-1612-4a44-94da-e33d27bedf39",
     userId: "8d2efb36-a726-425c-ad12-98f2683c5d86",
-    title: "Community 1",
+    title: "Community1",
     created_at: "2023-05-27T17:21:45.432Z",
     updated_at: "2023-05-27T17:21:45.432Z",
   },
   {
     id: "41094cb6-470d-4409-85b4-484fd43dd41d",
     userId: "266c189f-5986-404a-9889-0a54c298acb2",
-    title: "Community 2",
+    title: "Community2",
     created_at: "2023-06-27T09:52:32.876Z",
     updated_at: "2023-06-27T09:52:12.876Z",
   },

@@ -159,10 +159,10 @@ describe("Search bar", function () {
     cy.get("@communities-results")
       .children()
       .then((results) => {
-        expect(results.eq(0).children().eq(0)).to.have.text("Community 1")
+        expect(results.eq(0).children().eq(0)).to.have.text("Community1")
         expect(results.eq(0).children().eq(1)).to.have.text("1 Member")
 
-        expect(results.eq(1).children().eq(0)).to.have.text("Community 2")
+        expect(results.eq(1).children().eq(0)).to.have.text("Community2")
         expect(results.eq(1).children().eq(1)).to.have.text("2 Members")
       })
 

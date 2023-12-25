@@ -2,11 +2,7 @@ import { useState } from "react"
 import Modal from "../../misc/Modal"
 import TextInput from "../../misc/TextInput"
 import { ImSpinner11 } from "react-icons/im"
-import {
-  FieldState,
-  FieldStates,
-  initialFieldState,
-} from "../../../types/shared"
+import { FieldState, FieldStates, initialFieldState } from "../../../types/shared"
 import { useMutation } from "@tanstack/react-query"
 import { graphQLClient } from "../../../utils/graphql"
 import { setFieldStateSuccess, setFieldStateValue } from "../../../utils/form"
@@ -55,14 +51,8 @@ enum FieldErrorMsgs {
   TITLE_MATCH = "Please enter your community's title",
 }
 
-const DeleteCommunityModal = ({
-  communityId,
-  communityTitle,
-  isOpen,
-  onClose,
-}: DeleteCommunityModalProps) => {
-  const [fieldStates, setFieldStates] =
-    useState<FormFieldStates>(initialFieldStates)
+const DeleteCommunityModal = ({ communityId, communityTitle, isOpen, onClose }: DeleteCommunityModalProps) => {
+  const [fieldStates, setFieldStates] = useState<FormFieldStates>(initialFieldStates)
   const [submitting, setSubmitting] = useState<boolean>(false)
 
   const navigate = useNavigate()
@@ -79,16 +69,9 @@ const DeleteCommunityModal = ({
         toast.success("Successfully deleted community")
         onClose()
         navigate("/")
-      } else if (
-        data.deleteCommunity.__typename == "DeleteCommunityInputError"
-      ) {
+      } else if (data.deleteCommunity.__typename == "DeleteCommunityInputError") {
         if (data.deleteCommunity.inputErrors?.title) {
-          setFieldStateSuccess(
-            setFieldStates,
-            "title",
-            false,
-            data.deleteCommunity.inputErrors.title
-          )
+          setFieldStateSuccess(setFieldStates, "title", false, data.deleteCommunity.inputErrors.title)
         }
       }
     },
@@ -138,6 +121,7 @@ const DeleteCommunityModal = ({
 
   return (
     <Modal
+      testid="delete-community-modal"
       isOpen={isOpen}
       onClose={() => {
         fieldStates.title = initialFieldState
@@ -147,14 +131,11 @@ const DeleteCommunityModal = ({
       <form className="flex flex-col w-[80%]">
         <div className="flex flex-col gap-2 mb-4">
           <h1 className="text-xl font-medium">Delete Community</h1>
-          <p className="text-sm">
-            This will delete everything, including all of your community's posts
-            and comments.
-          </p>
+          <p className="text-sm">This will delete everything, including all of your community's posts and comments.</p>
         </div>
         <div className="flex flex-col">
           <TextInput
-            name="title"
+            name="delete-title"
             type="text"
             placeholder="Title"
             value={fieldStates.title.value}
@@ -170,6 +151,7 @@ const DeleteCommunityModal = ({
           />
         </div>
         <button
+          data-testid="submit-delete-community"
           type="button"
           onClick={() => {
             submitEditCommunityTitle()
@@ -178,11 +160,7 @@ const DeleteCommunityModal = ({
           className="btn_red py-1 px-2 mt-2 self-end text-sm"
           disabled={submitting}
         >
-          {submitting ? (
-            <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
-          ) : (
-            "Delete"
-          )}
+          {submitting ? <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" /> : "Delete"}
         </button>
       </form>
     </Modal>

@@ -1,6 +1,6 @@
 import { recurse } from "cypress-recurse"
 import { PostFeedQuery } from "../../src/graphql_codegen/graphql"
-import { aliasQuery } from "../../src/utils/graphql-test-utils"
+import { aliasMutation, aliasQuery } from "../../src/utils/graphql-test-utils"
 import { translator } from "../../src/utils/uuid"
 
 beforeEach(function () {
@@ -9,6 +9,14 @@ beforeEach(function () {
 
   cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
     aliasQuery(req, "PostFeed")
+    aliasMutation(req, "CreateCommunityPost")
+  })
+})
+
+describe("Navigation", function () {
+  it("Redirect if community not found", function () {
+    cy.visit("/communities/123")
+    cy.location("pathname").should("eq", "/404-not-found")
   })
 })
 
@@ -62,7 +70,7 @@ describe("Post form, authenticated", function () {
     cy.get("@post-button").should("be.disabled")
   })
 
-  it("Check post creation", function () {
+  it.only("Check post creation", function () {
     cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
     cy.get('[data-testid="open-post-form-button"]').as("open-post-form-button").click()
     cy.get('[data-testid="post-title-input"]').as("post-title-input").type("Post title")
@@ -72,6 +80,13 @@ describe("Post form, authenticated", function () {
     cy.get("@open-post-form-button").click()
     cy.get("@post-title-input").should("have.value", "")
     cy.get("@post-body-input").should("have.value", "")
+
+    cy.wait("@gqlCreateCommunityPostMutation").then(({ response }) => {
+      cy.wrap(response?.body.data)
+        .its("createPost")
+        .should((res) => expect(res.code).to.eq(200))
+        .should((res) => expect(res.successMsg).to.eq("Successfully created post"))
+    })
 
     cy.get('[data-testid="community-post-0-title"]').should("have.text", "Post title")
     cy.get('[data-testid="community-post-0-body"]').should("have.text", "Post body")
@@ -149,6 +164,8 @@ describe("Post feed", function () {
         return children.length == 14 && posts.length == 13
       }
     ).then(() => {
+      expect(posts.every((post) => post.node.community.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
+
       expect(
         posts.every((post, i) => {
           if (i == 0) {
@@ -190,6 +207,8 @@ describe("Post feed", function () {
         return children.length == 14 && posts.length == 13
       }
     ).then(() => {
+      expect(posts.every((post) => post.node.community.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
+
       expect(
         posts.every((post, i) => {
           if (i == 0) {
@@ -231,6 +250,8 @@ describe("Post feed", function () {
         return children.length == 14 && posts.length == 13
       }
     ).then(() => {
+      expect(posts.every((post) => post.node.community.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
+
       expect(
         posts.every((post, i) => {
           if (i == 0) {
@@ -270,6 +291,8 @@ describe("Post feed", function () {
         return children.length == 14 && posts.length == 13
       }
     ).then(() => {
+      expect(posts.every((post) => post.node.community.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
+
       expect(
         posts.every((post, i) => {
           if (i == 0) {
@@ -306,7 +329,7 @@ describe("Sidebar", function () {
   it("Check correct information", function () {
     cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
 
-    cy.get('[data-testid="community-title"]').should("have.text", "Community 1")
+    cy.get('[data-testid="community-title"]').should("have.text", "Community1")
     cy.get('[data-testid="community-created-at"]').should("have.text", "Created 05/27/2023")
     cy.get('[data-testid="community-member-count"]').should("have.text", "1 Member")
     cy.get('[data-testid="community-post-count"]').should("have.text", "13 Posts")
@@ -364,7 +387,7 @@ describe("Header (small screen)", function () {
     cy.viewport(300, 600)
     cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
 
-    cy.get('[data-testid="community-header-title"]').should("have.text", "Community 1")
+    cy.get('[data-testid="community-header-title"]').should("have.text", "Community1")
     cy.get('[data-testid="community-header-created-at"]').should("have.text", "Created 05/27/2023")
     cy.get('[data-testid="community-header-posts-and-members"]').should("have.text", "1 Member • 13 Posts")
 

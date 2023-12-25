@@ -159,11 +159,11 @@ describe("Search bar", function () {
     cy.get("@communities-results")
       .children()
       .then((results) => {
-        expect(results.eq(0).children().eq(0)).to.contain.text("Community 1")
-        expect(results.eq(0).children().eq(1)).to.contain.text("1 Member")
+        expect(results.eq(0).children().eq(0)).to.have.text("Community 1")
+        expect(results.eq(0).children().eq(1)).to.have.text("1 Member")
 
-        expect(results.eq(1).children().eq(0)).to.contain.text("Community 2")
-        expect(results.eq(1).children().eq(1)).to.contain.text("2 Members")
+        expect(results.eq(1).children().eq(0)).to.have.text("Community 2")
+        expect(results.eq(1).children().eq(1)).to.have.text("2 Members")
       })
 
     cy.get("@communities-results").children().eq(0).click()
@@ -190,14 +190,14 @@ describe("Search bar", function () {
     cy.get("@users-results")
       .children()
       .then((results) => {
-        expect(results.eq(0).children().eq(0)).to.contain.text("username1")
-        expect(results.eq(0).children().eq(1)).to.contain.text("2 Posts • 2 Comments")
+        expect(results.eq(0).children().eq(0)).to.have.text("username1")
+        expect(results.eq(0).children().eq(1)).to.have.text("18 Posts • 2 Comments")
 
-        expect(results.eq(1).children().eq(0)).to.contain.text("username2")
-        expect(results.eq(1).children().eq(1)).to.contain.text("2 Posts • 2 Comments")
+        expect(results.eq(1).children().eq(0)).to.have.text("username2")
+        expect(results.eq(1).children().eq(1)).to.have.text("2 Posts • 2 Comments")
 
-        expect(results.eq(2).children().eq(0)).to.contain.text("username3")
-        expect(results.eq(2).children().eq(1)).to.contain.text("1 Post • 1 Comment")
+        expect(results.eq(2).children().eq(0)).to.have.text("username3")
+        expect(results.eq(2).children().eq(1)).to.have.text("1 Post • 1 Comment")
       })
 
     cy.get("@users-results").children().eq(0).click()

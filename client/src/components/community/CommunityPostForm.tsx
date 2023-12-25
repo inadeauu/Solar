@@ -80,11 +80,7 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
 
         setOpenEditor(false)
 
-        queryClient.resetQueries([
-          "communityPostFeed",
-          community.id,
-          postOrderByType,
-        ])
+        queryClient.resetQueries(["communityPostFeed", community.id, postOrderByType])
       } else if (data.createPost.__typename == "CreatePostInputError") {
         setError(data.createPost.errorMsg)
       }
@@ -113,6 +109,7 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
     <div className="bg-white border border-neutral-300 rounded-lg p-4">
       {!openEditor ? (
         <button
+          data-testid="open-post-form-button"
           onClick={() => {
             if (!user) {
               navigate("/login")
@@ -126,8 +123,9 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
           Create Post
         </button>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div data-testid="post-form" className="flex flex-col gap-4">
           <button
+            data-testid="close-post-form-button"
             onClick={() => {
               setOpenEditor((prev) => !prev)
             }}
@@ -139,6 +137,7 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
             {error && <ErrorCard error={error} className="mb-4" />}
             <div className="flex flex-col gap-1">
               <input
+                data-testid="post-title-input"
                 name="title"
                 type="text"
                 placeholder="Title"
@@ -147,12 +146,9 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
                 className="rounded-lg border w-full px-2 py-1 outline-none transition-all duration-200 placeholder:font-light border-neutral-500 hover:border-blue-400 focus:border-blue-400"
               />
               <span
+                data-testid="post-title-length-indicator"
                 className={`text-xs font-semibold self-end
-                  ${
-                    title.trim().length <= 0 || title.length > 200
-                      ? "text-red-500"
-                      : "text-green-500"
-                  }
+                  ${title.trim().length <= 0 || title.length > 200 ? "text-red-500" : "text-green-500"}
                 `}
               >
                 {title.length}/200
@@ -160,6 +156,7 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
             </div>
             <div className="flex flex-col gap-1">
               <textarea
+                data-testid="post-body-input"
                 ref={textAreaRef}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
@@ -167,32 +164,23 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
                 placeholder="Body (optional)"
               />
               <span
-                className={`text-xs font-semibold self-end ${
-                  body.length > 20000 && "text-red-500"
-                }`}
+                data-testid="post-body-length-indicator"
+                className={`text-xs font-semibold self-end ${body.length > 20000 && "text-red-500"}`}
               >
                 {body.length}/20000
               </span>
             </div>
             <button
+              data-testid="post-button"
               type="button"
               onClick={() => {
                 submitCreatePost()
                 setSubmitting(false)
               }}
               className="btn_blue px-3 py-1 self-end"
-              disabled={
-                title.trim().length <= 0 ||
-                title.length > 200 ||
-                body.length > 20000 ||
-                submitting
-              }
+              disabled={title.trim().length <= 0 || title.length > 200 || body.length > 20000 || submitting}
             >
-              {submitting ? (
-                <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" />
-              ) : (
-                "Post"
-              )}
+              {submitting ? <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" /> : "Post"}
             </button>
           </form>
         </div>

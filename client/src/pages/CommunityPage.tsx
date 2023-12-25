@@ -28,6 +28,7 @@ const CommunityPage = () => {
         <CommunityHeader community={data.community} />
         <CommunityPostForm community={data.community} />
         <Dropdown
+          name="order"
           className="py-1"
           width="w-[65px]"
           items={["New", "Old", "Top", "Low"]}

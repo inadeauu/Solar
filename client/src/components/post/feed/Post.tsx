@@ -11,14 +11,10 @@ type PostProps = {
   innerRef?: Ref<HTMLAnchorElement> | undefined
   queryKey: any[]
   communityFeed?: boolean
+  testid?: string
 }
 
-const Post = ({
-  post,
-  innerRef,
-  queryKey,
-  communityFeed = false,
-}: PostProps) => {
+const Post = ({ post, innerRef, queryKey, communityFeed = false, testid }: PostProps) => {
   const { user } = useAuth()
   const [overflown, setOverflown] = useState<boolean>(false)
   const bodyRef = useRef<HTMLDivElement | null>(null)
@@ -33,6 +29,7 @@ const Post = ({
 
   return (
     <Link
+      data-testid={testid}
       ref={innerRef}
       to={`/posts/${translator.fromUUID(post.id)}`}
       className="bg-white border border-neutral-300 rounded-lg p-4 hover:cursor-pointer hover:border-black group"
@@ -48,9 +45,7 @@ const Post = ({
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    navigate(
-                      `/communities/${translator.fromUUID(post.community.id)}`
-                    )
+                    navigate(`/communities/${translator.fromUUID(post.community.id)}`)
                   }}
                 >
                   {post.community.title}
@@ -74,6 +69,7 @@ const Post = ({
           </span>
           {user?.id == post.owner.id && (
             <button
+              data-testid={`${testid}-edit-button`}
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -86,17 +82,17 @@ const Post = ({
             </button>
           )}
         </div>
-        <span className="font-medium text-lg">{post.title}</span>
+        <span data-testid={`${testid}-title`} className="font-medium text-lg">
+          {post.title}
+        </span>
         {post.body && (
           <div ref={bodyRef} className="max-h-[250px] overflow-hidden">
-            <p className="text-sm font-light text-neutral-800">{post.body}</p>
+            <p data-testid={`${testid}-body`} className="text-sm font-light text-neutral-800">
+              {post.body}
+            </p>
           </div>
         )}
-        {overflown && (
-          <span className="text-sm text-blue-400 group-visited:text-violet-400">
-            See Full Post
-          </span>
-        )}
+        {overflown && <span className="text-sm text-blue-400 group-visited:text-violet-400">See Full Post</span>}
       </div>
       <PostFooter post={post} queryKey={queryKey} />
     </Link>

@@ -112,7 +112,7 @@ describe("Sign up form", function () {
 })
 
 describe("Log in form", function () {
-  it.only("Check log in works", function () {
+  it("Check log in works", function () {
     cy.visit("/")
 
     cy.get('[data-testid="login-button"]').click()

@@ -18,7 +18,7 @@ describe("Post feed", function () {
     cy.visit("/")
 
     cy.get('[data-testid="no-posts-text"]').as("no-posts-text").should("exist")
-    cy.get("@no-posts-text").should("contain.text", "No Posts")
+    cy.get("@no-posts-text").should("have.text", "No Posts")
   })
 
   it("Check infinite scroll", function () {
@@ -64,7 +64,7 @@ describe("Post feed", function () {
         cy.wait("@gqlPostFeedQuery").then(({ response }) => {
           if (!response) throw new Error("Response not present")
 
-          if (response.body.data.orderBy == "NEW") {
+          if (response.body.data.posts.orderBy == "NEW") {
             posts = posts.concat(response.body.data.posts.edges)
           }
         })
@@ -72,11 +72,9 @@ describe("Post feed", function () {
         return cy.get("@home-post-feed").children()
       },
       (children) => {
-        return children.length == 22
+        return children.length == 22 && posts.length == 21
       }
     ).then(() => {
-      posts = posts.slice(0, posts.length - 2)
-
       expect(
         posts.every((post, i) => {
           if (i == 0) {
@@ -108,7 +106,7 @@ describe("Post feed", function () {
         cy.wait("@gqlPostFeedQuery").then(({ response }) => {
           if (!response) throw new Error("Response not present")
 
-          if (response.body.data.orderBy == "OLD") {
+          if (response.body.data.posts.orderBy == "OLD") {
             posts = posts.concat(response.body.data.posts.edges)
           }
         })
@@ -116,11 +114,9 @@ describe("Post feed", function () {
         return cy.get("@home-post-feed").children()
       },
       (children) => {
-        return children.length == 22
+        return children.length == 22 && posts.length == 21
       }
     ).then(() => {
-      posts = posts.slice(0, posts.length - 2)
-
       expect(
         posts.every((post, i) => {
           if (i == 0) {
@@ -152,7 +148,7 @@ describe("Post feed", function () {
         cy.wait("@gqlPostFeedQuery").then(({ response }) => {
           if (!response) throw new Error("Response not present")
 
-          if (response.body.data.orderBy == "LOW") {
+          if (response.body.data.posts.orderBy == "LOW") {
             posts = posts.concat(response.body.data.posts.edges)
           }
         })
@@ -160,19 +156,17 @@ describe("Post feed", function () {
         return cy.get("@home-post-feed").children()
       },
       (children) => {
-        return children.length == 22
+        return children.length == 22 && posts.length == 21
       }
     ).then(() => {
-      posts = posts.slice(0, posts.length - 2)
-
       expect(
         posts.every((post, i) => {
           if (i == 0) {
-            return post.node.voteSum < posts[i + 1].node.voteSum
+            return post.node.voteSum <= posts[i + 1].node.voteSum
           } else if (i == posts.length - 1) {
-            return post.node.voteSum > posts[i - 1].node.voteSum
+            return post.node.voteSum >= posts[i - 1].node.voteSum
           } else {
-            return post.node.voteSum < posts[i + 1].node.voteSum && post.node.voteSum > posts[i - 1].node.voteSum
+            return post.node.voteSum <= posts[i + 1].node.voteSum && post.node.voteSum >= posts[i - 1].node.voteSum
           }
         })
       ).to.be.true
@@ -194,7 +188,7 @@ describe("Post feed", function () {
         cy.wait("@gqlPostFeedQuery").then(({ response }) => {
           if (!response) throw new Error("Response not present")
 
-          if (response.body.data.orderBy == "TOP") {
+          if (response.body.data.posts.orderBy == "TOP") {
             posts = posts.concat(response.body.data.posts.edges)
           }
         })
@@ -202,19 +196,17 @@ describe("Post feed", function () {
         return cy.get("@home-post-feed").children()
       },
       (children) => {
-        return children.length == 22
+        return children.length == 22 && posts.length == 21
       }
     ).then(() => {
-      posts = posts.slice(0, posts.length - 2)
-
       expect(
         posts.every((post, i) => {
           if (i == 0) {
-            return post.node.voteSum > posts[i + 1].node.voteSum
+            return post.node.voteSum >= posts[i + 1].node.voteSum
           } else if (i == posts.length - 1) {
-            return post.node.voteSum < posts[i - 1].node.voteSum
+            return post.node.voteSum <= posts[i - 1].node.voteSum
           } else {
-            return post.node.voteSum > posts[i + 1].node.voteSum && post.node.voteSum < posts[i - 1].node.voteSum
+            return post.node.voteSum >= posts[i + 1].node.voteSum && post.node.voteSum <= posts[i - 1].node.voteSum
           }
         })
       ).to.be.true

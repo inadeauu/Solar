@@ -17,14 +17,7 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
 
   const { postOrderByType } = useContext(CommunityContext)
 
-  const {
-    data,
-    isLoading,
-    isSuccess,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(
+  const { data, isLoading, isSuccess, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["communityPostFeed", community.id, postOrderByType],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getPostFeedDocument, {
@@ -53,14 +46,14 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
 
   if (isSuccess && !data.pages[0].posts.edges.length) {
     return (
-      <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
+      <span data-testid="no-posts-text" className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
         No Posts
       </span>
     )
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div data-testid="community-post-feed" className="flex flex-col gap-5">
       {isSuccess &&
         data.pages.map((page) =>
           page.posts.edges.map((edge, i) => {
@@ -71,13 +64,13 @@ const CommunityPostFeed = ({ community }: CommunityPostFeedProps) => {
                 key={edge.node.id}
                 post={edge.node}
                 queryKey={["communityPostFeed", community.id, postOrderByType]}
+                testid={`community-post-${i}`}
               />
             )
           })
         )}
-      {isFetchingNextPage && (
-        <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
-      )}
+      {isFetchingNextPage && <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />}
+      {!hasNextPage && <span>All posts loaded</span>}
     </div>
   )
 }

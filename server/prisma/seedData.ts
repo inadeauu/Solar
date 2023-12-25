@@ -66,7 +66,7 @@ export const posts = [
   {
     id: "86677911-05d4-4e65-a6b6-3ebdaea58b93",
     userId: "266c189f-5986-404a-9889-0a54c298acb2",
-    communityId: "351146cd-1612-4a44-94da-e33d27bedf39",
+    communityId: "41094cb6-470d-4409-85b4-484fd43dd41d",
     title: "Post 3",
     body: "Post body 3",
     created_at: "2023-10-27T11:52:12.876Z",
@@ -84,7 +84,7 @@ export const posts = [
   {
     id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3",
     userId: "f734d0b4-20a1-4b7b-9d95-f5ad532582df",
-    communityId: "351146cd-1612-4a44-94da-e33d27bedf39",
+    communityId: "41094cb6-470d-4409-85b4-484fd43dd41d",
     title: "Post 5",
     body: "Post body 5",
     created_at: "2023-10-30T14:52:12.876Z",
@@ -102,7 +102,7 @@ export const posts = [
   {
     id: "8447d9da-e4fc-46c2-8c6a-beeaa8b00b45",
     userId: "8d2efb36-a726-425c-ad12-98f2683c5d86",
-    communityId: "351146cd-1612-4a44-94da-e33d27bedf39",
+    communityId: "41094cb6-470d-4409-85b4-484fd43dd41d",
     title: "Post 7",
     body: "Post body 7",
     created_at: "2023-08-10T11:52:12.876Z",
@@ -120,7 +120,7 @@ export const posts = [
   {
     id: "068c3f6b-df80-49dc-9765-0233badee399",
     userId: "8d2efb36-a726-425c-ad12-98f2683c5d86",
-    communityId: "351146cd-1612-4a44-94da-e33d27bedf39",
+    communityId: "41094cb6-470d-4409-85b4-484fd43dd41d",
     title: "Post 9",
     body: "Post body 9",
     created_at: "2023-08-12T11:52:12.876Z",
@@ -129,7 +129,7 @@ export const posts = [
   {
     id: "faa00786-8574-4da2-ac62-0ed89e5f7ac5",
     userId: "8d2efb36-a726-425c-ad12-98f2683c5d86",
-    communityId: "351146cd-1612-4a44-94da-e33d27bedf39",
+    communityId: "41094cb6-470d-4409-85b4-484fd43dd41d",
     title: "Post 10",
     body: "Post body 10",
     created_at: "2023-08-13T11:52:12.876Z",
@@ -138,7 +138,7 @@ export const posts = [
   {
     id: "e600578d-bbee-41c0-9af8-1de95328e1fc",
     userId: "8d2efb36-a726-425c-ad12-98f2683c5d86",
-    communityId: "351146cd-1612-4a44-94da-e33d27bedf39",
+    communityId: "41094cb6-470d-4409-85b4-484fd43dd41d",
     title: "Post 11",
     body: "Post body 11",
     created_at: "2023-08-14T11:52:12.876Z",
@@ -174,7 +174,7 @@ export const posts = [
   {
     id: "74ee0ea3-1907-434a-9a0d-0cb5bef872a2",
     userId: "8d2efb36-a726-425c-ad12-98f2683c5d86",
-    communityId: "351146cd-1612-4a44-94da-e33d27bedf39",
+    communityId: "41094cb6-470d-4409-85b4-484fd43dd41d",
     title: "Post 15",
     body: "Post body 15",
     created_at: "2023-08-18T11:52:12.876Z",
@@ -192,7 +192,7 @@ export const posts = [
   {
     id: "71af7c3c-9644-498a-9c51-40f412f9c051",
     userId: "8d2efb36-a726-425c-ad12-98f2683c5d86",
-    communityId: "351146cd-1612-4a44-94da-e33d27bedf39",
+    communityId: "41094cb6-470d-4409-85b4-484fd43dd41d",
     title: "Post 17",
     body: "Post body 17",
     created_at: "2023-08-20T11:52:12.876Z",

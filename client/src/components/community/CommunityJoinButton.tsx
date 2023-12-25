@@ -2,10 +2,7 @@ import { useNavigate } from "react-router-dom"
 import { useAuth } from "../../hooks/useAuth"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphql } from "../../graphql_codegen/gql"
-import {
-  CommunityQuery,
-  UserJoinCommunityInput,
-} from "../../graphql_codegen/graphql"
+import { CommunityQuery, UserJoinCommunityInput } from "../../graphql_codegen/graphql"
 import { graphQLClient } from "../../utils/graphql"
 import { useRef } from "react"
 import { toast } from "react-toastify"
@@ -41,10 +38,7 @@ type CommunityJoinButtonProps = {
   className?: string
 }
 
-const CommunityJoinButton = ({
-  community,
-  className,
-}: CommunityJoinButtonProps) => {
+const CommunityJoinButton = ({ community, className, ...rest }: CommunityJoinButtonProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -63,25 +57,21 @@ const CommunityJoinButton = ({
     onMutate: async (input) => {
       await queryClient.cancelQueries({ queryKey: [input.communityId] })
 
-      const previous_community = queryClient.getQueryData<CommunityQuery>([
-        input.communityId,
-      ])
+      const previous_community = queryClient.getQueryData<CommunityQuery>([input.communityId])
 
-      queryClient.setQueryData<CommunityQuery>(
-        ["community", input.communityId],
-        (oldData) =>
-          oldData
-            ? {
-                ...oldData,
-                community: {
-                  ...oldData.community!,
-                  memberCount: !oldData.community!.inCommunity
-                    ? oldData.community!.memberCount + 1
-                    : oldData.community!.memberCount - 1,
-                  inCommunity: !oldData.community!.inCommunity,
-                },
-              }
-            : oldData
+      queryClient.setQueryData<CommunityQuery>(["community", input.communityId], (oldData) =>
+        oldData
+          ? {
+              ...oldData,
+              community: {
+                ...oldData.community!,
+                memberCount: !oldData.community!.inCommunity
+                  ? oldData.community!.memberCount + 1
+                  : oldData.community!.memberCount - 1,
+                inCommunity: !oldData.community!.inCommunity,
+              },
+            }
+          : oldData
       )
 
       return { previous_community, updated_at: new Date().toISOString() }
@@ -90,10 +80,7 @@ const CommunityJoinButton = ({
       if (!error.current) error.current = true
 
       if (last_updated.current <= context!.updated_at && !rollback.current) {
-        queryClient.setQueryData(
-          ["community", input.communityId],
-          context!.previous_community
-        )
+        queryClient.setQueryData(["community", input.communityId], context!.previous_community)
       } else if (sent_requests.current == 1 && rollback.current) {
         queryClient.invalidateQueries([input.communityId])
       }
@@ -134,6 +121,7 @@ const CommunityJoinButton = ({
           communityId: community.id,
         })
       }}
+      {...rest}
     >
       {!community.inCommunity ? "Join" : "Joined"}
     </button>

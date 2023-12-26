@@ -1,4 +1,4 @@
-import { aliasMutation, aliasQuery } from "../../src/utils/graphql-test-utils"
+import { aliasMutation, aliasQuery } from "../utils/graphqlTest"
 import { graphQLClient } from "../../src/utils/graphql"
 import { authUserTestDoc, registerUsernameTestDoc, loginUsernameTestDoc, logoutTestDoc } from "../utils/authGraphQL"
 import { ClientError } from "graphql-request"
@@ -108,6 +108,28 @@ describe("Sign up form", function () {
 
     cy.get("@confirmPassword-input").clear().blur()
     cy.get("@confirmPassword-error").should("contain", "Required")
+  })
+
+  it("Check error response", function () {
+    cy.visit("/")
+
+    cy.get('[data-testid="signup-button"]').click()
+    cy.url().should("eq", "http://localhost:5173/signup")
+
+    cy.get('[data-testid="username-input"]').as("username-input").type("username")
+    cy.get('[data-testid="password-input"]').as("password-input").type("password")
+    cy.get('[data-testid="confirmPassword-input"]').as("confirmPassword-input").type("password")
+
+    cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+      if (req.body.operationName.includes("RegisterUsername")) {
+        req.reply({ fixture: "/auth/errors/signupInput.json" })
+      }
+    })
+
+    cy.get('[data-testid="signup-form-submit"').click()
+
+    cy.get('[data-testid="signup-error"]').should("be.visible").and("have.text", "Error: Invalid input")
+    cy.location("pathname").should("eq", "/signup")
   })
 })
 

@@ -1,0 +1,9 @@
+{
+  "data": {
+    "registerUsername": {
+      "__typename": "RegisterUsernameInputError",
+      "errorMsg": "Invalid input",
+      "code": 400
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { aliasMutation } from "../../src/utils/graphql-test-utils"
+import { aliasMutation } from "../utils/graphqlTest"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -108,6 +108,29 @@ describe("Change community title", function () {
 
       cy.get('[data-testid="current-community-title"]').should("have.text", "Current community title: NewTitle")
     })
+
+    it("Check error response", function () {
+      cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+      cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn/settings")
+      cy.get('[data-testid="change-title-button"]').as("change-title-button").click()
+
+      cy.get('[data-testid="new-title-input"]').type("NewTitle")
+
+      cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+        if (req.body.operationName.includes("ChangeCommunityTitle")) {
+          req.reply({ fixture: "/community/errors/changeTitleInput.json" })
+        }
+      })
+
+      cy.get('[data-testid="change-title-modal-submit"]').click()
+      cy.get('[data-testid="change-community-title-error"]').as("error").should("have.text", "Error: Invalid input")
+      cy.get('[data-testid="change-community-title-modal"]').should("be.visible")
+
+      cy.get('[data-testid="change-community-title-modal-close-button"]').click()
+      cy.get("@change-title-button").click()
+
+      cy.get("@error").should("not.exist")
+    })
   })
 })
 
@@ -177,6 +200,29 @@ describe("Delete community", function () {
 
       cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
       cy.location("pathname").should("eq", "/404-not-found")
+    })
+
+    it("Check error response", function () {
+      cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+      cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn/settings")
+      cy.get('[data-testid="delete-community-button"]').as("delete-button").click()
+
+      cy.get('[data-testid="delete-title-input"]').type("Community1")
+
+      cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+        if (req.body.operationName.includes("DeleteCommunity")) {
+          req.reply({ fixture: "/community/errors/deleteInput.json" })
+        }
+      })
+
+      cy.get('[data-testid="submit-delete-community"]').click()
+      cy.get('[data-testid="delete-community-error"]').as("error").should("have.text", "Error: Invalid input")
+      cy.get('[data-testid="delete-community-modal"]').should("be.visible")
+
+      cy.get('[data-testid="delete-community-modal-close-button"]').click()
+      cy.get("@delete-button").click()
+
+      cy.get("@error").should("not.exist")
     })
   })
 })

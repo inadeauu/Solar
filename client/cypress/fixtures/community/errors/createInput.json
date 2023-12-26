@@ -1,0 +1,9 @@
+{
+  "data": {
+    "createCommunity": {
+      "__typename": "CreateCommunityInputError",
+      "errorMsg": "Invalid input",
+      "code": 400
+    }
+  }
+}

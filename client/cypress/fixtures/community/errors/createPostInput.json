@@ -1,0 +1,9 @@
+{
+  "data": {
+    "createPost": {
+      "__typename": "CreatePostInputError",
+      "errorMsg": "Invalid input",
+      "code": 400
+    }
+  }
+}

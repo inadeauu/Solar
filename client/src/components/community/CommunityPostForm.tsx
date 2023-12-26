@@ -128,13 +128,14 @@ const CommunityPostForm = ({ community }: CommunityPostFormProps) => {
             data-testid="close-post-form-button"
             onClick={() => {
               setOpenEditor((prev) => !prev)
+              setError("")
             }}
             className="btn_red py-1 px-3 self-start"
           >
             Close
           </button>
           <form className="flex flex-col gap-3">
-            {error && <ErrorCard error={error} className="mb-4" />}
+            {error && <ErrorCard data-testid="create-community-post-error" error={error} className="mb-4" />}
             <div className="flex flex-col gap-1">
               <input
                 data-testid="post-title-input"

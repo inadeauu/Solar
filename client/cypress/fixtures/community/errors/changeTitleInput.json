@@ -1,0 +1,9 @@
+{
+  "data": {
+    "changeCommunityTitle": {
+      "__typename": "ChangeCommunityTitleInputError",
+      "errorMsg": "Invalid input",
+      "code": 400
+    }
+  }
+}

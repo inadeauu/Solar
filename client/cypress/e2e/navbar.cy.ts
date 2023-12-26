@@ -1,4 +1,4 @@
-import { aliasMutation } from "../../src/utils/graphql-test-utils"
+import { aliasMutation } from "../utils/graphqlTest"
 import { translator } from "../../src/utils/uuid"
 
 beforeEach(function () {

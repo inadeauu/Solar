@@ -11,6 +11,7 @@ import { toast } from "react-toastify"
 import { communityTitleExistsDocument } from "../../../graphql/sharedDocuments"
 import { graphql } from "../../../graphql_codegen/gql"
 import { ChangeCommunityTitleInput, CommunityQuery } from "../../../graphql_codegen/graphql"
+import ErrorCard from "../../misc/ErrorCard"
 
 const changeCommunityTitleDocument = graphql(/* GraphQL */ `
   mutation ChangeCommunityTitle($input: ChangeCommunityTitleInput!) {
@@ -70,6 +71,7 @@ const CommunityTitleChangeModal = ({ communityId, isOpen, onClose }: CommunityTi
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [validatingTitle, setValidatingTitle] = useState<boolean>(false)
 
+  const [error, setError] = useState("")
   const queryClient = useQueryClient()
 
   const editCommunityTitle = useMutation({
@@ -91,11 +93,10 @@ const CommunityTitleChangeModal = ({ communityId, isOpen, onClose }: CommunityTi
             : oldData
         })
         toast.success("Successfully changed title")
+        setError("")
         onClose()
       } else if (data.changeCommunityTitle.__typename == "ChangeCommunityTitleInputError") {
-        if (data.changeCommunityTitle.inputErrors.newTitle) {
-          setFieldStateSuccess(setFieldStates, "title", false, data.changeCommunityTitle.inputErrors.newTitle)
-        }
+        setError(data.changeCommunityTitle.errorMsg)
       }
     },
   })
@@ -174,11 +175,13 @@ const CommunityTitleChangeModal = ({ communityId, isOpen, onClose }: CommunityTi
       isOpen={isOpen}
       onClose={() => {
         fieldStates.title = initialFieldState
+        setError("")
         onClose()
       }}
     >
       <form className="flex flex-col w-[80%]">
         <h1 className="text-xl font-medium mb-4">Change Community Title</h1>
+        {error && <ErrorCard data-testid="change-community-title-error" error={error} className="mb-4" />}
         <div className="flex flex-col">
           <TextInput
             name="new-title"

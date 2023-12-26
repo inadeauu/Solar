@@ -1,5 +1,5 @@
 import { recurse } from "cypress-recurse"
-import { aliasQuery } from "../../src/utils/graphql-test-utils"
+import { aliasQuery } from "../utils/graphqlTest"
 import { PostFeedQuery } from "../../src/graphql_codegen/graphql"
 
 beforeEach(function () {

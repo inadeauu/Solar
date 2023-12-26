@@ -214,7 +214,7 @@ const SignupPage = () => {
         </Link>
         <form className="flex flex-col xs:w-[60%] xs-max:w-[80%] mx-auto mt-4">
           <h1 className="xs:text-3xl xs-max:text-2xl font-medium xs:mb-8 xs-max:mb-6">Sign Up</h1>
-          {error && <ErrorCard error={error} className="mb-4" />}
+          {error && <ErrorCard data-testid="signup-error" error={error} className="mb-4" />}
           <TextInput
             name="username"
             type="text"

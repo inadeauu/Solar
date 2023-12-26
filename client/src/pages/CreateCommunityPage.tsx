@@ -45,8 +45,7 @@ enum FieldErrorMsgs {
 }
 
 const CreateCommunityPage = () => {
-  const [fieldStates, setFieldStates] =
-    useState<FormFieldStates>(initialFieldStates)
+  const [fieldStates, setFieldStates] = useState<FormFieldStates>(initialFieldStates)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const [validatingTitle, setValidatingTitle] = useState<boolean>(false)
 
@@ -65,9 +64,7 @@ const CreateCommunityPage = () => {
         toast.success("Successfully created community")
         if (error) setError("")
         navigate("/")
-      } else if (
-        data.createCommunity.__typename == "CreateCommunityInputError"
-      ) {
+      } else if (data.createCommunity.__typename == "CreateCommunityInputError") {
         setError(data.createCommunity.errorMsg)
       }
     },
@@ -81,12 +78,9 @@ const CreateCommunityPage = () => {
     } else if (title.length > 25) {
       error = FieldErrorMsgs.TITLE_LENGTH
     } else {
-      const response = await graphQLClient.request(
-        communityTitleExistsDocument,
-        {
-          title,
-        }
-      )
+      const response = await graphQLClient.request(communityTitleExistsDocument, {
+        title,
+      })
 
       if (response.titleExists) {
         error = FieldErrorMsgs.TITLE_TAKEN
@@ -146,11 +140,9 @@ const CreateCommunityPage = () => {
   return (
     <div className="bg-white m-auto rounded-xl h-[300px] max-w-[550px] w-[90%] p-4 border border-neutral-300 overflow-auto">
       <div className="flex flex-col items-center xs:w-[60%] xs-max:w-[90%] mx-auto">
-        <h1 className="text-2xl font-medium mb-6 xs-max:text-xl">
-          Create a Community
-        </h1>
+        <h1 className="text-2xl font-medium mb-6 xs-max:text-xl">Create a Community</h1>
         <form className="flex flex-col">
-          {error && <ErrorCard error={error} className="mb-4" />}
+          {error && <ErrorCard data-testid="create-community-error" error={error} className="mb-4" />}
           <label className="flex flex-col gap-2">
             <p className="text-xl xs-max:text-lg">Title</p>
             <TextInput
@@ -158,21 +150,12 @@ const CreateCommunityPage = () => {
               type="text"
               value={fieldStates.title.value}
               onChange={(e) => {
-                setFieldStateValue(
-                  setFieldStates,
-                  "title",
-                  e.target.value.trim()
-                )
+                setFieldStateValue(setFieldStates, "title", e.target.value.trim())
                 validateTitle(e.target.value.trim())
               }}
               onBlur={(e) => {
                 if (!e.target.value) {
-                  setFieldStateSuccess(
-                    setFieldStates,
-                    "title",
-                    false,
-                    FieldErrorMsgs.REQUIRED
-                  )
+                  setFieldStateSuccess(setFieldStates, "title", false, FieldErrorMsgs.REQUIRED)
                 }
               }}
               error={fieldStates.title.error}
@@ -181,6 +164,7 @@ const CreateCommunityPage = () => {
             />
           </label>
           <button
+            data-testid="create-community-button"
             type="button"
             onClick={() => {
               submitCreateCommunity()
@@ -189,11 +173,7 @@ const CreateCommunityPage = () => {
             className="btn_blue py-1 mt-4 px-4 mx-auto"
             disabled={submitting}
           >
-            {submitting ? (
-              <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" />
-            ) : (
-              "Submit"
-            )}
+            {submitting ? <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" /> : "Submit"}
           </button>
         </form>
       </div>

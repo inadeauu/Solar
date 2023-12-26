@@ -1,0 +1,9 @@
+{
+  "data": {
+    "deleteCommunity": {
+      "__typename": "DeleteCommunityInputError",
+      "errorMsg": "Invalid input",
+      "code": 400
+    }
+  }
+}

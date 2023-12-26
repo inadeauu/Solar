@@ -1,6 +1,6 @@
 import { recurse } from "cypress-recurse"
 import { PostFeedQuery } from "../../src/graphql_codegen/graphql"
-import { aliasMutation, aliasQuery } from "../../src/utils/graphql-test-utils"
+import { aliasMutation, aliasQuery } from "../utils/graphqlTest"
 import { translator } from "../../src/utils/uuid"
 
 beforeEach(function () {
@@ -70,7 +70,7 @@ describe("Post form, authenticated", function () {
     cy.get("@post-button").should("be.disabled")
   })
 
-  it.only("Check post creation", function () {
+  it("Check post creation", function () {
     cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
     cy.get('[data-testid="open-post-form-button"]').as("open-post-form-button").click()
     cy.get('[data-testid="post-title-input"]').as("post-title-input").type("Post title")
@@ -90,6 +90,34 @@ describe("Post form, authenticated", function () {
 
     cy.get('[data-testid="community-post-0-title"]').should("have.text", "Post title")
     cy.get('[data-testid="community-post-0-body"]').should("have.text", "Post body")
+  })
+
+  it("Check error response", function () {
+    cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
+    cy.get('[data-testid="open-post-form-button"]').as("open-post-form-button").click()
+    cy.get('[data-testid="post-title-input"]').as("post-title-input").type("Post title")
+    cy.get('[data-testid="post-body-input"]').as("post-body-input").type("Post body")
+
+    cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+      if (req.body.operationName == "CreateCommunityPost") {
+        req.reply({ fixture: "/community/errors/createPostInput.json" })
+      }
+    })
+
+    cy.get('[data-testid="post-button"]').click()
+
+    cy.get('[data-testid="create-community-post-error"]')
+      .as("error")
+      .should("exist")
+      .and("have.text", "Error: Invalid input")
+    cy.get('[data-testid="post-form"]').should("exist")
+
+    cy.get('[data-testid="community-post-0-title"]').should("not.have.text", "Post title")
+    cy.get('[data-testid="community-post-0-body"]').should("not.have.text", "Post body")
+
+    cy.get('[data-testid="close-post-form-button"]').click()
+    cy.get("@open-post-form-button").click()
+    cy.get("@error").should("not.exist")
   })
 })
 

@@ -10,6 +10,7 @@ import { toast } from "react-toastify"
 import { graphql } from "../../../graphql_codegen/gql"
 import { DeleteCommunityInput } from "../../../graphql_codegen/graphql"
 import { useNavigate } from "react-router-dom"
+import ErrorCard from "../../misc/ErrorCard"
 
 const deleteCommunityDocument = graphql(/* GraphQL */ `
   mutation DeleteCommunity($input: DeleteCommunityInput!) {
@@ -55,6 +56,7 @@ const DeleteCommunityModal = ({ communityId, communityTitle, isOpen, onClose }: 
   const [fieldStates, setFieldStates] = useState<FormFieldStates>(initialFieldStates)
   const [submitting, setSubmitting] = useState<boolean>(false)
 
+  const [error, setError] = useState("")
   const navigate = useNavigate()
 
   const deleteCommunity = useMutation({
@@ -68,11 +70,10 @@ const DeleteCommunityModal = ({ communityId, communityTitle, isOpen, onClose }: 
         fieldStates.title = initialFieldState
         toast.success("Successfully deleted community")
         onClose()
+        setError("")
         navigate("/")
       } else if (data.deleteCommunity.__typename == "DeleteCommunityInputError") {
-        if (data.deleteCommunity.inputErrors?.title) {
-          setFieldStateSuccess(setFieldStates, "title", false, data.deleteCommunity.inputErrors.title)
-        }
+        setError(data.deleteCommunity.errorMsg)
       }
     },
   })
@@ -125,12 +126,14 @@ const DeleteCommunityModal = ({ communityId, communityTitle, isOpen, onClose }: 
       isOpen={isOpen}
       onClose={() => {
         fieldStates.title = initialFieldState
+        setError("")
         onClose()
       }}
     >
       <form className="flex flex-col w-[80%]">
         <div className="flex flex-col gap-2 mb-4">
           <h1 className="text-xl font-medium">Delete Community</h1>
+          {error && <ErrorCard data-testid="delete-community-error" error={error} className="mb-4" />}
           <p className="text-sm">This will delete everything, including all of your community's posts and comments.</p>
         </div>
         <div className="flex flex-col">

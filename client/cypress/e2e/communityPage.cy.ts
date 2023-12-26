@@ -9,7 +9,10 @@ beforeEach(function () {
 
   cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
     aliasQuery(req, "PostFeed")
+    aliasQuery(req, "Community")
+
     aliasMutation(req, "CreateCommunityPost")
+    aliasMutation(req, "UserJoinCommunity")
   })
 })
 
@@ -368,29 +371,139 @@ describe("Sidebar", function () {
     cy.location("pathname").should("eq", "/profile/username1")
   })
 
-  it("Check join community button", function () {
-    cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
+  describe.only("Join community button", function () {
+    it("Check joining and leaving community", function () {
+      cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
 
-    cy.get('[data-testid="community-join-button"]').should("not.exist")
+      cy.get('[data-testid="community-join-button"]').should("not.exist")
 
-    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
-    cy.get('[data-testid="community-join-button"]').should("not.exist")
+      cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+      cy.get('[data-testid="community-join-button"]').should("not.exist")
 
-    cy.setCookie("test-user", "266c189f-5986-404a-9889-0a54c298acb2")
-    cy.reload()
+      cy.setCookie("test-user", "266c189f-5986-404a-9889-0a54c298acb2")
+      cy.reload()
 
-    cy.get('[data-testid="community-join-button"]').as("join-button").should("have.text", "Join")
-    cy.reload()
+      cy.get('[data-testid="community-join-button"]').as("join-button").should("have.text", "Join")
 
-    cy.get("@join-button").click()
-    cy.reload()
-    cy.get("@join-button").should("have.text", "Joined")
-    cy.get('[data-testid="community-member-count"]').should("have.text", "2 Members")
+      cy.get("@join-button").click()
+      cy.get("@join-button").should("have.text", "Joined")
+      cy.get('[data-testid="community-member-count"]').should("have.text", "2 Members")
 
-    cy.get("@join-button").click()
-    cy.reload()
-    cy.get('[data-testid="community-member-count"]').should("have.text", "1 Member")
-    cy.get("@join-button").should("have.text", "Join")
+      cy.wait("@gqlUserJoinCommunityMutation").then(({ response }) => {
+        console.log(response)
+        cy.wrap(response?.body.data)
+          .its("userJoinCommunity")
+          .should((res) => expect(res.code).to.eq(200))
+          .should((res) => expect(res.successMsg).to.eq("Successfully joined community"))
+          .should((res) => expect(res.community.inCommunity).to.eq(true))
+      })
+
+      cy.get("@join-button").click()
+      cy.get('[data-testid="community-member-count"]').should("have.text", "1 Member")
+      cy.get("@join-button").should("have.text", "Join")
+
+      cy.wait("@gqlUserJoinCommunityMutation").then(({ response }) => {
+        console.log(response)
+        cy.wrap(response?.body.data)
+          .its("userJoinCommunity")
+          .should((res) => expect(res.code).to.eq(200))
+          .should((res) => expect(res.successMsg).to.eq("Successfully left community"))
+          .should((res) => expect(res.community.inCommunity).to.eq(false))
+      })
+    })
+
+    describe("Success and error combos (optimistic updates)", function () {
+      beforeEach(function () {
+        cy.setCookie("test-user", "266c189f-5986-404a-9889-0a54c298acb2")
+        cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
+        cy.get('[data-testid="community-join-button"]').as("join-button")
+      })
+
+      it("Error", function () {
+        cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+          req.reply({ statusCode: 500 })
+        })
+
+        cy.get("@join-button").click()
+
+        cy.get("@join-button").should("have.text", "Join")
+        cy.get('[data-testid="community-member-count"]').should("have.text", "1 Member")
+      })
+
+      it("Success + error", function () {
+        let requestNum = 1
+
+        cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+          if (requestNum == 2) {
+            req.reply({ statusCode: 500 })
+          }
+
+          requestNum++
+        })
+
+        cy.get("@join-button").click()
+        cy.get("@join-button").click()
+
+        cy.get("@join-button").should("have.text", "Joined")
+        cy.get('[data-testid="community-member-count"]').should("have.text", "2 Members")
+      })
+
+      it("Error + success", function () {
+        let requestNum = 1
+
+        cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+          if (requestNum == 1) {
+            req.reply({ statusCode: 500 })
+          }
+
+          requestNum++
+        })
+
+        cy.get("@join-button").click()
+        cy.get("@join-button").click()
+
+        cy.get("@join-button").should("have.text", "Joined")
+        cy.get('[data-testid="community-member-count"]').should("have.text", "2 Members")
+      })
+
+      it("Error + success + error", function () {
+        let requestNum = 1
+
+        cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+          if (requestNum == 1 || requestNum == 3) {
+            req.reply({ statusCode: 500 })
+          }
+
+          requestNum++
+        })
+
+        cy.get("@join-button").click()
+        cy.get("@join-button").click()
+        cy.get("@join-button").click()
+
+        cy.get("@join-button").should("have.text", "Joined")
+        cy.get('[data-testid="community-member-count"]').should("have.text", "2 Members")
+      })
+
+      it("Success + error + success", function () {
+        let requestNum = 1
+
+        cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+          if (requestNum == 2) {
+            req.reply({ statusCode: 500 })
+          }
+
+          requestNum++
+        })
+
+        cy.get("@join-button").click()
+        cy.get("@join-button").click()
+        cy.get("@join-button").click()
+
+        cy.get("@join-button").should("have.text", "Join")
+        cy.get('[data-testid="community-member-count"]').should("have.text", "1 Member")
+      })
+    })
   })
 
   it("Check edit community button", function () {

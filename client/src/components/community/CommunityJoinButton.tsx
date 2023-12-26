@@ -57,7 +57,9 @@ const CommunityJoinButton = ({ community, className, ...rest }: CommunityJoinBut
     onMutate: async (input) => {
       await queryClient.cancelQueries({ queryKey: [input.communityId] })
 
-      const previous_community = queryClient.getQueryData<CommunityQuery>([input.communityId])
+      const previous_community = queryClient.getQueryData<CommunityQuery>(["community", input.communityId])
+
+      console.log(previous_community)
 
       queryClient.setQueryData<CommunityQuery>(["community", input.communityId], (oldData) =>
         oldData

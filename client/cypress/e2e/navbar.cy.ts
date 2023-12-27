@@ -155,7 +155,7 @@ describe("Search bar", function () {
     cy.get("@searchbar-input").clear()
 
     cy.get("@searchbar-input").type("Community")
-    cy.get("@communities-results").children().should("have.length", 2)
+    cy.get("@communities-results").children().should("have.length", 3)
     cy.get("@communities-results")
       .children()
       .then((results) => {
@@ -164,6 +164,9 @@ describe("Search bar", function () {
 
         expect(results.eq(1).children().eq(0)).to.have.text("Community2")
         expect(results.eq(1).children().eq(1)).to.have.text("2 Members")
+
+        expect(results.eq(2).children().eq(0)).to.have.text("Community3")
+        expect(results.eq(2).children().eq(1)).to.have.text("1 Member")
       })
 
     cy.get("@communities-results").children().eq(0).click()

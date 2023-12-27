@@ -63,11 +63,7 @@ const PostCommentForm = ({ post }: PostCommentFormProps) => {
 
         setOpenEditor(false)
 
-        queryClient.resetQueries([
-          "postCommentFeed",
-          post.id,
-          commentOrderByType,
-        ])
+        queryClient.resetQueries(["postCommentFeed", post.id, commentOrderByType])
       } else if (data.createComment.__typename == "CreateCommentInputError") {
         setError(data.createComment.errorMsg)
       }
@@ -96,6 +92,7 @@ const PostCommentForm = ({ post }: PostCommentFormProps) => {
     <div className="bg-white border border-neutral-300 rounded-lg p-4">
       {!openEditor ? (
         <button
+          data-testid="create-comment-button"
           onClick={() => {
             if (!user) {
               navigate("/login")
@@ -111,17 +108,20 @@ const PostCommentForm = ({ post }: PostCommentFormProps) => {
       ) : (
         <div className="flex flex-col gap-4">
           <button
+            data-testid="close-create-comment-form-button"
             onClick={() => {
+              setError("")
               setOpenEditor((prev) => !prev)
             }}
             className="btn_red py-1 px-3 self-start"
           >
             Close
           </button>
-          <form className="flex flex-col gap-3">
-            {error && <ErrorCard error={error} className="mb-4" />}
+          <form data-testid="create-comment-form" className="flex flex-col gap-3">
+            {error && <ErrorCard data-testid="comment-create-error" error={error} className="mb-4" />}
             <div className="flex flex-col gap-1">
               <textarea
+                data-testid="comment-body-input"
                 ref={textAreaRef}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
@@ -129,31 +129,25 @@ const PostCommentForm = ({ post }: PostCommentFormProps) => {
                 placeholder="Comment"
               />
               <span
+                data-testid="comment-body-length-indicator"
                 className={`text-xs font-semibold self-end ${
-                  body.length > 2000 || body.trim().length <= 0
-                    ? "text-red-500"
-                    : "text-green-500"
+                  body.length > 2000 || body.trim().length <= 0 ? "text-red-500" : "text-green-500"
                 }`}
               >
                 {body.length}/2000
               </span>
             </div>
             <button
+              data-testid="create-comment-submit"
               type="button"
               onClick={() => {
                 submitCreateComment()
                 setSubmitting(false)
               }}
               className="btn_blue px-3 py-1 self-end"
-              disabled={
-                body.trim().length <= 0 || body.length > 2000 || submitting
-              }
+              disabled={body.trim().length <= 0 || body.length > 2000 || submitting}
             >
-              {submitting ? (
-                <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" />
-              ) : (
-                "Comment"
-              )}
+              {submitting ? <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" /> : "Comment"}
             </button>
           </form>
         </div>

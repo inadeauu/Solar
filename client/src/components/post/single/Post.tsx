@@ -41,13 +41,12 @@ const Post = ({ post }: PostProps) => {
               <div>
                 Posted in{" "}
                 <span
+                  data-testid="post-community-title"
                   className="text-black font-medium hover:underline hover:cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
-                    navigate(
-                      `/communities/${translator.fromUUID(post.community.id)}`
-                    )
+                    navigate(`/communities/${translator.fromUUID(post.community.id)}`)
                   }}
                 >
                   {post.community.title}
@@ -58,6 +57,7 @@ const Post = ({ post }: PostProps) => {
               <div>
                 Posted by{" "}
                 <span
+                  data-testid="post-owner"
                   className="text-black font-medium hover:underline hover:cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault()
@@ -71,6 +71,7 @@ const Post = ({ post }: PostProps) => {
             </span>
             {user?.id == post.owner.id && (
               <button
+                data-testid="post-edit-button"
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -83,19 +84,23 @@ const Post = ({ post }: PostProps) => {
               </button>
             )}
           </div>
-          <span className="font-medium text-lg">{post.title}</span>
+          <span data-testid="post-title" className="font-medium text-lg">
+            {post.title}
+          </span>
           {post.body && (
             <div
+              data-testid="post-body-overflow-container"
               ref={bodyRef}
-              className={
-                overflown ? "max-h-[500px] overflow-hidden" : "max-h-fit"
-              }
+              className={overflown ? "max-h-[200px] overflow-hidden" : "max-h-fit"}
             >
-              <p className="text-sm font-light text-neutral-800">{post.body}</p>
+              <p data-testid="post-body" className="text-sm font-light text-neutral-800">
+                {post.body}
+              </p>
             </div>
           )}
           {overflown && (
             <span
+              data-testid="show-more-button"
               className="w-fit text-sm text-blue-400 hover:cursor-pointer flex gap-1 items-center active:bg-neutral-100 p-1"
               onClick={() => setOverflown(false)}
             >
@@ -104,7 +109,9 @@ const Post = ({ post }: PostProps) => {
           )}
           <div className="flex gap-2 items-center w-fit mt-1">
             <BiComment className="w-[16px] h-[16px] mt-[1px]" />
-            <span className="text-sm">{post.commentCount}</span>
+            <span data-testid="comment-count" className="text-sm">
+              {post.commentCount}
+            </span>
           </div>
         </div>
       </div>

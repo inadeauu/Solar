@@ -67,7 +67,10 @@ describe("Post form, authenticated", function () {
 
     cy.get("@post-body-input").invoke("val", "A".repeat(20100)).type("A")
     cy.get('[data-testid="post-body-length-indicator"]').should("have.css", "color", "rgb(239, 68, 68)")
-    cy.get("@post-body-input").invoke("height").should("be.gt", 100)
+
+    cy.get("@post-body-input").then((element) => {
+      expect(element.outerHeight()).to.eq(element.prop("scrollHeight"))
+    })
 
     cy.get("@post-title-input").clear()
     cy.get("@post-button").should("be.disabled")
@@ -371,7 +374,7 @@ describe("Sidebar", function () {
     cy.location("pathname").should("eq", "/profile/username1")
   })
 
-  describe.only("Join community button", function () {
+  describe("Join community button", function () {
     it("Check joining and leaving community", function () {
       cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
 
@@ -390,12 +393,12 @@ describe("Sidebar", function () {
       cy.get('[data-testid="community-member-count"]').should("have.text", "2 Members")
 
       cy.wait("@gqlUserJoinCommunityMutation").then(({ response }) => {
-        console.log(response)
         cy.wrap(response?.body.data)
           .its("userJoinCommunity")
           .should((res) => expect(res.code).to.eq(200))
           .should((res) => expect(res.successMsg).to.eq("Successfully joined community"))
           .should((res) => expect(res.community.inCommunity).to.eq(true))
+          .should((res) => expect(res.community.memberCount).to.eq(2))
       })
 
       cy.get("@join-button").click()
@@ -403,12 +406,12 @@ describe("Sidebar", function () {
       cy.get("@join-button").should("have.text", "Join")
 
       cy.wait("@gqlUserJoinCommunityMutation").then(({ response }) => {
-        console.log(response)
         cy.wrap(response?.body.data)
           .its("userJoinCommunity")
           .should((res) => expect(res.code).to.eq(200))
           .should((res) => expect(res.successMsg).to.eq("Successfully left community"))
           .should((res) => expect(res.community.inCommunity).to.eq(false))
+          .should((res) => expect(res.community.memberCount).to.eq(1))
       })
     })
 
@@ -419,62 +422,17 @@ describe("Sidebar", function () {
         cy.get('[data-testid="community-join-button"]').as("join-button")
       })
 
-      it("Error", function () {
-        cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-          req.reply({ statusCode: 500 })
-        })
-
-        cy.get("@join-button").click()
-
-        cy.get("@join-button").should("have.text", "Join")
-        cy.get('[data-testid="community-member-count"]').should("have.text", "1 Member")
-      })
-
-      it("Success + error", function () {
-        let requestNum = 1
-
-        cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-          if (requestNum == 2) {
-            req.reply({ statusCode: 500 })
-          }
-
-          requestNum++
-        })
-
-        cy.get("@join-button").click()
-        cy.get("@join-button").click()
-
-        cy.get("@join-button").should("have.text", "Joined")
-        cy.get('[data-testid="community-member-count"]').should("have.text", "2 Members")
-      })
-
-      it("Error + success", function () {
-        let requestNum = 1
-
-        cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-          if (requestNum == 1) {
-            req.reply({ statusCode: 500 })
-          }
-
-          requestNum++
-        })
-
-        cy.get("@join-button").click()
-        cy.get("@join-button").click()
-
-        cy.get("@join-button").should("have.text", "Joined")
-        cy.get('[data-testid="community-member-count"]').should("have.text", "2 Members")
-      })
-
       it("Error + success + error", function () {
         let requestNum = 1
 
         cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-          if (requestNum == 1 || requestNum == 3) {
-            req.reply({ statusCode: 500 })
-          }
+          if (req.body.operationName == "UserJoinCommunity") {
+            if (requestNum == 1 || requestNum == 3) {
+              req.reply({ statusCode: 500 })
+            }
 
-          requestNum++
+            requestNum++
+          }
         })
 
         cy.get("@join-button").click()
@@ -489,11 +447,13 @@ describe("Sidebar", function () {
         let requestNum = 1
 
         cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-          if (requestNum == 2) {
-            req.reply({ statusCode: 500 })
-          }
+          if (req.body.operationName == "UserJoinCommunity") {
+            if (requestNum == 2) {
+              req.reply({ statusCode: 500 })
+            }
 
-          requestNum++
+            requestNum++
+          }
         })
 
         cy.get("@join-button").click()

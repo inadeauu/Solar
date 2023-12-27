@@ -17,14 +17,7 @@ const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
 
   const { commentOrderByType } = useContext(CommentContext)
 
-  const {
-    data,
-    isLoading,
-    isSuccess,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(
+  const { data, isLoading, isSuccess, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["postCommentFeed", post.id, commentOrderByType],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getCommentFeedDocument, {
@@ -56,33 +49,26 @@ const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
   }
 
   if (isSuccess && !data.pages[0].comments.edges.length) {
-    return (
-      <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-        No Comments
-      </span>
-    )
+    return <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">No Comments</span>
   }
 
   return (
-    <>
+    <div data-testid="post-comment-feed" className="flex flex-col gap-4">
       {isSuccess &&
         data.pages.map((page) =>
           page.comments.edges.map((edge, i) => {
             return (
               <Comment
-                innerRef={
-                  page.comments.edges.length === i + 1 ? ref : undefined
-                }
+                testid={`post-comment-${i}`}
+                innerRef={page.comments.edges.length === i + 1 ? ref : undefined}
                 key={edge.node.id}
                 comment={edge.node}
               />
             )
           })
         )}
-      {isFetchingNextPage && (
-        <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
-      )}
-    </>
+      {isFetchingNextPage && <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />}
+    </div>
   )
 }
 

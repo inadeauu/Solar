@@ -117,7 +117,7 @@ describe("Change community title", function () {
       cy.get('[data-testid="new-title-input"]').type("NewTitle")
 
       cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-        if (req.body.operationName.includes("ChangeCommunityTitle")) {
+        if (req.body.operationName == "ChangeCommunityTitle") {
           req.reply({ fixture: "/community/errors/changeTitleInput.json" })
         }
       })
@@ -210,7 +210,7 @@ describe("Delete community", function () {
       cy.get('[data-testid="delete-title-input"]').type("Community1")
 
       cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-        if (req.body.operationName.includes("DeleteCommunity")) {
+        if (req.body.operationName == "DeleteCommunity") {
           req.reply({ fixture: "/community/errors/deleteInput.json" })
         }
       })

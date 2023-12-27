@@ -59,8 +59,6 @@ const CommunityJoinButton = ({ community, className, ...rest }: CommunityJoinBut
 
       const previous_community = queryClient.getQueryData<CommunityQuery>(["community", input.communityId])
 
-      console.log(previous_community)
-
       queryClient.setQueryData<CommunityQuery>(["community", input.communityId], (oldData) =>
         oldData
           ? {

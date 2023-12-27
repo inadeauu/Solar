@@ -8,17 +8,15 @@ import { translator } from "../../utils/uuid"
 type CommentProps = {
   comment: Comment
   innerRef?: React.LegacyRef<HTMLDivElement> | undefined
+  testid?: string
 }
 
-const Comment = ({ comment, innerRef }: CommentProps) => {
+const Comment = ({ comment, innerRef, testid }: CommentProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
 
   return (
-    <div
-      ref={innerRef}
-      className="bg-white border border-neutral-300 rounded-lg py-4 px-[11px]"
-    >
+    <div ref={innerRef} className="bg-white border border-neutral-300 rounded-lg py-4 px-[11px]">
       <div className="flex flex-col gap-1">
         <div className="flex flex-col gap-[6px] px-[5px]">
           <div className="flex items-center justify-between gap-4">
@@ -47,7 +45,9 @@ const Comment = ({ comment, innerRef }: CommentProps) => {
               </button>
             )}
           </div>
-          <p className="text-sm font-light text-neutral-800">{comment.body}</p>
+          <p data-testid={`${testid}-body`} className="text-sm font-light text-neutral-800">
+            {comment.body}
+          </p>
         </div>
         <CommentFooter comment={comment} />
       </div>

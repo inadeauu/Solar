@@ -1,6 +1,12 @@
+import { aliasMutation } from "../utils/graphqlTest"
+
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
   cy.exec("npm --prefix ../server run seed")
+
+  cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+    aliasMutation(req, "CreateCommunity")
+  })
 })
 
 describe("Navigation", function () {
@@ -46,6 +52,13 @@ describe("Create a community", function () {
     cy.get('[data-testid="title-input"]').as("title-input").type("NewCommunity")
     cy.get('[data-testid="create-community-button"]').as("submit-button").click()
 
+    cy.wait("@gqlCreateCommunityMutation").then(({ response }) => {
+      cy.wrap(response?.body.data)
+        .its("createCommunity")
+        .should((res) => expect(res.code).to.eq(200))
+        .should((res) => expect(res.successMsg).to.eq("Community successfully created"))
+    })
+
     cy.location("pathname").should("eq", "/")
 
     cy.get('[data-testid="searchbar-input"]').type("NewCommunity")
@@ -57,7 +70,7 @@ describe("Create a community", function () {
     cy.visit("/create-community")
 
     cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-      if (req.body.operationName.includes("CreateCommunity")) {
+      if (req.body.operationName == "CreateCommunity") {
         req.reply({ fixture: "/community/errors/createInput.json" })
       }
     })

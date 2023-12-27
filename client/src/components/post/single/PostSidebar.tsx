@@ -2,20 +2,11 @@ import { useRef } from "react"
 import type { Post } from "../../../graphql/types"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { votePostDocument } from "../../../graphql/sharedDocuments"
-import {
-  VoteStatus,
-  SinglePostQuery,
-  VotePostInput,
-} from "../../../graphql_codegen/graphql"
+import { VoteStatus, SinglePostQuery, VotePostInput } from "../../../graphql_codegen/graphql"
 import { graphQLClient } from "../../../utils/graphql"
 import { useAuth } from "../../../hooks/useAuth"
 import { useNavigate } from "react-router-dom"
-import {
-  BiDownvote,
-  BiSolidDownvote,
-  BiSolidUpvote,
-  BiUpvote,
-} from "react-icons/bi"
+import { BiDownvote, BiSolidDownvote, BiSolidUpvote, BiUpvote } from "react-icons/bi"
 
 type PostSidebarProps = {
   post: Post
@@ -51,8 +42,7 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
                 ...post,
                 voteStatus:
                   (oldData.post!.voteStatus == VoteStatus.Like && input.like) ||
-                  (oldData.post!.voteStatus == VoteStatus.Dislike &&
-                    !input.like)
+                  (oldData.post!.voteStatus == VoteStatus.Dislike && !input.like)
                     ? VoteStatus.None
                     : input.like
                     ? VoteStatus.Like
@@ -107,10 +97,7 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
     },
   })
 
-  const vote = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    like: boolean
-  ) => {
+  const vote = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, like: boolean) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -127,29 +114,39 @@ const PostSidebar = ({ post }: PostSidebarProps) => {
   return (
     <div className="flex flex-col items-center gap-1 rounded-full max-h-fit">
       <div
+        data-testid="post-upvote"
         onClick={(e) => vote(e, true)}
         className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
       >
         {post.voteStatus == VoteStatus.Like ? (
-          <BiSolidUpvote className="w-[18px] h-[18px] text-upvote-green" />
+          <BiSolidUpvote data-testid="upvote-icon" className="w-[18px] h-[18px] text-upvote-green" />
         ) : (
           <>
             <BiUpvote className="w-[18px] h-[18px] group-hover/upvote:hidden" />
-            <BiSolidUpvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-upvote-green" />
+            <BiSolidUpvote
+              data-testid="upvote-icon-hover"
+              className="w-[18px] h-[18px] hidden group-hover/upvote:block text-upvote-green"
+            />
           </>
         )}
       </div>
-      <span className="text-xs font-semibold">{post.voteSum}</span>
+      <span data-testid="post-vote-sum" className="text-xs font-semibold">
+        {post.voteSum}
+      </span>
       <div
+        data-testid="post-downvote"
         onClick={(e) => vote(e, false)}
         className="group/upvote rounded-full p-[6px] hover:bg-upvote-hover hover:cursor-pointer"
       >
         {post.voteStatus == VoteStatus.Dislike ? (
-          <BiSolidDownvote className="w-[18px] h-[18px] text-red-500" />
+          <BiSolidDownvote data-testid="downvote-icon" className="w-[18px] h-[18px] text-red-500" />
         ) : (
           <>
             <BiDownvote className="w-[18px] h-[18px] group-hover/upvote:hidden" />
-            <BiSolidDownvote className="w-[18px] h-[18px] hidden group-hover/upvote:block text-red-500" />
+            <BiSolidDownvote
+              data-testid="downvote-icon-hover"
+              className="w-[18px] h-[18px] hidden group-hover/upvote:block text-red-500"
+            />
           </>
         )}
       </div>

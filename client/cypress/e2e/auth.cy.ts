@@ -121,7 +121,7 @@ describe("Sign up form", function () {
     cy.get('[data-testid="confirmPassword-input"]').as("confirmPassword-input").type("password")
 
     cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-      if (req.body.operationName.includes("RegisterUsername")) {
+      if (req.body.operationName == "RegisterUsername") {
         req.reply({ fixture: "/auth/errors/signupInput.json" })
       }
     })

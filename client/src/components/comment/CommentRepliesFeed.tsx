@@ -9,19 +9,13 @@ import { useContext } from "react"
 
 type CommentRepliesProps = {
   comment: Comment
+  testid: string
 }
 
-const CommentReplies = ({ comment }: CommentRepliesProps) => {
+const CommentReplies = ({ comment, testid }: CommentRepliesProps) => {
   const { commentOrderByType } = useContext(CommentContext)
 
-  const {
-    data,
-    isLoading,
-    isSuccess,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(
+  const { data, isLoading, isSuccess, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["commentRepliesFeed", comment.id, commentOrderByType],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getCommentFeedDocument, {
@@ -43,12 +37,13 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 mt-2 px-[11px]">
+    <div data-testid={`${testid}-replies-feed`} className="flex flex-col gap-4 mt-2 px-[11px]">
       {isSuccess &&
         data.pages.map((page) =>
-          page.comments.edges.map((edge) => {
+          page.comments.edges.map((edge, i) => {
             return (
               <CommentReply
+                testid={`${testid}-reply-${i}`}
                 key={edge.node.id}
                 comment={edge.node}
                 parentId={comment.id}
@@ -62,11 +57,7 @@ const CommentReplies = ({ comment }: CommentRepliesProps) => {
           onClick={() => fetchNextPage()}
           disabled={isFetchingNextPage}
         >
-          {isFetchingNextPage ? (
-            <ImSpinner11 className="animate-spin h-[14px] w-[14px]" />
-          ) : (
-            "Show more replies"
-          )}
+          {isFetchingNextPage ? <ImSpinner11 className="animate-spin h-[14px] w-[14px]" /> : "Show more replies"}
         </button>
       )}
     </div>

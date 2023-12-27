@@ -1,14 +1,7 @@
 import type { Comment } from "../../graphql/types"
 import { useContext, useLayoutEffect, useRef, useState } from "react"
-import {
-  InfiniteData,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query"
-import {
-  CommentFeedQuery,
-  CreateCommentReplyInput,
-} from "../../graphql_codegen/graphql"
+import { InfiniteData, useMutation, useQueryClient } from "@tanstack/react-query"
+import { CommentFeedQuery, CreateCommentReplyInput } from "../../graphql_codegen/graphql"
 import { graphQLClient } from "../../utils/graphql"
 import { toast } from "react-toastify"
 import { graphql } from "../../graphql_codegen/gql"
@@ -19,6 +12,7 @@ import { CommentContext } from "../../contexts/CommentContext"
 type CommentReplyFormProps = {
   comment: Comment
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
+  testid: string
 }
 
 const createCommentReplyDocument = graphql(/* GraphQL */ `
@@ -38,7 +32,7 @@ const createCommentReplyDocument = graphql(/* GraphQL */ `
   }
 `)
 
-const CommentReplyForm = ({ comment, setOpen }: CommentReplyFormProps) => {
+const CommentReplyForm = ({ comment, setOpen, testid }: CommentReplyFormProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
   const [submitting, setSubmitting] = useState<boolean>(false)
 
@@ -99,14 +93,8 @@ const CommentReplyForm = ({ comment, setOpen }: CommentReplyFormProps) => {
           }
         )
 
-        queryClient.resetQueries([
-          "commentRepliesFeed",
-          comment.id,
-          commentOrderByType,
-        ])
-      } else if (
-        data.createCommentReply.__typename == "CreateCommentReplyInputError"
-      ) {
+        queryClient.resetQueries(["commentRepliesFeed", comment.id, commentOrderByType])
+      } else if (data.createCommentReply.__typename == "CreateCommentReplyInputError") {
         setError(data.createCommentReply.errorMsg)
       }
     },
@@ -131,7 +119,7 @@ const CommentReplyForm = ({ comment, setOpen }: CommentReplyFormProps) => {
   }
 
   return (
-    <form className="flex flex-col gap-2">
+    <form data-testid={`${testid}-reply-form`} className="flex flex-col gap-2">
       {error && <ErrorCard error={error} className="mb-4" />}
       <textarea
         ref={textAreaRef}
@@ -143,9 +131,7 @@ const CommentReplyForm = ({ comment, setOpen }: CommentReplyFormProps) => {
       <div className="self-end flex gap-2 items-center">
         <span
           className={`text-xs font-semibold ${
-            body.length > 2000 || body.trim().length <= 0
-              ? "text-red-500"
-              : "text-green-500"
+            body.length > 2000 || body.trim().length <= 0 ? "text-red-500" : "text-green-500"
           }`}
         >
           {body.length}/2000
@@ -159,11 +145,7 @@ const CommentReplyForm = ({ comment, setOpen }: CommentReplyFormProps) => {
           className="btn_blue text-xs px-2 py-1 self-end"
           disabled={body.trim().length <= 0 || body.length > 2000 || submitting}
         >
-          {submitting ? (
-            <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" />
-          ) : (
-            "Reply"
-          )}
+          {submitting ? <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" /> : "Reply"}
         </button>
       </div>
     </form>

@@ -11,7 +11,7 @@ type PostProps = {
   innerRef?: Ref<HTMLAnchorElement> | undefined
   queryKey: any[]
   communityFeed?: boolean
-  testid?: string
+  testid: string
 }
 
 const Post = ({ post, innerRef, queryKey, communityFeed = false, testid }: PostProps) => {

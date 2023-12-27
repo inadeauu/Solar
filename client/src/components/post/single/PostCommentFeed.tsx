@@ -49,7 +49,11 @@ const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
   }
 
   if (isSuccess && !data.pages[0].comments.edges.length) {
-    return <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">No Comments</span>
+    return (
+      <span data-testid="no-comments-text" className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
+        No Comments
+      </span>
+    )
   }
 
   return (
@@ -68,6 +72,7 @@ const PostCommentFeed = ({ post }: PostCommentFeedProps) => {
           })
         )}
       {isFetchingNextPage && <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />}
+      {!hasNextPage && <span>All comments loaded</span>}
     </div>
   )
 }

@@ -4,7 +4,7 @@ type ModalProps = {
   isOpen: boolean
   onClose: (...args: any[]) => any
   children: React.ReactNode
-  testid?: string
+  testid: string
 }
 
 const Modal = ({ isOpen, onClose, children, testid }: ModalProps) => {

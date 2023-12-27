@@ -8,7 +8,7 @@ import { translator } from "../../utils/uuid"
 type CommentProps = {
   comment: Comment
   innerRef?: React.LegacyRef<HTMLDivElement> | undefined
-  testid?: string
+  testid: string
 }
 
 const Comment = ({ comment, innerRef, testid }: CommentProps) => {
@@ -22,6 +22,7 @@ const Comment = ({ comment, innerRef, testid }: CommentProps) => {
           <div className="flex items-center justify-between gap-4">
             <span className="text-neutral-500 text-xs min-w-0 break-words">
               <span
+                data-testid={`${testid}-owner`}
                 className="text-black font-medium hover:underline hover:cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault()
@@ -36,6 +37,7 @@ const Comment = ({ comment, innerRef, testid }: CommentProps) => {
             </span>
             {user?.id == comment.owner.id && (
               <button
+                data-testid={`${testid}-edit-button`}
                 onClick={() => {
                   navigate(`/comments/${translator.fromUUID(comment.id)}/edit`)
                 }}
@@ -49,7 +51,7 @@ const Comment = ({ comment, innerRef, testid }: CommentProps) => {
             {comment.body}
           </p>
         </div>
-        <CommentFooter comment={comment} />
+        <CommentFooter testid={testid} comment={comment} />
       </div>
     </div>
   )

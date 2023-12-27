@@ -109,6 +109,7 @@ export const getCommentFeedDocument = graphql(/* GraphQL */ `
         }
         hasNextPage
       }
+      orderBy
     }
   }
 `)

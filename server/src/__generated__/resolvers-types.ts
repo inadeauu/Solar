@@ -129,6 +129,7 @@ export type Comment = {
 export type CommentConnection = {
   __typename?: 'CommentConnection';
   edges: Array<CommentEdge>;
+  orderBy?: Maybe<Scalars['String']['output']>;
   pageInfo: PageInfo;
 };
 
@@ -1292,6 +1293,7 @@ export type CommentResolvers<ContextType = Context, ParentType extends Resolvers
 
 export type CommentConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CommentConnection'] = ResolversParentTypes['CommentConnection']> = ResolversObject<{
   edges?: Resolver<Array<ResolversTypes['CommentEdge']>, ParentType, ContextType>;
+  orderBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

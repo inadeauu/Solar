@@ -1,10 +1,14 @@
-import { aliasMutation } from "../utils/graphqlTest"
+import { recurse } from "cypress-recurse"
+import { aliasMutation, aliasQuery } from "../utils/graphqlTest"
+import { CommentFeedQuery } from "../../src/graphql_codegen/graphql"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
   cy.exec("npm --prefix ../server run seed")
 
   cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+    aliasQuery(req, "CommentFeed")
+
     aliasMutation(req, "VotePost")
     aliasMutation(req, "CreateComment")
   })
@@ -284,4 +288,239 @@ describe("Comment creation form", function () {
   })
 })
 
-describe("Comment feed", function () {})
+describe("Comment feed", function () {
+  it("Check no comments message shows", function () {
+    cy.visit("/posts/duRZHrFgdqynoRoScrDdjL")
+    cy.get('[data-testid="no-comments-text"]').should("have.text", "No Comments")
+  })
+
+  it("Check infinite scroll", function () {
+    cy.visit("/posts/7y5hQri7cfRRpU5trE5CAn")
+
+    let iterations = 1
+
+    let comments: CommentFeedQuery["comments"]["edges"] = []
+
+    recurse(
+      () => {
+        cy.get('[data-testid="post-comment-feed"]').as("post-comment-feed").children().last().scrollIntoView()
+
+        cy.wait("@gqlCommentFeedQuery")
+          .then(({ response }) => {
+            if (!response) throw new Error("Response not present")
+
+            if (iterations != 2) {
+              expect(response.body.data.comments.edges).to.have.lengthOf(10)
+            } else {
+              expect(response.body.data.comments.edges).to.have.lengthOf(5)
+            }
+
+            comments = comments.concat(response.body.data.comments.edges)
+          })
+          .then(() => {
+            iterations += 1
+          })
+
+        return cy.get("@post-comment-feed").children()
+      },
+      (children) => {
+        return (
+          children.length == 16 &&
+          children[children.length - 1].innerHTML == "All comments loaded" &&
+          comments.length == 15
+        )
+      }
+    ).then(() => {
+      expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39"))
+    })
+  })
+
+  it("Check new ordering", function () {
+    cy.visit("/posts/7y5hQri7cfRRpU5trE5CAn")
+
+    let comments: CommentFeedQuery["comments"]["edges"] = []
+
+    recurse(
+      () => {
+        cy.get('[data-testid="post-comment-feed"]').as("post-comment-feed").children().last().scrollIntoView()
+
+        cy.wait("@gqlCommentFeedQuery").then(({ response }) => {
+          if (!response) throw new Error("Response not present")
+
+          if (response.body.data.comments.orderBy == "NEW") {
+            comments = comments.concat(response.body.data.comments.edges)
+          }
+        })
+
+        return cy.get("@post-comment-feed").children()
+      },
+      (children) => {
+        return (
+          children.length == 16 &&
+          children[children.length - 1].innerHTML == "All comments loaded" &&
+          comments.length == 15
+        )
+      }
+    ).then(() => {
+      expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
+      expect(
+        comments.every((comment, i) => {
+          if (i == 0) {
+            return comment.node.created_at > comments[i + 1].node.created_at
+          } else if (i == comments.length - 1) {
+            return comment.node.created_at < comments[i - 1].node.created_at
+          } else {
+            return (
+              comment.node.created_at > comments[i + 1].node.created_at &&
+              comment.node.created_at < comments[i - 1].node.created_at
+            )
+          }
+        })
+      ).to.be.true
+    })
+  })
+
+  it("Check old ordering", function () {
+    cy.visit("/posts/7y5hQri7cfRRpU5trE5CAn")
+
+    let comments: CommentFeedQuery["comments"]["edges"] = []
+
+    cy.get('[data-testid="comment-order-dropdown"]').click()
+    cy.get('[data-testid="comment-order-Old"]').click()
+
+    recurse(
+      () => {
+        cy.get('[data-testid="post-comment-feed"]').as("post-comment-feed").children().last().scrollIntoView()
+
+        cy.wait("@gqlCommentFeedQuery").then(({ response }) => {
+          if (!response) throw new Error("Response not present")
+
+          if (response.body.data.comments.orderBy == "OLD") {
+            comments = comments.concat(response.body.data.comments.edges)
+          }
+        })
+
+        return cy.get("@post-comment-feed").children()
+      },
+      (children) => {
+        return (
+          children.length == 16 &&
+          children[children.length - 1].innerHTML == "All comments loaded" &&
+          comments.length == 15
+        )
+      }
+    ).then(() => {
+      expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
+      expect(
+        comments.every((comment, i) => {
+          if (i == 0) {
+            return comment.node.created_at < comments[i + 1].node.created_at
+          } else if (i == comments.length - 1) {
+            return comment.node.created_at > comments[i - 1].node.created_at
+          } else {
+            return (
+              comment.node.created_at < comments[i + 1].node.created_at &&
+              comment.node.created_at > comments[i - 1].node.created_at
+            )
+          }
+        })
+      ).to.be.true
+    })
+  })
+
+  it("Check increasing vote count ordering", function () {
+    cy.visit("/posts/7y5hQri7cfRRpU5trE5CAn")
+
+    let comments: CommentFeedQuery["comments"]["edges"] = []
+
+    cy.get('[data-testid="comment-order-dropdown"]').click()
+    cy.get('[data-testid="comment-order-Low"]').click()
+
+    recurse(
+      () => {
+        cy.get('[data-testid="post-comment-feed"]').as("post-comment-feed").children().last().scrollIntoView()
+
+        cy.wait("@gqlCommentFeedQuery").then(({ response }) => {
+          if (!response) throw new Error("Response not present")
+
+          if (response.body.data.comments.orderBy == "LOW") {
+            comments = comments.concat(response.body.data.comments.edges)
+          }
+        })
+
+        return cy.get("@post-comment-feed").children()
+      },
+      (children) => {
+        return (
+          children.length == 16 &&
+          children[children.length - 1].innerHTML == "All comments loaded" &&
+          comments.length == 15
+        )
+      }
+    ).then(() => {
+      expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
+      expect(
+        comments.every((comment, i) => {
+          if (i == 0) {
+            return comment.node.voteSum <= comments[i + 1].node.voteSum
+          } else if (i == comments.length - 1) {
+            return comment.node.voteSum >= comments[i - 1].node.voteSum
+          } else {
+            return (
+              comment.node.voteSum <= comments[i + 1].node.voteSum &&
+              comment.node.voteSum >= comments[i - 1].node.voteSum
+            )
+          }
+        })
+      ).to.be.true
+    })
+  })
+
+  it("Check decreasing vote count ordering", function () {
+    cy.visit("/posts/7y5hQri7cfRRpU5trE5CAn")
+
+    let comments: CommentFeedQuery["comments"]["edges"] = []
+
+    cy.get('[data-testid="comment-order-dropdown"]').click()
+    cy.get('[data-testid="comment-order-Top"]').click()
+
+    recurse(
+      () => {
+        cy.get('[data-testid="post-comment-feed"]').as("post-comment-feed").children().last().scrollIntoView()
+
+        cy.wait("@gqlCommentFeedQuery").then(({ response }) => {
+          if (!response) throw new Error("Response not present")
+
+          if (response.body.data.comments.orderBy == "TOP") {
+            comments = comments.concat(response.body.data.comments.edges)
+          }
+        })
+
+        return cy.get("@post-comment-feed").children()
+      },
+      (children) => {
+        return (
+          children.length == 16 &&
+          children[children.length - 1].innerHTML == "All comments loaded" &&
+          comments.length == 15
+        )
+      }
+    ).then(() => {
+      expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
+      expect(
+        comments.every((comment, i) => {
+          if (i == 0) {
+            return comment.node.voteSum >= comments[i + 1].node.voteSum
+          } else if (i == comments.length - 1) {
+            return comment.node.voteSum <= comments[i - 1].node.voteSum
+          } else {
+            return (
+              comment.node.voteSum >= comments[i + 1].node.voteSum &&
+              comment.node.voteSum <= comments[i - 1].node.voteSum
+            )
+          }
+        })
+      ).to.be.true
+    })
+  })
+})

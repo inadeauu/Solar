@@ -11,9 +11,10 @@ import { CommentContext } from "../../contexts/CommentContext"
 
 type CommentFooterProps = {
   comment: Comment
+  testid: string
 }
 
-const CommentFooter = ({ comment }: CommentFooterProps) => {
+const CommentFooter = ({ comment, testid }: CommentFooterProps) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const [reply, setReply] = useState<boolean>(false)
@@ -25,10 +26,12 @@ const CommentFooter = ({ comment }: CommentFooterProps) => {
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-1">
         <CommentVote
+          testid={testid}
           comment={comment}
           queryKey={["postCommentFeed", comment.post.id, commentOrderByType]}
         />
         <button
+          data-testid={`${testid}-reply-button`}
           onClick={(e) => {
             e.preventDefault()
             e.stopPropagation()
@@ -46,23 +49,20 @@ const CommentFooter = ({ comment }: CommentFooterProps) => {
           Reply
         </button>
       </div>
-      {reply && <CommentReplyForm comment={comment} setOpen={setReply} />}
+      {reply && <CommentReplyForm testid={testid} comment={comment} setOpen={setReply} />}
       {comment.replyCount > 0 && (
         <button
+          data-testid={`${testid}-open-replies-button`}
           onClick={() => {
             setShowReplies((prev) => !prev)
           }}
           className="flex items-center gap-2 text-sm text-blue-500 px-[5px] w-fit"
         >
-          {showReplies ? (
-            <BiSolidDownArrow className="w-3 h-3" />
-          ) : (
-            <BiSolidUpArrow className="w-3 h-3" />
-          )}
+          {showReplies ? <BiSolidDownArrow className="w-3 h-3" /> : <BiSolidUpArrow className="w-3 h-3" />}
           {comment.replyCount} {getReply(comment.replyCount)}
         </button>
       )}
-      {showReplies && <CommentReplies comment={comment} />}
+      {showReplies && <CommentReplies testid={testid} comment={comment} />}
     </div>
   )
 }

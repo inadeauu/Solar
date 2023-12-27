@@ -28,6 +28,7 @@ const PostPage = () => {
       <Post post={data.post} />
       <PostCommentForm post={data.post} />
       <Dropdown
+        name="comment-order"
         className="py-1"
         width="w-[65px]"
         items={["New", "Old", "Top", "Low"]}

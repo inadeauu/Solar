@@ -68,4 +68,5 @@ type CommentEdge {
 type CommentConnection {
   edges: [CommentEdge!]!
   pageInfo: PageInfo!
+  orderBy: String
 }

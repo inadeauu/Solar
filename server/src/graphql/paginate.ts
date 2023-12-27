@@ -240,6 +240,7 @@ export const paginateComments = async (
   return {
     edges,
     pageInfo,
+    orderBy: filters.orderBy,
   }
 }
 

@@ -10,9 +10,10 @@ import { useAuth } from "../../hooks/useAuth"
 type CommentReplyType = {
   comment: Comment
   parentId: string
+  testid: string
 }
 
-export const CommentReply = ({ comment, parentId }: CommentReplyType) => {
+export const CommentReply = ({ comment, parentId, testid }: CommentReplyType) => {
   const { user } = useAuth()
   const { commentOrderByType } = useContext(CommentContext)
   const navigate = useNavigate()
@@ -23,6 +24,7 @@ export const CommentReply = ({ comment, parentId }: CommentReplyType) => {
         <div className="flex items-center justify-between gap-4">
           <span className="text-neutral-500 text-xs min-w-0 break-words">
             <span
+              data-testid={`${testid}-owner`}
               className="text-black font-medium hover:underline hover:cursor-pointer"
               onClick={(e) => {
                 e.preventDefault()
@@ -37,6 +39,7 @@ export const CommentReply = ({ comment, parentId }: CommentReplyType) => {
           </span>
           {user?.id == comment.owner.id && (
             <button
+              data-testid={`${testid}-edit-button`}
               onClick={() => {
                 navigate(`/comments/${translator.fromUUID(comment.id)}/edit`)
               }}
@@ -46,12 +49,11 @@ export const CommentReply = ({ comment, parentId }: CommentReplyType) => {
             </button>
           )}
         </div>
-        <p className="text-sm font-light text-neutral-800">{comment.body}</p>
+        <p data-testid={`${testid}-body`} className="text-sm font-light text-neutral-800">
+          {comment.body}
+        </p>
       </div>
-      <CommentVote
-        comment={comment}
-        queryKey={["commentRepliesFeed", parentId, commentOrderByType]}
-      />
+      <CommentVote testid={testid} comment={comment} queryKey={["commentRepliesFeed", parentId, commentOrderByType]} />
     </div>
   )
 }

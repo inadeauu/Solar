@@ -5,16 +5,13 @@ type ConfirmationModalProps = {
   onClose: (...any: any[]) => any
   onAccept: (...any: any[]) => any
   text: string
+  testid: string
 }
 
-const ConfirmationModal = ({
-  isOpen,
-  onClose,
-  onAccept,
-  text,
-}: ConfirmationModalProps) => {
+const ConfirmationModal = ({ isOpen, onClose, onAccept, text, testid }: ConfirmationModalProps) => {
   return (
     <Modal
+      testid={testid}
       isOpen={isOpen}
       onClose={() => {
         onClose()
@@ -24,6 +21,7 @@ const ConfirmationModal = ({
         <h1 className="text-xl font-medium">{text}</h1>
         <div className="flex gap-4 mt-4">
           <button
+            data-testid={`${testid}-no`}
             type="button"
             onClick={() => {
               onClose()
@@ -33,6 +31,7 @@ const ConfirmationModal = ({
             No
           </button>
           <button
+            data-testid={`${testid}-yes`}
             type="button"
             onClick={() => {
               onAccept()

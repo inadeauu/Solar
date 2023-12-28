@@ -5,14 +5,11 @@ import { ImSpinner11 } from "react-icons/im"
 import ErrorCard from "../../misc/ErrorCard"
 import type { Post } from "../../../graphql/types"
 import { graphql } from "../../../graphql_codegen/gql"
-import {
-  DeletePostInput,
-  EditPostInput,
-  SinglePostQuery,
-} from "../../../graphql_codegen/graphql"
+import { DeletePostInput, EditPostInput, SinglePostQuery } from "../../../graphql_codegen/graphql"
 import { graphQLClient } from "../../../utils/graphql"
 import { toast } from "react-toastify"
 import ConfirmationModal from "../../misc/ConfirmationModal"
+import { translator } from "../../../utils/uuid"
 
 const editPostDocument = graphql(/* GraphQL */ `
   mutation EditPost($input: EditPostInput!) {
@@ -88,22 +85,17 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
     onSuccess: (data) => {
       if (data.editPost.__typename == "EditPostSuccess") {
         const updatedPost = data.editPost.post
-        queryClient.setQueryData<SinglePostQuery>(
-          ["post", updatedPost.id],
-          (oldData) => {
-            return oldData
-              ? {
-                  ...oldData,
-                  post: updatedPost,
-                }
-              : oldData
-          }
-        )
-        setTitle("")
-        setBody("")
-        if (error) setError("")
+        queryClient.setQueryData<SinglePostQuery>(["post", updatedPost.id], (oldData) => {
+          return oldData
+            ? {
+                ...oldData,
+                post: updatedPost,
+              }
+            : oldData
+        })
+
         toast.success("Successfully edited post")
-        navigate(-1)
+        navigate(`/posts/${translator.fromUUID(post.id)}`)
       } else if (data.editPost.__typename == "EditPostInputError") {
         setError(data.editPost.errorMsg)
       }
@@ -118,9 +110,6 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
     },
     onSuccess: (data) => {
       if (data.deletePost.__typename == "DeletePostSuccess") {
-        setTitle("")
-        setBody("")
-        if (error) setError("")
         toast.success("Successfully deleted post")
         navigate("/")
       }
@@ -158,6 +147,7 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
             <div className="flex gap-2 justify-between items-center">
               <h1 className="text-xl font-medium mb-1">Update Post</h1>
               <button
+                data-testid="reset-changes-button"
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -171,9 +161,10 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
                 Reset Changes
               </button>
             </div>
-            {error && <ErrorCard error={error} className="mb-4" />}
+            {error && <ErrorCard data-testid="post-edit-error" error={error} className="mb-4" />}
             <div className="flex flex-col gap-1">
               <input
+                data-testid="post-title-input"
                 name="title"
                 type="text"
                 placeholder="Title"
@@ -182,12 +173,9 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
                 className="rounded-lg border w-full px-2 py-1 outline-none transition-all duration-200 placeholder:font-light border-neutral-500 hover:border-blue-400 focus:border-blue-400"
               />
               <span
+                data-testid="title-input-indicator"
                 className={`text-xs font-semibold self-end
-                  ${
-                    title.trim().length <= 0 || title.length > 200
-                      ? "text-red-500"
-                      : "text-green-500"
-                  }
+                  ${title.trim().length <= 0 || title.length > 200 ? "text-red-500" : "text-green-500"}
                 `}
               >
                 {title.length}/200
@@ -195,6 +183,7 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
             </div>
             <div className="flex flex-col gap-1">
               <textarea
+                data-testid="post-body-input"
                 ref={textAreaRef}
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
@@ -202,15 +191,15 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
                 placeholder="Body (optional)"
               />
               <span
-                className={`text-xs font-semibold self-end ${
-                  body.length > 20000 && "text-red-500"
-                }`}
+                data-testid="body-input-indicator"
+                className={`text-xs font-semibold self-end ${body.length > 20000 && "text-red-500"}`}
               >
                 {body.length}/20000
               </span>
             </div>
             <div className="flex gap-4 self-end">
               <button
+                data-testid="post-delete-button"
                 type="button"
                 onClick={() => {
                   setDeletePostModalOpen(true)
@@ -221,6 +210,7 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
                 Delete
               </button>
               <button
+                data-testid="post-edit-button"
                 type="button"
                 onClick={() => {
                   submitEditPost()
@@ -235,17 +225,14 @@ const EditPostForm = ({ post }: EditPostFormProps) => {
                   submittingEdit
                 }
               >
-                {submittingEdit ? (
-                  <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" />
-                ) : (
-                  "Update"
-                )}
+                {submittingEdit ? <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" /> : "Update"}
               </button>
             </div>
           </form>
         </div>
       </div>
       <ConfirmationModal
+        testid="delete-modal"
         isOpen={deletePostModalOpen}
         onClose={() => setDeletePostModalOpen(false)}
         text="Are you sure you want to delete this post?"

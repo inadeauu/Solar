@@ -1,0 +1,9 @@
+{
+  "data": {
+    "editPost": {
+      "__typename": "EditPostInputError",
+      "errorMsg": "Invalid input",
+      "code": 400
+    }
+  }
+}

@@ -21,8 +21,6 @@
 <p>Click here to view a demo of the website.</p>
 https://github.com/inadeauu/solar/assets/123025115/dec62bce-0611-4c19-80fc-98efce12cac5
 
-
-
 <h2>Local Install Instructions</h2>
 <p>To locally install and run this project on your machine:</p>
 <ol>
@@ -37,10 +35,10 @@ https://github.com/inadeauu/solar/assets/123025115/dec62bce-0611-4c19-80fc-98efc
 
 <h2>Images</h2>
 <h3>Community Page</h3>
-<img src="images/CommunityPage.jpg" />
+<img src="demo/CommunityPage.jpg" />
 <h3>Post Page</h3>
-<img src="images/PostPage.jpg" />
+<img src="demo/PostPage.jpg" />
 <h3>Profile Page</h3>
-<img src="images/ProfilePage.jpg" />
+<img src="demo/ProfilePage.jpg" />
 <h3>Profile Edit Page</h3>
-<img src="images/ProfileEditPage.jpg" />
+<img src="demo/ProfileEditPage.jpg" />

@@ -1,0 +1,9 @@
+{
+  "data": {
+    "createCommentReply": {
+      "__typename": "CreateCommentReplyInputError",
+      "errorMsg": "Invalid input",
+      "code": 400
+    }
+  }
+}

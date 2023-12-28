@@ -114,6 +114,42 @@ export const getCommentFeedDocument = graphql(/* GraphQL */ `
   }
 `)
 
+export const getCommentRepliesFeedDocument = graphql(/* GraphQL */ `
+  query CommentRepliesFeed($input: CommentsInput!) {
+    comments(input: $input) {
+      edges {
+        node {
+          body
+          created_at
+          id
+          post {
+            id
+          }
+          owner {
+            id
+            username
+          }
+          parent {
+            id
+          }
+          voteSum
+          voteStatus
+          replyCount
+        }
+      }
+      pageInfo {
+        endCursor {
+          id
+          created_at
+          voteSum
+        }
+        hasNextPage
+      }
+      orderBy
+    }
+  }
+`)
+
 export const getCommunityFeedDocument = graphql(/* GraphQL */ `
   query CommunityFeed($input: CommunitiesInput!) {
     communities(input: $input) {

@@ -1,5 +1,5 @@
 import type { Comment } from "../../graphql/types"
-import { getCommentFeedDocument } from "../../graphql/sharedDocuments"
+import { getCommentRepliesFeedDocument } from "../../graphql/sharedDocuments"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { graphQLClient } from "../../utils/graphql"
 import { ImSpinner11 } from "react-icons/im"
@@ -18,7 +18,7 @@ const CommentReplies = ({ comment, testid }: CommentRepliesProps) => {
   const { data, isLoading, isSuccess, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["commentRepliesFeed", comment.id, commentOrderByType],
     ({ pageParam = undefined }) => {
-      return graphQLClient.request(getCommentFeedDocument, {
+      return graphQLClient.request(getCommentRepliesFeedDocument, {
         input: {
           filters: { parentId: comment.id, orderBy: commentOrderByType },
           paginate: { first: 10, after: pageParam },
@@ -51,14 +51,17 @@ const CommentReplies = ({ comment, testid }: CommentRepliesProps) => {
             )
           })
         )}
-      {hasNextPage && (
+      {hasNextPage ? (
         <button
+          data-testid={`${testid}-fetch-button`}
           className="btn_blue w-fit flex text-xs py-1 px-3"
           onClick={() => fetchNextPage()}
           disabled={isFetchingNextPage}
         >
           {isFetchingNextPage ? <ImSpinner11 className="animate-spin h-[14px] w-[14px]" /> : "Show more replies"}
         </button>
+      ) : (
+        <span>All replies loaded</span>
       )}
     </div>
   )

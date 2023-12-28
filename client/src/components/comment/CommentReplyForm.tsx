@@ -54,11 +54,7 @@ const CommentReplyForm = ({ comment, setOpen, testid }: CommentReplyFormProps) =
       if (data.createCommentReply.__typename == "CreateCommentReplySuccess") {
         toast.success(data.createCommentReply.successMsg)
 
-        setBody("")
-
         setOpen(false)
-
-        if (error) setError("")
 
         queryClient.setQueryData<InfiniteData<CommentFeedQuery>>(
           ["postCommentFeed", comment.post.id, commentOrderByType],
@@ -120,8 +116,9 @@ const CommentReplyForm = ({ comment, setOpen, testid }: CommentReplyFormProps) =
 
   return (
     <form data-testid={`${testid}-reply-form`} className="flex flex-col gap-2">
-      {error && <ErrorCard error={error} className="mb-4" />}
+      {error && <ErrorCard data-testid={`${testid}-reply-error`} error={error} className="mb-4" />}
       <textarea
+        data-testid={`${testid}-reply-input`}
         ref={textAreaRef}
         value={body}
         onChange={(e) => setBody(e.target.value)}
@@ -130,6 +127,7 @@ const CommentReplyForm = ({ comment, setOpen, testid }: CommentReplyFormProps) =
       />
       <div className="self-end flex gap-2 items-center">
         <span
+          data-testid={`${testid}-reply-length`}
           className={`text-xs font-semibold ${
             body.length > 2000 || body.trim().length <= 0 ? "text-red-500" : "text-green-500"
           }`}
@@ -137,6 +135,7 @@ const CommentReplyForm = ({ comment, setOpen, testid }: CommentReplyFormProps) =
           {body.length}/2000
         </span>
         <button
+          data-testid={`${testid}-reply-submit`}
           type="button"
           onClick={() => {
             submitCreateComment()

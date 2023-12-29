@@ -54,6 +54,8 @@ const getProfileCommentFeedDocument = graphql(/* GraphQL */ `
         }
         hasNextPage
       }
+      orderBy
+      replies
     }
   }
 `)
@@ -66,14 +68,7 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
 
   const commentOrderByType = getCommentOrderByType(commentOrderBy)
 
-  const {
-    data,
-    isLoading,
-    isSuccess,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(
+  const { data, isLoading, isSuccess, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["profileCommentFeed", user.username, commentOrderByType, commentFilter],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getProfileCommentFeedDocument, {
@@ -105,9 +100,10 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <div className="flex gap-4">
         <Dropdown
+          name="order"
           className="py-1"
           width="w-[65px]"
           items={["New", "Old", "Top", "Low"]}
@@ -115,6 +111,7 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
           setValue={setCommentOrderBy}
         />
         <Dropdown
+          name="filter"
           className="py-1"
           width="w-[95px]"
           items={["Top level", "Reply"]}
@@ -122,28 +119,26 @@ const ProfileCommentFeed = ({ user }: ProfileCommentFeedProps) => {
           setValue={setCommentFilter}
         />
       </div>
-      {isSuccess && data.pages[0].comments.edges.length ? (
-        data.pages.map((page) =>
-          page.comments.edges.map((edge, i) => {
-            return (
-              <ProfileComment
-                innerRef={
-                  page.comments.edges.length === i + 1 ? ref : undefined
-                }
-                key={edge.node.id}
-                comment={edge.node}
-              />
-            )
-          })
-        )
-      ) : (
-        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-          No Comments
-        </span>
-      )}
-      {isFetchingNextPage && (
-        <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
-      )}
+      <div data-testid="profile-comment-feed" className="flex flex-col gap-5">
+        {isSuccess && data.pages[0].comments.edges.length ? (
+          data.pages.map((page) =>
+            page.comments.edges.map((edge, i) => {
+              return (
+                <ProfileComment
+                  testid={`profile-comment-${i}`}
+                  innerRef={page.comments.edges.length === i + 1 ? ref : undefined}
+                  key={edge.node.id}
+                  comment={edge.node}
+                />
+              )
+            })
+          )
+        ) : (
+          <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">No Comments</span>
+        )}
+        {isFetchingNextPage && <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />}
+        {!hasNextPage && <span>All comments loaded</span>}
+      </div>
     </div>
   )
 }

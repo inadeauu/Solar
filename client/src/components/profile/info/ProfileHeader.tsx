@@ -13,11 +13,17 @@ const ProfileHeader = ({ user }: ProfileHeaderProps) => {
   const navigate = useNavigate()
 
   return (
-    <div className="flex flex-col gap-2 bg-white border border-neutral-300 rounded-lg p-4 md:hidden">
+    <div
+      data-testid="profile-header"
+      className="flex flex-col gap-2 bg-white border border-neutral-300 rounded-lg p-4 md:hidden"
+    >
       <div className="flex items-center gap-4 justify-between break-words">
-        <h1 className="text-lg font-semibold min-w-0">{user.username}</h1>
+        <h1 data-testid="header-username" className="text-lg font-semibold min-w-0">
+          {user.username}
+        </h1>
         {loggedInUser?.id == user.id && (
           <button
+            data-testid="header-edit-button"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -31,10 +37,10 @@ const ProfileHeader = ({ user }: ProfileHeaderProps) => {
         )}
       </div>
       <div className="flex flex-col gap-1 break-words">
-        <span className="text-sm text-neutral-500">
+        <span data-testid="header-joined" className="text-sm text-neutral-500">
           Joined {moment(user.created_at).format("MM/DD/YYYY")}
         </span>
-        <div className="flex gap-1 text-neutral-500 text-sm">
+        <div data-testid="header-post-comment-count" className="flex gap-1 text-neutral-500 text-sm">
           <span>
             {user.postsCount} {pluralize(user.postsCount, "Post")}
           </span>

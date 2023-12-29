@@ -17,14 +17,7 @@ const ProfileCommunityFeed = ({ user }: ProfileCommunityFeedProps) => {
 
   const [communityFilter, setCommunityFilter] = useState<string>("Owns")
 
-  const {
-    data,
-    isLoading,
-    isSuccess,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(
+  const { data, isLoading, isSuccess, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["profileCommunityFeed", user.username, communityFilter],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getCommunityFeedDocument, {
@@ -55,36 +48,35 @@ const ProfileCommunityFeed = ({ user }: ProfileCommunityFeedProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <Dropdown
+        name="filter"
         className="py-1"
         width="w-[95px]"
         items={["Owns", "Member of"]}
         value={communityFilter}
         setValue={setCommunityFilter}
       />
-      {isSuccess && data.pages[0].communities.edges.length ? (
-        data.pages.map((page) =>
-          page.communities.edges.map((edge, i) => {
-            return (
-              <ProfileCommunity
-                innerRef={
-                  page.communities.edges.length === i + 1 ? ref : undefined
-                }
-                key={edge.node.id}
-                community={edge.node}
-              />
-            )
-          })
-        )
-      ) : (
-        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-          No Communities
-        </span>
-      )}
-      {isFetchingNextPage && (
-        <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
-      )}
+      <div data-testid="profile-community-feed" className="flex flex-col gap-5">
+        {isSuccess && data.pages[0].communities.edges.length ? (
+          data.pages.map((page) =>
+            page.communities.edges.map((edge, i) => {
+              return (
+                <ProfileCommunity
+                  testid={`profile-community-${i}`}
+                  innerRef={page.communities.edges.length === i + 1 ? ref : undefined}
+                  key={edge.node.id}
+                  community={edge.node}
+                />
+              )
+            })
+          )
+        ) : (
+          <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">No Communities</span>
+        )}
+        {isFetchingNextPage && <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />}
+        {!hasNextPage && <span>All communities loaded</span>}
+      </div>
     </div>
   )
 }

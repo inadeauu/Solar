@@ -57,6 +57,7 @@ type CommunityEdge {
 type CommunityConnection {
   edges: [CommunityEdge!]!
   pageInfo: PageInfo!
+  memberOf: Boolean
 }
 
 # -- COMMENT
@@ -69,4 +70,5 @@ type CommentConnection {
   edges: [CommentEdge!]!
   pageInfo: PageInfo!
   orderBy: String
+  replies: Boolean
 }

@@ -1,6 +1,7 @@
 import { recurse } from "cypress-recurse"
-import { aliasMutation, aliasQuery } from "../utils/graphqlTest"
-import { CommentRepliesFeedQuery } from "../../src/graphql_codegen/graphql"
+import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
+import { CommentRepliesFeedQuery } from "../../../src/graphql_codegen/graphql"
+import { nodeIdsUnique } from "../../utils/utils"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -354,7 +355,6 @@ describe("Reply form", function () {
     cy.get('[data-testid="post-comment-0-reply-button"]').click()
 
     cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
-      console.log(req)
       if (req.body.operationName == "CreateCommentReply") {
         req.reply({ fixture: "/post/errors/commentReplyInput.json" })
       }
@@ -411,6 +411,8 @@ describe("Comment replies feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(comments)).to.be.true
+
       expect(
         comments.every(
           (comment) => comment.node.parent && comment.node.parent.id == "36756cee-a0ce-40d3-a51d-686699e0b3a1"
@@ -452,6 +454,8 @@ describe("Comment replies feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(comments)).to.be.true
+
       expect(
         comments.every(
           (comment) => comment.node.parent && comment.node.parent.id == "36756cee-a0ce-40d3-a51d-686699e0b3a1"
@@ -510,6 +514,8 @@ describe("Comment replies feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(comments)).to.be.true
+
       expect(
         comments.every(
           (comment) => comment.node.parent && comment.node.parent.id == "36756cee-a0ce-40d3-a51d-686699e0b3a1"
@@ -568,6 +574,8 @@ describe("Comment replies feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(comments)).to.be.true
+
       expect(
         comments.every(
           (comment) => comment.node.parent && comment.node.parent.id == "36756cee-a0ce-40d3-a51d-686699e0b3a1"
@@ -626,6 +634,8 @@ describe("Comment replies feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(comments)).to.be.true
+
       expect(
         comments.every(
           (comment) => comment.node.parent && comment.node.parent.id == "36756cee-a0ce-40d3-a51d-686699e0b3a1"

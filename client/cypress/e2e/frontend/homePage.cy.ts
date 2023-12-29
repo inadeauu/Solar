@@ -1,6 +1,7 @@
 import { recurse } from "cypress-recurse"
-import { aliasMutation, aliasQuery } from "../utils/graphqlTest"
-import { PostFeedQuery } from "../../src/graphql_codegen/graphql"
+import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
+import { PostFeedQuery } from "../../../src/graphql_codegen/graphql"
+import { nodeIdsUnique } from "../../utils/utils"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -206,32 +207,36 @@ describe("Post feed", function () {
   it("Check infinite scroll", function () {
     cy.visit("/")
 
+    let posts: PostFeedQuery["posts"]["edges"] = []
     let iterations = 1
 
     recurse(
       () => {
         cy.get('[data-testid="home-post-feed"]').as("home-post-feed").children().last().scrollIntoView()
 
-        cy.wait("@gqlPostFeedQuery")
-          .then(({ response }) => {
-            if (!response) throw new Error("Response not present")
+        cy.wait("@gqlPostFeedQuery").then(({ response }) => {
+          if (!response) throw new Error("Response not present")
 
-            if (iterations != 3) {
-              expect(response.body.data.posts.edges).to.have.lengthOf(10)
-            } else {
-              expect(response.body.data.posts.edges).to.have.lengthOf(2)
-            }
-          })
-          .then(() => {
-            iterations += 1
-          })
+          if (iterations != 3) {
+            expect(response.body.data.posts.edges).to.have.lengthOf(10)
+          } else {
+            expect(response.body.data.posts.edges).to.have.lengthOf(3)
+          }
+
+          posts = posts.concat(response.body.data.posts.edges)
+          iterations += 1
+        })
 
         return cy.get("@home-post-feed").children()
       },
       (children) => {
-        return children.length == 23 && children[children.length - 1].innerHTML == "All posts loaded"
+        return (
+          children.length == 24 && children[children.length - 1].innerHTML == "All posts loaded" && posts.length == 23
+        )
       }
-    )
+    ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
+    })
   })
 
   it("Check new ordering", function () {
@@ -254,9 +259,11 @@ describe("Post feed", function () {
         return cy.get("@home-post-feed").children()
       },
       (children) => {
-        return children.length == 23 && posts.length == 22
+        return children.length == 24 && posts.length == 23
       }
     ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
+
       expect(
         posts.every((post, i) => {
           if (i == 0) {
@@ -296,9 +303,11 @@ describe("Post feed", function () {
         return cy.get("@home-post-feed").children()
       },
       (children) => {
-        return children.length == 23 && posts.length == 22
+        return children.length == 24 && posts.length == 23
       }
     ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
+
       expect(
         posts.every((post, i) => {
           if (i == 0) {
@@ -338,9 +347,11 @@ describe("Post feed", function () {
         return cy.get("@home-post-feed").children()
       },
       (children) => {
-        return children.length == 23 && posts.length == 22
+        return children.length == 24 && posts.length == 23
       }
     ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
+
       expect(
         posts.every((post, i) => {
           if (i == 0) {
@@ -378,9 +389,11 @@ describe("Post feed", function () {
         return cy.get("@home-post-feed").children()
       },
       (children) => {
-        return children.length == 23 && posts.length == 22
+        return children.length == 24 && posts.length == 23
       }
     ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
+
       expect(
         posts.every((post, i) => {
           if (i == 0) {

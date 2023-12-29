@@ -1,20 +1,9 @@
 import { UseQueryOptions, useQuery } from "@tanstack/react-query"
 import { graphQLClient } from "../utils/graphql"
-import {
-  CommunityQuery,
-  SingleCommentQuery,
-  SinglePostQuery,
-} from "../graphql_codegen/graphql"
-import {
-  getCommunityDocument,
-  getPostDocument,
-  getCommentDocumnet,
-} from "./sharedDocuments"
+import { CommunityQuery, SingleCommentQuery, SinglePostQuery } from "../graphql_codegen/graphql"
+import { getCommunityDocument, getPostDocument, getCommentDocument } from "./sharedDocuments"
 
-export const useCommunity = (
-  id: string | undefined,
-  options?: UseQueryOptions<CommunityQuery>
-) =>
+export const useCommunity = (id: string | undefined, options?: UseQueryOptions<CommunityQuery>) =>
   useQuery<CommunityQuery>(
     ["community", id],
     () =>
@@ -26,10 +15,7 @@ export const useCommunity = (
     options
   )
 
-export const usePost = (
-  id: string | undefined,
-  options?: UseQueryOptions<SinglePostQuery>
-) =>
+export const usePost = (id: string | undefined, options?: UseQueryOptions<SinglePostQuery>) =>
   useQuery<SinglePostQuery>(
     ["post", id],
     () =>
@@ -41,14 +27,11 @@ export const usePost = (
     options
   )
 
-export const useComment = (
-  id: string | undefined,
-  options?: UseQueryOptions<SingleCommentQuery>
-) =>
+export const useComment = (id: string | undefined, options?: UseQueryOptions<SingleCommentQuery>) =>
   useQuery<SingleCommentQuery>(
     ["comment", id],
     () =>
-      graphQLClient.request(getCommentDocumnet, {
+      graphQLClient.request(getCommentDocument, {
         input: {
           id: id ?? "",
         },

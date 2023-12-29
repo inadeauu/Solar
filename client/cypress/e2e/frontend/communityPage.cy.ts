@@ -1,7 +1,8 @@
 import { recurse } from "cypress-recurse"
-import { PostFeedQuery } from "../../src/graphql_codegen/graphql"
-import { aliasMutation, aliasQuery } from "../utils/graphqlTest"
-import { translator } from "../../src/utils/uuid"
+import { PostFeedQuery } from "../../../src/graphql_codegen/graphql"
+import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
+import { translator } from "../../../src/utils/uuid"
+import { nodeIdsUnique } from "../../utils/utils"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -147,21 +148,19 @@ describe("Post feed", function () {
       () => {
         cy.get('[data-testid="community-post-feed"]').as("community-post-feed").children().last().scrollIntoView()
 
-        cy.wait("@gqlPostFeedQuery")
-          .then(({ response }) => {
-            if (!response) throw new Error("Response not present")
+        cy.wait("@gqlPostFeedQuery").then(({ response }) => {
+          if (!response) throw new Error("Response not present")
 
-            posts = posts.concat(response.body.data.posts.edges)
+          posts = posts.concat(response.body.data.posts.edges)
 
-            if (iterations != 2) {
-              expect(response.body.data.posts.edges).to.have.lengthOf(10)
-            } else {
-              expect(response.body.data.posts.edges).to.have.lengthOf(3)
-            }
-          })
-          .then(() => {
-            iterations += 1
-          })
+          if (iterations != 2) {
+            expect(response.body.data.posts.edges).to.have.lengthOf(10)
+          } else {
+            expect(response.body.data.posts.edges).to.have.lengthOf(3)
+          }
+
+          iterations += 1
+        })
 
         return cy.get("@community-post-feed").children()
       },
@@ -171,6 +170,7 @@ describe("Post feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
       expect(posts.every((post) => post.node.community.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
     })
   })
@@ -198,6 +198,7 @@ describe("Post feed", function () {
         return children.length == 14 && posts.length == 13
       }
     ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
       expect(posts.every((post) => post.node.community.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
 
       expect(
@@ -241,6 +242,7 @@ describe("Post feed", function () {
         return children.length == 14 && posts.length == 13
       }
     ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
       expect(posts.every((post) => post.node.community.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
 
       expect(
@@ -284,6 +286,7 @@ describe("Post feed", function () {
         return children.length == 14 && posts.length == 13
       }
     ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
       expect(posts.every((post) => post.node.community.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
 
       expect(
@@ -325,6 +328,7 @@ describe("Post feed", function () {
         return children.length == 14 && posts.length == 13
       }
     ).then(() => {
+      expect(nodeIdsUnique(posts)).to.be.true
       expect(posts.every((post) => post.node.community.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
 
       expect(

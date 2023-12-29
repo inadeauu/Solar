@@ -29,6 +29,8 @@ export interface PaginateReturn<T> {
   edges: Array<Edge<T>>
   pageInfo: PageInfo
   orderBy?: string
+  replies?: boolean
+  memberOf?: boolean
 }
 
 type PostPaginate = Post & { voteSum: number }
@@ -241,6 +243,7 @@ export const paginateComments = async (
     edges,
     pageInfo,
     orderBy: filters.orderBy,
+    replies: filters.replies,
   }
 }
 
@@ -266,7 +269,7 @@ export const paginateCommunities = async (
 
   const id = paginateArgs.after?.id
   const title = paginateArgs.after?.title
-  const cursor = Prisma.sql`(${paginateArgs.after}::json IS NULL OR "c"."title" <= ${title} AND ("c"."id" > ${id} OR "c"."title" < ${title}))`
+  const cursor = Prisma.sql`(${paginateArgs.after}::json IS NULL OR "c"."title" >= ${title} AND ("c"."id" > ${id} OR "c"."title" > ${title}))`
 
   const where = Prisma.sql`WHERE 1=1 
     AND (${titleContains}::text IS NULL OR "c"."title" LIKE ${titleContains}::text || '%') 
@@ -308,6 +311,7 @@ export const paginateCommunities = async (
   return {
     edges,
     pageInfo,
+    memberOf: filters.memberId ? true : false,
   }
 }
 

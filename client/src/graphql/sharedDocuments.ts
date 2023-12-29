@@ -96,6 +96,9 @@ export const getCommentFeedDocument = graphql(/* GraphQL */ `
             id
             username
           }
+          parent {
+            id
+          }
           voteSum
           voteStatus
           replyCount
@@ -176,6 +179,7 @@ export const getCommunityFeedDocument = graphql(/* GraphQL */ `
         }
         hasNextPage
       }
+      memberOf
     }
   }
 `)
@@ -214,7 +218,7 @@ export const getPostDocument = graphql(/* GraphQL */ `
   }
 `)
 
-export const getCommentDocumnet = graphql(/* GraphQL */ `
+export const getCommentDocument = graphql(/* GraphQL */ `
   query SingleComment($input: CommentInput!) {
     comment(input: $input) {
       body

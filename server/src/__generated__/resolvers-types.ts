@@ -131,6 +131,7 @@ export type CommentConnection = {
   edges: Array<CommentEdge>;
   orderBy?: Maybe<Scalars['String']['output']>;
   pageInfo: PageInfo;
+  replies?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type CommentEdge = {
@@ -190,6 +191,7 @@ export type Community = {
 export type CommunityConnection = {
   __typename?: 'CommunityConnection';
   edges: Array<CommunityEdge>;
+  memberOf?: Maybe<Scalars['Boolean']['output']>;
   pageInfo: PageInfo;
 };
 
@@ -1295,6 +1297,7 @@ export type CommentConnectionResolvers<ContextType = Context, ParentType extends
   edges?: Resolver<Array<ResolversTypes['CommentEdge']>, ParentType, ContextType>;
   orderBy?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
+  replies?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
@@ -1318,6 +1321,7 @@ export type CommunityResolvers<ContextType = Context, ParentType extends Resolve
 
 export type CommunityConnectionResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CommunityConnection'] = ResolversParentTypes['CommunityConnection']> = ResolversObject<{
   edges?: Resolver<Array<ResolversTypes['CommunityEdge']>, ParentType, ContextType>;
+  memberOf?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   pageInfo?: Resolver<ResolversTypes['PageInfo'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

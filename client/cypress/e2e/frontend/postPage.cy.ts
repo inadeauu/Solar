@@ -1,6 +1,7 @@
 import { recurse } from "cypress-recurse"
-import { aliasMutation, aliasQuery } from "../utils/graphqlTest"
-import { CommentFeedQuery } from "../../src/graphql_codegen/graphql"
+import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
+import { CommentFeedQuery } from "../../../src/graphql_codegen/graphql"
+import { nodeIdsUnique } from "../../utils/utils"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -31,7 +32,7 @@ describe("Post", function () {
     cy.get('[data-testid="post-title"]').should("have.text", "Post 3")
     cy.get('[data-testid="post-body"]').should("have.text", "Post body 3")
 
-    cy.get('[data-testid="comment-count"]').should("have.text", "1")
+    cy.get('[data-testid="comment-count"]').should("have.text", "16")
     cy.get('[data-testid="post-vote-sum"]').should("have.text", "1")
   })
 
@@ -305,21 +306,18 @@ describe("Comment feed", function () {
       () => {
         cy.get('[data-testid="post-comment-feed"]').as("post-comment-feed").children().last().scrollIntoView()
 
-        cy.wait("@gqlCommentFeedQuery")
-          .then(({ response }) => {
-            if (!response) throw new Error("Response not present")
+        cy.wait("@gqlCommentFeedQuery").then(({ response }) => {
+          if (!response) throw new Error("Response not present")
 
-            if (iterations != 2) {
-              expect(response.body.data.comments.edges).to.have.lengthOf(10)
-            } else {
-              expect(response.body.data.comments.edges).to.have.lengthOf(5)
-            }
+          if (iterations != 2) {
+            expect(response.body.data.comments.edges).to.have.lengthOf(10)
+          } else {
+            expect(response.body.data.comments.edges).to.have.lengthOf(5)
+          }
 
-            comments = comments.concat(response.body.data.comments.edges)
-          })
-          .then(() => {
-            iterations += 1
-          })
+          comments = comments.concat(response.body.data.comments.edges)
+          iterations += 1
+        })
 
         return cy.get("@post-comment-feed").children()
       },
@@ -331,7 +329,8 @@ describe("Comment feed", function () {
         )
       }
     ).then(() => {
-      expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39"))
+      expect(nodeIdsUnique(comments)).to.be.true
+      expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
     })
   })
 
@@ -362,6 +361,7 @@ describe("Comment feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(comments)).to.be.true
       expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
       expect(
         comments.every((comment, i) => {
@@ -410,6 +410,7 @@ describe("Comment feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(comments)).to.be.true
       expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
       expect(
         comments.every((comment, i) => {
@@ -458,6 +459,7 @@ describe("Comment feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(comments)).to.be.true
       expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
       expect(
         comments.every((comment, i) => {
@@ -506,6 +508,7 @@ describe("Comment feed", function () {
         )
       }
     ).then(() => {
+      expect(nodeIdsUnique(comments)).to.be.true
       expect(comments.every((comment) => comment.node.post.id == "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true
       expect(
         comments.every((comment, i) => {

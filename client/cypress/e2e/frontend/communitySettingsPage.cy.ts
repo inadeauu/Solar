@@ -1,4 +1,4 @@
-import { aliasMutation } from "../utils/graphqlTest"
+import { aliasMutation } from "../../utils/graphqlTest"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")

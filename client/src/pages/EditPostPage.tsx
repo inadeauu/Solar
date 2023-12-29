@@ -13,7 +13,6 @@ const EditPostPage = () => {
   if (isLoading) {
     return <ImSpinner11 className="animate-spin h-12 w-12" />
   } else if (!data?.post) {
-    console.log("there")
     return <Navigate to="/404-not-found" />
   } else if (data.post.owner.id !== user?.id) {
     return <Navigate to="/" />

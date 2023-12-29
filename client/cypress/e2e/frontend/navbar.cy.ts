@@ -1,5 +1,5 @@
-import { aliasMutation } from "../utils/graphqlTest"
-import { translator } from "../../src/utils/uuid"
+import { aliasMutation } from "../../utils/graphqlTest"
+import { translator } from "../../../src/utils/uuid"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -194,13 +194,13 @@ describe("Search bar", function () {
       .children()
       .then((results) => {
         expect(results.eq(0).children().eq(0)).to.have.text("username1")
-        expect(results.eq(0).children().eq(1)).to.have.text("18 Posts • 2 Comments")
+        expect(results.eq(0).children().eq(1)).to.have.text("19 Posts • 31 Comments")
 
         expect(results.eq(1).children().eq(0)).to.have.text("username2")
-        expect(results.eq(1).children().eq(1)).to.have.text("2 Posts • 2 Comments")
+        expect(results.eq(1).children().eq(1)).to.have.text("2 Posts • 17 Comments")
 
         expect(results.eq(2).children().eq(0)).to.have.text("username3")
-        expect(results.eq(2).children().eq(1)).to.have.text("1 Post • 1 Comment")
+        expect(results.eq(2).children().eq(1)).to.have.text("2 Posts • 1 Comment")
       })
 
     cy.get("@users-results").children().eq(0).click()

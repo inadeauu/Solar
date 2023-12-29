@@ -1,7 +1,4 @@
-import { aliasMutation, aliasQuery } from "../utils/graphqlTest"
-import { graphQLClient } from "../../src/utils/graphql"
-import { authUserTestDoc, registerUsernameTestDoc, loginUsernameTestDoc, logoutTestDoc } from "../utils/authGraphQL"
-import { ClientError } from "graphql-request"
+import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -181,95 +178,5 @@ describe("Log in form", function () {
 
     cy.get('[data-testid="username-error"]').contains("Required")
     cy.get('[data-testid="password-error"]').contains("Required")
-  })
-})
-
-describe("Auth user endpoint", function () {
-  it("No cookie", function () {
-    cy.wrap(graphQLClient.request(authUserTestDoc))
-      .its("authUser")
-      .should((res) => expect(res.code).to.eq(200))
-      .should((res) => expect(res.successMsg).to.eq(null))
-      .should((res) => expect(res.user).to.eq(null))
-  })
-
-  it("With cookie", function () {
-    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86").then(() => {
-      cy.wrap(graphQLClient.request(authUserTestDoc))
-        .its("authUser")
-        .should((res) => expect(res.code).to.eq(200))
-        .should((res) => expect(res.user.id).to.eq("8d2efb36-a726-425c-ad12-98f2683c5d86"))
-    })
-  })
-})
-
-describe("Register username endpoint", function () {
-  it("Username and password too small", function () {
-    cy.wrap(graphQLClient.request(registerUsernameTestDoc, { input: { username: "1", password: "2" } }))
-      .its("registerUsername")
-      .should((res) => expect(res.code).to.eq(400))
-      .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
-      .should((res) => expect(res.inputErrors.username).to.eq("Username must be between 5 and 15 characters long"))
-      .should((res) => expect(res.inputErrors.password).to.eq("Password must be at least 8 characters long"))
-  })
-
-  it("Username already in use", function () {
-    cy.wrap(graphQLClient.request(registerUsernameTestDoc, { input: { username: "username1", password: "password" } }))
-      .its("registerUsername")
-      .should((res) => expect(res.code).to.eq(400))
-      .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
-      .should((res) => expect(res.inputErrors.username).to.eq("Username already in use"))
-      .should((res) => expect(res.inputErrors.password).to.eq(null))
-  })
-
-  it("Valid input", function () {
-    cy.wrap(
-      graphQLClient.request(registerUsernameTestDoc, { input: { username: "newUsername", password: "password" } })
-    )
-      .its("registerUsername")
-      .should((res) => expect(res.code).to.eq(200))
-      .should((res) => expect(res.successMsg).to.eq("Successfully registered"))
-  })
-})
-
-describe("Login endpoint", function () {
-  it("Invalid username and/or password", function () {
-    cy.wrap(graphQLClient.request(loginUsernameTestDoc, { input: { username: "user", password: "password" } }))
-      .its("loginUsername")
-      .should((res) => expect(res.code).to.eq(400))
-      .should((res) => expect(res.errorMsg).to.eq("Invalid username and/or password"))
-  })
-
-  it("Valid credentials", function () {
-    cy.wrap(graphQLClient.request(loginUsernameTestDoc, { input: { username: "username1", password: "password" } }))
-      .its("loginUsername")
-      .should((res) => expect(res.code).to.eq(200))
-      .should((res) => expect(res.successMsg).to.eq("Successfully logged in"))
-      .should((res) => expect(res.user.id).to.eq("8d2efb36-a726-425c-ad12-98f2683c5d86"))
-  })
-})
-
-describe("Logout endpoint", function () {
-  it("Not signed in", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
-
-    cy.wrap(graphQLClient.request(logoutTestDoc))
-  })
-
-  it("Signed in", function () {
-    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86").then(() => {
-      cy.wrap(graphQLClient.request(logoutTestDoc))
-        .its("logout")
-        .should((res) => expect(res.code).to.eq(200))
-        .should((res) => expect(res.successMsg).to.eq("Successfully logged out"))
-    })
   })
 })

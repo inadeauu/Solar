@@ -20,14 +20,7 @@ const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
 
   const postOrderByType = getPostOrderByType(postOrderBy)
 
-  const {
-    data,
-    isLoading,
-    isSuccess,
-    hasNextPage,
-    fetchNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery(
+  const { data, isLoading, isSuccess, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery(
     ["profilePostFeed", user.username, postOrderByType],
     ({ pageParam = undefined }) => {
       return graphQLClient.request(getPostFeedDocument, {
@@ -58,35 +51,36 @@ const ProfilePostFeed = ({ user }: ProfilePostFeedProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <Dropdown
+        name="order"
         className="py-1"
         width="w-[65px]"
         items={["New", "Old", "Top", "Low"]}
         value={postOrderBy}
         setValue={setPostOrderBy}
       />
-      {isSuccess && data.pages[0].posts.edges.length ? (
-        data.pages.map((page) =>
-          page.posts.edges.map((edge, i) => {
-            return (
-              <Post
-                innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
-                key={edge.node.id}
-                post={edge.node}
-                queryKey={["profilePostFeed", user.username, postOrderByType]}
-              />
-            )
-          })
-        )
-      ) : (
-        <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">
-          No Posts
-        </span>
-      )}
-      {isFetchingNextPage && (
-        <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />
-      )}
+      <div data-testid="profile-post-feed" className="flex flex-col gap-5">
+        {isSuccess && data.pages[0].posts.edges.length ? (
+          data.pages.map((page) =>
+            page.posts.edges.map((edge, i) => {
+              return (
+                <Post
+                  testid={`profile-post-${i}`}
+                  innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
+                  key={edge.node.id}
+                  post={edge.node}
+                  queryKey={["profilePostFeed", user.username, postOrderByType]}
+                />
+              )
+            })
+          )
+        ) : (
+          <span className="bg-white border border-neutral-300 rounded-lg p-4 text-medium">No Posts</span>
+        )}
+        {isFetchingNextPage && <ImSpinner11 className="mt-2 animate-spin h-10 w-10" />}
+        {!hasNextPage && <span>All posts loaded</span>}
+      </div>
     </div>
   )
 }

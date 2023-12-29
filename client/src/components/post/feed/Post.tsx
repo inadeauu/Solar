@@ -41,6 +41,7 @@ const Post = ({ post, innerRef, queryKey, communityFeed = false, testid }: PostP
               <>
                 Posted in{" "}
                 <span
+                  data-testid={`${testid}-community`}
                   className="text-black font-medium hover:underline hover:cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault()
@@ -55,6 +56,7 @@ const Post = ({ post, innerRef, queryKey, communityFeed = false, testid }: PostP
             )}
             Posted by{" "}
             <span
+              data-testid={`${testid}-owner`}
               className="text-black font-medium hover:underline hover:cursor-pointer"
               onClick={(e) => {
                 e.preventDefault()
@@ -86,15 +88,19 @@ const Post = ({ post, innerRef, queryKey, communityFeed = false, testid }: PostP
           {post.title}
         </span>
         {post.body && (
-          <div ref={bodyRef} className="max-h-[250px] overflow-hidden">
+          <div data-testid={`${testid}-body-container`} ref={bodyRef} className="max-h-[250px] overflow-hidden">
             <p data-testid={`${testid}-body`} className="text-sm font-light text-neutral-800">
               {post.body}
             </p>
           </div>
         )}
-        {overflown && <span className="text-sm text-blue-400 group-visited:text-violet-400">See Full Post</span>}
+        {overflown && (
+          <span data-testid={`${testid}-overflown`} className="text-sm text-blue-400 group-visited:text-violet-400">
+            See Full Post
+          </span>
+        )}
       </div>
-      <PostFooter post={post} queryKey={queryKey} />
+      <PostFooter testid={testid} post={post} queryKey={queryKey} />
     </Link>
   )
 }

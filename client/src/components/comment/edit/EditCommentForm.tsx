@@ -5,14 +5,11 @@ import { ImSpinner11 } from "react-icons/im"
 import ConfirmationModal from "../../misc/ConfirmationModal"
 import { graphql } from "../../../graphql_codegen/gql"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import {
-  DeleteCommentInput,
-  EditCommentInput,
-  SingleCommentQuery,
-} from "../../../graphql_codegen/graphql"
+import { DeleteCommentInput, EditCommentInput, SingleCommentQuery } from "../../../graphql_codegen/graphql"
 import { graphQLClient } from "../../../utils/graphql"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
+import { translator } from "../../../utils/uuid"
 
 const editCommentDocument = graphql(/* GraphQL */ `
   mutation EditComment($input: EditCommentInput!) {
@@ -68,8 +65,7 @@ const EditCommentForm = ({ comment }: EditCommentFormProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
   const [submittingEdit, setSubmittingEdit] = useState<boolean>(false)
   const [submittingDelete, setSubmittingDelete] = useState<boolean>(false)
-  const [deleteCommentModalOpen, setDeleteCommentModalOpen] =
-    useState<boolean>(false)
+  const [deleteCommentModalOpen, setDeleteCommentModalOpen] = useState<boolean>(false)
 
   const [body, setBody] = useState<string>(comment.body)
 
@@ -84,21 +80,18 @@ const EditCommentForm = ({ comment }: EditCommentFormProps) => {
     onSuccess: (data) => {
       if (data.editComment.__typename == "EditCommentSuccess") {
         const updatedComment = data.editComment.comment
-        queryClient.setQueryData<SingleCommentQuery>(
-          ["comment", updatedComment.id],
-          (oldData) => {
-            return oldData
-              ? {
-                  ...oldData,
-                  comment: updatedComment,
-                }
-              : oldData
-          }
-        )
-        setBody("")
-        if (error) setError("")
+        queryClient.setQueryData<SingleCommentQuery>(["comment", updatedComment.id], (oldData) => {
+          return oldData
+            ? {
+                ...oldData,
+                comment: updatedComment,
+              }
+            : oldData
+        })
+
         toast.success("Successfully edited comment")
-        navigate(-1)
+
+        navigate(`/posts/${translator.fromUUID(comment.post.id)}`)
       } else if (data.editComment.__typename == "EditCommentInputError") {
         setError(data.editComment.errorMsg)
       }
@@ -112,23 +105,8 @@ const EditCommentForm = ({ comment }: EditCommentFormProps) => {
       })
     },
     onSuccess: (data) => {
-      if (data.deleteComment.__typename == "DeleteCommentSuccess") {
-        queryClient.setQueryData<SingleCommentQuery>(
-          ["comment", comment.id],
-          (oldData) => {
-            return oldData
-              ? {
-                  ...oldData,
-                  comment: null,
-                }
-              : oldData
-          }
-        )
-        setBody("")
-        if (error) setError("")
-        toast.success("Successfully deleted comment")
-        navigate(-1)
-      }
+      toast.success("Successfully deleted comment")
+      navigate("/")
     },
   })
 
@@ -162,6 +140,7 @@ const EditCommentForm = ({ comment }: EditCommentFormProps) => {
           <div className="flex gap-2 justify-between items-center">
             <h1 className="text-xl font-medium mb-1">Update Comment</h1>
             <button
+              data-testid="reset-changes-button"
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
@@ -174,9 +153,10 @@ const EditCommentForm = ({ comment }: EditCommentFormProps) => {
               Reset Changes
             </button>
           </div>
-          {error && <ErrorCard error={error} className="mb-4" />}
+          {error && <ErrorCard data-testid="edit-comment-error" error={error} className="mb-4" />}
           <div className="flex flex-col gap-1">
             <textarea
+              data-testid="comment-body-input"
               ref={textAreaRef}
               value={body}
               onChange={(e) => setBody(e.target.value)}
@@ -184,10 +164,9 @@ const EditCommentForm = ({ comment }: EditCommentFormProps) => {
               placeholder="Comment"
             />
             <span
+              data-testid="body-input-indicator"
               className={`text-xs font-semibold self-end ${
-                body.length > 2000 || body.trim().length <= 0
-                  ? "text-red-500"
-                  : "text-green-500"
+                body.length > 2000 || body.trim().length <= 0 ? "text-red-500" : "text-green-500"
               }`}
             >
               {body.length}/2000
@@ -195,6 +174,7 @@ const EditCommentForm = ({ comment }: EditCommentFormProps) => {
           </div>
           <div className="flex gap-4 self-end">
             <button
+              data-testid="comment-delete-button"
               type="button"
               onClick={() => {
                 setDeleteCommentModalOpen(true)
@@ -205,29 +185,22 @@ const EditCommentForm = ({ comment }: EditCommentFormProps) => {
               Delete
             </button>
             <button
+              data-testid="comment-edit-button"
               type="button"
               onClick={() => {
                 submitEditComment()
                 setSubmittingEdit(false)
               }}
               className="btn_blue px-3 py-1 self-end"
-              disabled={
-                body.trim().length <= 0 ||
-                body.length > 2000 ||
-                submittingEdit ||
-                body == comment.body
-              }
+              disabled={body.trim().length <= 0 || body.length > 2000 || submittingEdit || body == comment.body}
             >
-              {submittingEdit ? (
-                <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" />
-              ) : (
-                "Update"
-              )}
+              {submittingEdit ? <ImSpinner11 className="animate-spin h-5 w-5 mx-auto" /> : "Update"}
             </button>
           </div>
         </form>
       </div>
       <ConfirmationModal
+        testid="delete-modal"
         isOpen={deleteCommentModalOpen}
         onClose={() => setDeleteCommentModalOpen(false)}
         text="Are you sure you want to delete this comment?"

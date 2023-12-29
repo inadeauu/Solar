@@ -343,6 +343,45 @@ describe("Post feed", function () {
 })
 
 describe("Post", function () {
+  it("Check post information is correct", function () {
+    cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
+
+    cy.get('[data-testid="community-post-0-community"]').should("not.exist")
+
+    cy.get('[data-testid="community-post-1-owner"]').as("post-owner").should("have.text", "username1")
+    cy.get("@post-owner").click()
+    cy.location("pathname").should("eq", "/profile/username1")
+    cy.go(-1)
+
+    cy.get('[data-testid="community-post-1-title"]').should("have.text", "Post 2")
+    cy.get('[data-testid="community-post-1-body"]').should("have.text", "Post body 2")
+
+    cy.get('[data-testid="community-post-0-vote-sum"]').should("have.text", "-2")
+    cy.get('[data-testid="community-post-0-comment-count"]').should("have.text", "2")
+  })
+
+  it("Check clicking on post goes to post page", function () {
+    cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
+    cy.get('[data-testid="community-post-0"]').click()
+    cy.location("pathname").should("eq", "/posts/sS7SLVJRBL7dTBazMKGg1S")
+  })
+
+  it("Check post body overflow shows correctly", function () {
+    cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
+
+    cy.get('[data-testid="community-post-0-body-container"]').then((element) => {
+      expect(element.outerHeight()).to.be.lessThan(element.prop("scrollHeight"))
+    })
+
+    cy.get('[data-testid="community-post-0-overflown"]').should("have.text", "See Full Post")
+
+    cy.get('[data-testid="community-post-1-body-container"]').then((element) => {
+      expect(element.outerHeight()).to.be.equal(element.prop("scrollHeight"))
+    })
+
+    cy.get('[data-testid="community-post-1-overflown"]').should("not.exist")
+  })
+
   it("Check edit post button on owned post", function () {
     cy.visit("/communities/7y5hQri7cfRRpU5trE5CAn")
 

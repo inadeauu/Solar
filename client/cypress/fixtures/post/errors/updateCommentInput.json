@@ -1,0 +1,9 @@
+{
+  "data": {
+    "editComment": {
+      "__typename": "EditCommentInputError",
+      "errorMsg": "Invalid input",
+      "code": 400
+    }
+  }
+}

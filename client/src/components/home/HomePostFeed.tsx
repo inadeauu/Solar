@@ -68,6 +68,7 @@ const HomeFeed = () => {
             page.posts.edges.map((edge, i) => {
               return (
                 <Post
+                  testid={`post-${i}`}
                   innerRef={page.posts.edges.length === i + 1 ? ref : undefined}
                   key={edge.node.id}
                   post={edge.node}

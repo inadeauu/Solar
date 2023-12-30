@@ -73,8 +73,6 @@ const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
         toast.success("Successfully changed password")
         onClose()
       } else if (data.changePassword.__typename == "ChangePasswordInputError") {
-        console.log(data)
-
         if (data.changePassword.inputErrors.currentPassword) {
           setFieldStateSuccess(
             setFieldStates,

@@ -6,7 +6,13 @@ import {
   PostFeedQuery,
   ProfileCommentFeedQuery,
 } from "../../../src/graphql_codegen/graphql"
-import { nodeIdsUnique } from "../../utils/utils"
+import {
+  hasDecreasingVoteSumOrdering,
+  hasIncreasingVoteSumOrdering,
+  hasNewOrdering,
+  hasOldOrdering,
+  nodeIdsUnique,
+} from "../../utils/utils"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -187,22 +193,8 @@ describe("Post feed", function () {
       }
     ).then(() => {
       expect(nodeIdsUnique(posts)).to.be.true
-
       expect(posts.every((post) => post.node.owner.id == "8d2efb36-a726-425c-ad12-98f2683c5d86")).to.be.true
-
-      expect(
-        posts.every((post, i) => {
-          if (i == 0) {
-            return post.node.created_at > posts[i + 1].node.created_at
-          } else if (i == posts.length - 1) {
-            return post.node.created_at < posts[i - 1].node.created_at
-          } else {
-            return (
-              post.node.created_at > posts[i + 1].node.created_at && post.node.created_at < posts[i - 1].node.created_at
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasNewOrdering(posts)).to.be.true
     })
   })
 
@@ -233,22 +225,8 @@ describe("Post feed", function () {
       }
     ).then(() => {
       expect(nodeIdsUnique(posts)).to.be.true
-
       expect(posts.every((post) => post.node.owner.id == "8d2efb36-a726-425c-ad12-98f2683c5d86")).to.be.true
-
-      expect(
-        posts.every((post, i) => {
-          if (i == 0) {
-            return post.node.created_at < posts[i + 1].node.created_at
-          } else if (i == posts.length - 1) {
-            return post.node.created_at > posts[i - 1].node.created_at
-          } else {
-            return (
-              post.node.created_at < posts[i + 1].node.created_at && post.node.created_at > posts[i - 1].node.created_at
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasOldOrdering(posts)).to.be.true
     })
   })
 
@@ -279,20 +257,8 @@ describe("Post feed", function () {
       }
     ).then(() => {
       expect(nodeIdsUnique(posts)).to.be.true
-
       expect(posts.every((post) => post.node.owner.id == "8d2efb36-a726-425c-ad12-98f2683c5d86")).to.be.true
-
-      expect(
-        posts.every((post, i) => {
-          if (i == 0) {
-            return post.node.voteSum <= posts[i + 1].node.voteSum
-          } else if (i == posts.length - 1) {
-            return post.node.voteSum >= posts[i - 1].node.voteSum
-          } else {
-            return post.node.voteSum <= posts[i + 1].node.voteSum && post.node.voteSum >= posts[i - 1].node.voteSum
-          }
-        })
-      ).to.be.true
+      expect(hasIncreasingVoteSumOrdering(posts)).to.be.true
     })
   })
 
@@ -323,20 +289,8 @@ describe("Post feed", function () {
       }
     ).then(() => {
       expect(nodeIdsUnique(posts)).to.be.true
-
       expect(posts.every((post) => post.node.owner.id == "8d2efb36-a726-425c-ad12-98f2683c5d86")).to.be.true
-
-      expect(
-        posts.every((post, i) => {
-          if (i == 0) {
-            return post.node.voteSum >= posts[i + 1].node.voteSum
-          } else if (i == posts.length - 1) {
-            return post.node.voteSum <= posts[i - 1].node.voteSum
-          } else {
-            return post.node.voteSum >= posts[i + 1].node.voteSum && post.node.voteSum <= posts[i - 1].node.voteSum
-          }
-        })
-      ).to.be.true
+      expect(hasDecreasingVoteSumOrdering(posts)).to.be.true
     })
   })
 })
@@ -392,7 +346,7 @@ describe("Comment card", function () {
   })
 })
 
-describe("Comment feed", function () {
+describe.only("Comment feed", function () {
   beforeEach(function () {
     cy.visit("/profile/username1")
     cy.get('[data-testid="profile-feed-tabs"]').children().as("tabs")
@@ -465,21 +419,7 @@ describe("Comment feed", function () {
       expect(nodeIdsUnique(comments)).to.be.true
       expect(comments.every((comment) => comment.node.parent == null)).to.be.true
       expect(comments.every((comment) => comment.node.owner.id == "8d2efb36-a726-425c-ad12-98f2683c5d86")).to.be.true
-
-      expect(
-        comments.every((comment, i) => {
-          if (i == 0) {
-            return comment.node.created_at > comments[i + 1].node.created_at
-          } else if (i == comments.length - 1) {
-            return comment.node.created_at < comments[i - 1].node.created_at
-          } else {
-            return (
-              comment.node.created_at > comments[i + 1].node.created_at &&
-              comment.node.created_at < comments[i - 1].node.created_at
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasNewOrdering(comments)).to.be.true
     })
   })
 
@@ -514,21 +454,7 @@ describe("Comment feed", function () {
       expect(nodeIdsUnique(comments)).to.be.true
       expect(comments.every((comment) => comment.node.parent == null)).to.be.true
       expect(comments.every((comment) => comment.node.owner.id == "8d2efb36-a726-425c-ad12-98f2683c5d86")).to.be.true
-
-      expect(
-        comments.every((comment, i) => {
-          if (i == 0) {
-            return comment.node.created_at < comments[i + 1].node.created_at
-          } else if (i == comments.length - 1) {
-            return comment.node.created_at > comments[i - 1].node.created_at
-          } else {
-            return (
-              comment.node.created_at < comments[i + 1].node.created_at &&
-              comment.node.created_at > comments[i - 1].node.created_at
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasOldOrdering(comments)).to.be.true
     })
   })
 
@@ -563,21 +489,7 @@ describe("Comment feed", function () {
       expect(nodeIdsUnique(comments)).to.be.true
       expect(comments.every((comment) => comment.node.parent == null)).to.be.true
       expect(comments.every((comment) => comment.node.owner.id == "8d2efb36-a726-425c-ad12-98f2683c5d86")).to.be.true
-
-      expect(
-        comments.every((comment, i) => {
-          if (i == 0) {
-            return comment.node.voteSum <= comments[i + 1].node.voteSum
-          } else if (i == comments.length - 1) {
-            return comment.node.voteSum >= comments[i - 1].node.voteSum
-          } else {
-            return (
-              comment.node.voteSum <= comments[i + 1].node.voteSum &&
-              comment.node.voteSum >= comments[i - 1].node.voteSum
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasIncreasingVoteSumOrdering(comments)).to.be.true
     })
   })
 
@@ -612,21 +524,7 @@ describe("Comment feed", function () {
       expect(nodeIdsUnique(comments)).to.be.true
       expect(comments.every((comment) => comment.node.parent == null)).to.be.true
       expect(comments.every((comment) => comment.node.owner.id == "8d2efb36-a726-425c-ad12-98f2683c5d86")).to.be.true
-
-      expect(
-        comments.every((comment, i) => {
-          if (i == 0) {
-            return comment.node.voteSum >= comments[i + 1].node.voteSum
-          } else if (i == comments.length - 1) {
-            return comment.node.voteSum <= comments[i - 1].node.voteSum
-          } else {
-            return (
-              comment.node.voteSum >= comments[i + 1].node.voteSum &&
-              comment.node.voteSum <= comments[i - 1].node.voteSum
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasDecreasingVoteSumOrdering(comments)).to.be.true
     })
   })
 
@@ -794,7 +692,6 @@ describe("Community feed", function () {
         )
       }
     ).then(() => {
-      console.log(communities)
       expect(nodeIdsUnique(communities)).to.be.true
       expect(communities[0].node.title == "test1").to.be.true
       expect(communities[communities.length - 1].node.title == "test9").to.be.true

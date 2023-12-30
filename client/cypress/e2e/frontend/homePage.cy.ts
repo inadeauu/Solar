@@ -1,7 +1,13 @@
 import { recurse } from "cypress-recurse"
 import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
 import { PostFeedQuery } from "../../../src/graphql_codegen/graphql"
-import { nodeIdsUnique } from "../../utils/utils"
+import {
+  hasDecreasingVoteSumOrdering,
+  hasIncreasingVoteSumOrdering,
+  hasNewOrdering,
+  hasOldOrdering,
+  nodeIdsUnique,
+} from "../../utils/utils"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -263,20 +269,7 @@ describe("Post feed", function () {
       }
     ).then(() => {
       expect(nodeIdsUnique(posts)).to.be.true
-
-      expect(
-        posts.every((post, i) => {
-          if (i == 0) {
-            return post.node.created_at > posts[i + 1].node.created_at
-          } else if (i == posts.length - 1) {
-            return post.node.created_at < posts[i - 1].node.created_at
-          } else {
-            return (
-              post.node.created_at > posts[i + 1].node.created_at && post.node.created_at < posts[i - 1].node.created_at
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasNewOrdering(posts)).to.be.true
     })
   })
 
@@ -307,20 +300,7 @@ describe("Post feed", function () {
       }
     ).then(() => {
       expect(nodeIdsUnique(posts)).to.be.true
-
-      expect(
-        posts.every((post, i) => {
-          if (i == 0) {
-            return post.node.created_at < posts[i + 1].node.created_at
-          } else if (i == posts.length - 1) {
-            return post.node.created_at > posts[i - 1].node.created_at
-          } else {
-            return (
-              post.node.created_at < posts[i + 1].node.created_at && post.node.created_at > posts[i - 1].node.created_at
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasOldOrdering(posts)).to.be.true
     })
   })
 
@@ -351,18 +331,7 @@ describe("Post feed", function () {
       }
     ).then(() => {
       expect(nodeIdsUnique(posts)).to.be.true
-
-      expect(
-        posts.every((post, i) => {
-          if (i == 0) {
-            return post.node.voteSum <= posts[i + 1].node.voteSum
-          } else if (i == posts.length - 1) {
-            return post.node.voteSum >= posts[i - 1].node.voteSum
-          } else {
-            return post.node.voteSum <= posts[i + 1].node.voteSum && post.node.voteSum >= posts[i - 1].node.voteSum
-          }
-        })
-      ).to.be.true
+      expect(hasIncreasingVoteSumOrdering(posts)).to.be.true
     })
   })
 
@@ -393,18 +362,7 @@ describe("Post feed", function () {
       }
     ).then(() => {
       expect(nodeIdsUnique(posts)).to.be.true
-
-      expect(
-        posts.every((post, i) => {
-          if (i == 0) {
-            return post.node.voteSum >= posts[i + 1].node.voteSum
-          } else if (i == posts.length - 1) {
-            return post.node.voteSum <= posts[i - 1].node.voteSum
-          } else {
-            return post.node.voteSum >= posts[i + 1].node.voteSum && post.node.voteSum <= posts[i - 1].node.voteSum
-          }
-        })
-      ).to.be.true
+      expect(hasDecreasingVoteSumOrdering(posts)).to.be.true
     })
   })
 })

@@ -1,7 +1,13 @@
 import { recurse } from "cypress-recurse"
 import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
 import { CommentRepliesFeedQuery } from "../../../src/graphql_codegen/graphql"
-import { nodeIdsUnique } from "../../utils/utils"
+import {
+  hasDecreasingVoteSumOrdering,
+  hasIncreasingVoteSumOrdering,
+  hasNewOrdering,
+  hasOldOrdering,
+  nodeIdsUnique,
+} from "../../utils/utils"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
@@ -462,20 +468,7 @@ describe("Comment replies feed", function () {
         )
       ).to.eq(true)
 
-      expect(
-        comments.every((comment, i) => {
-          if (i == 0) {
-            return comment.node.created_at > comments[i + 1].node.created_at
-          } else if (i == comments.length - 1) {
-            return comment.node.created_at < comments[i - 1].node.created_at
-          } else {
-            return (
-              comment.node.created_at > comments[i + 1].node.created_at &&
-              comment.node.created_at < comments[i - 1].node.created_at
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasNewOrdering(comments)).to.be.true
     })
   })
 
@@ -522,20 +515,7 @@ describe("Comment replies feed", function () {
         )
       ).to.eq(true)
 
-      expect(
-        comments.every((comment, i) => {
-          if (i == 0) {
-            return comment.node.created_at < comments[i + 1].node.created_at
-          } else if (i == comments.length - 1) {
-            return comment.node.created_at > comments[i - 1].node.created_at
-          } else {
-            return (
-              comment.node.created_at < comments[i + 1].node.created_at &&
-              comment.node.created_at > comments[i - 1].node.created_at
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasOldOrdering(comments)).to.be.true
     })
   })
 
@@ -582,20 +562,7 @@ describe("Comment replies feed", function () {
         )
       ).to.eq(true)
 
-      expect(
-        comments.every((comment, i) => {
-          if (i == 0) {
-            return comment.node.voteSum <= comments[i + 1].node.voteSum
-          } else if (i == comments.length - 1) {
-            return comment.node.voteSum >= comments[i - 1].node.voteSum
-          } else {
-            return (
-              comment.node.voteSum <= comments[i + 1].node.voteSum &&
-              comment.node.voteSum >= comments[i - 1].node.voteSum
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasIncreasingVoteSumOrdering(comments)).to.be.true
     })
   })
 
@@ -642,20 +609,7 @@ describe("Comment replies feed", function () {
         )
       ).to.eq(true)
 
-      expect(
-        comments.every((comment, i) => {
-          if (i == 0) {
-            return comment.node.voteSum >= comments[i + 1].node.voteSum
-          } else if (i == comments.length - 1) {
-            return comment.node.voteSum <= comments[i - 1].node.voteSum
-          } else {
-            return (
-              comment.node.voteSum >= comments[i + 1].node.voteSum &&
-              comment.node.voteSum <= comments[i - 1].node.voteSum
-            )
-          }
-        })
-      ).to.be.true
+      expect(hasDecreasingVoteSumOrdering(comments)).to.be.true
     })
   })
 })

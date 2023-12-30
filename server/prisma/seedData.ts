@@ -916,6 +916,13 @@ export const votedPosts = [
     updated_at: "2023-12-02T11:52:12.876Z",
   },
   {
+    userId: "266c189f-5986-404a-9889-0a54c298acb2",
+    postId: "d98d07e1-e017-4359-bca5-20b95355181e",
+    like: 1,
+    created_at: "2023-12-02T15:52:12.876Z",
+    updated_at: "2023-12-02T15:52:12.876Z",
+  },
+  {
     userId: "f734d0b4-20a1-4b7b-9d95-f5ad532582df",
     postId: "faa00786-8574-4da2-ac62-0ed89e5f7ac5",
     like: -1,
@@ -928,6 +935,13 @@ export const votedPosts = [
     like: -1,
     created_at: "2023-12-04T11:52:12.876Z",
     updated_at: "2023-12-04T11:52:12.876Z",
+  },
+  {
+    userId: "266c189f-5986-404a-9889-0a54c298acb2",
+    postId: "74ee0ea3-1907-434a-9a0d-0cb5bef872a2",
+    like: -1,
+    created_at: "2023-12-04T16:52:12.876Z",
+    updated_at: "2023-12-04T16:52:12.876Z",
   },
   {
     userId: "8d2efb36-a726-425c-ad12-98f2683c5d86",

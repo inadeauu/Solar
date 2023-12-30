@@ -59,13 +59,8 @@ export const resolvers: Resolvers = {
         }
       }
 
-      const usernameError =
-        args.input.newUsername.trim().length < 5 ||
-        args.input.newUsername.trim().length > 15
-      const passwordError = !(await bcrypt.compare(
-        args.input.password,
-        user.password
-      ))
+      const usernameError = args.input.newUsername.trim().length < 5 || args.input.newUsername.trim().length > 15
+      const passwordError = !(await bcrypt.compare(args.input.password, user.password))
 
       if (usernameError || passwordError) {
         return {
@@ -73,9 +68,7 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            username: usernameError
-              ? "Username must be between 5 and 15 characters long"
-              : null,
+            username: usernameError ? "Username must be between 5 and 15 characters long" : null,
             password: passwordError ? "Incorrect password" : null,
           },
         }
@@ -112,10 +105,7 @@ export const resolvers: Resolvers = {
         })
       }
 
-      const currentPasswordError = !(await bcrypt.compare(
-        args.input.currentPassword,
-        user.password
-      ))
+      const currentPasswordError = !(await bcrypt.compare(args.input.currentPassword, user.password))
       const newPasswordError = args.input.newPassword.length < 8
 
       if (currentPasswordError || newPasswordError) {
@@ -124,9 +114,7 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           inputErrors: {
             currentPassword: currentPasswordError ? "Incorrect password" : null,
-            newPassword: newPasswordError
-              ? "Password must be at least 8 characters long"
-              : null,
+            newPassword: newPasswordError ? "Password must be at least 8 characters long" : null,
           },
           code: 400,
         }
@@ -165,10 +153,7 @@ export const resolvers: Resolvers = {
       }
 
       const usernameError = args.input.username !== user.username
-      const passwordError = !(await bcrypt.compare(
-        args.input.password,
-        user.password
-      ))
+      const passwordError = !(await bcrypt.compare(args.input.password, user.password))
 
       if (usernameError || passwordError) {
         return {

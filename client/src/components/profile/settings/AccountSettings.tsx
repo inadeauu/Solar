@@ -11,8 +11,7 @@ const AccountSettings = () => {
 
   const [passwordModalOpen, setPasswordModalOpen] = useState<boolean>(false)
 
-  const [deleteAccountModalOpen, setDeleteAccountModalOpen] =
-    useState<boolean>(false)
+  const [deleteAccountModalOpen, setDeleteAccountModalOpen] = useState<boolean>(false)
 
   return (
     <>
@@ -22,19 +21,18 @@ const AccountSettings = () => {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 text-sm">
               <div className="flex flex-col gap-[2px]">
-                <span className="text-neutral-500 font-medium text-sm">
-                  Account Preferences
-                </span>
+                <span className="text-neutral-500 font-medium text-sm">Account Preferences</span>
                 <hr className="grow" />
               </div>
               <div className="flex items-center justify-between gap-4">
                 <div className="flex flex-col">
                   <span className="text-[16px] font-medium">Username</span>
-                  <span className="text-[13px] text-neutral-500 break-all">
+                  <span data-testid="settings-current-username" className="text-[13px] text-neutral-500 break-all">
                     Current username: {user?.username}
                   </span>
                 </div>
                 <button
+                  data-testid="change-username-button"
                   onClick={() => setUsernameModalOpen((prev) => !prev)}
                   className="btn_blue py-1 px-2"
                 >
@@ -44,11 +42,10 @@ const AccountSettings = () => {
               <div className="flex items-center justify-between gap-4">
                 <div className="flex flex-col">
                   <span className="text-[16px] font-medium">Password</span>
-                  <span className="text-[13px] text-neutral-500">
-                    Password must be at least 8 characters long
-                  </span>
+                  <span className="text-[13px] text-neutral-500">Password must be at least 8 characters long</span>
                 </div>
                 <button
+                  data-testid="change-password-button"
                   onClick={() => setPasswordModalOpen((prev) => !prev)}
                   className="btn_blue py-1 px-2"
                 >
@@ -58,12 +55,11 @@ const AccountSettings = () => {
             </div>
             <div className="flex flex-col gap-4 text-sm">
               <div className="flex flex-col gap-[2px]">
-                <span className="text-neutral-500 font-medium text-sm">
-                  Delete Account
-                </span>
+                <span className="text-neutral-500 font-medium text-sm">Delete Account</span>
                 <hr className="grow" />
               </div>
               <button
+                data-testid="delete-account-button"
                 onClick={() => setDeleteAccountModalOpen((prev) => !prev)}
                 className="btn_red py-1 px-2 w-fit text-sm"
               >
@@ -73,18 +69,9 @@ const AccountSettings = () => {
           </div>
         </div>
       </div>
-      <UsernameChangeModal
-        isOpen={usernameModalOpen}
-        onClose={() => setUsernameModalOpen(false)}
-      />
-      <PasswordChangeModal
-        isOpen={passwordModalOpen}
-        onClose={() => setPasswordModalOpen(false)}
-      />
-      <DeleteAccountModal
-        isOpen={deleteAccountModalOpen}
-        onClose={() => setDeleteAccountModalOpen(false)}
-      />
+      <UsernameChangeModal isOpen={usernameModalOpen} onClose={() => setUsernameModalOpen(false)} />
+      <PasswordChangeModal isOpen={passwordModalOpen} onClose={() => setPasswordModalOpen(false)} />
+      <DeleteAccountModal isOpen={deleteAccountModalOpen} onClose={() => setDeleteAccountModalOpen(false)} />
     </>
   )
 }

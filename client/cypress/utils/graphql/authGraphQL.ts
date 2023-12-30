@@ -1,4 +1,4 @@
-import { graphql } from "../../src/graphql_codegen"
+import { graphql } from "../../../src/graphql_codegen"
 
 export const authUserTestDoc = graphql(/* GraphQL */ `
   query AuthUserTest {

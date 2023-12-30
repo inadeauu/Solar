@@ -1,0 +1,13 @@
+{
+  "data": {
+    "changeUsername": {
+      "__typename": "ChangeUsernameInputError",
+      "errorMsg": "Invalid input",
+      "code": 400,
+      "inputErrors": {
+        "username": "Invalid username",
+        "password": "Invalid password"
+      }
+    }
+  }
+}

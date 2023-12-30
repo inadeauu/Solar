@@ -1,6 +1,11 @@
 import { ClientError } from "graphql-request"
 import { graphQLClient } from "../../../src/utils/graphql"
-import { authUserTestDoc, loginUsernameTestDoc, logoutTestDoc, registerUsernameTestDoc } from "../../utils/authGraphQL"
+import {
+  authUserTestDoc,
+  loginUsernameTestDoc,
+  logoutTestDoc,
+  registerUsernameTestDoc,
+} from "../../utils/graphql/authGraphQL"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")

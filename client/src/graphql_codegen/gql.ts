@@ -19,6 +19,7 @@ const documents = {
     "\n  mutation LogoutTest {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.LogoutTestDocument,
     "\n  query GetCommentTest($input: CommentInput!) {\n    comment(input: $input) {\n      id\n      body\n    }\n  }\n": types.GetCommentTestDocument,
     "\n  query GetPostTest($input: PostInput!) {\n    post(input: $input) {\n      id\n      body\n      title\n    }\n  }\n": types.GetPostTestDocument,
+    "\n  query GetUserTest($input: UserInput!) {\n    user(input: $input) {\n      id\n      username\n      provider\n      created_at\n      updated_at\n      postsCount\n      commentsCount\n    }\n  }\n": types.GetUserTestDocument,
     "\n  mutation CreateCommentReply($input: CreateCommentReplyInput!) {\n    createCommentReply(input: $input) {\n      ... on CreateCommentReplySuccess {\n        __typename\n        successMsg\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.CreateCommentReplyDocument,
     "\n  mutation EditComment($input: EditCommentInput!) {\n    editComment(input: $input) {\n      ... on EditCommentSuccess {\n        __typename\n        successMsg\n        code\n        comment {\n          body\n          created_at\n          id\n          post {\n            id\n          }\n          owner {\n            id\n            username\n          }\n          voteSum\n          voteStatus\n          replyCount\n        }\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.EditCommentDocument,
     "\n  mutation DeleteComment($input: DeleteCommentInput!) {\n    deleteComment(input: $input) {\n      ... on DeleteCommentSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.DeleteCommentDocument,
@@ -91,6 +92,10 @@ export function graphql(source: "\n  query GetCommentTest($input: CommentInput!)
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query GetPostTest($input: PostInput!) {\n    post(input: $input) {\n      id\n      body\n      title\n    }\n  }\n"): (typeof documents)["\n  query GetPostTest($input: PostInput!) {\n    post(input: $input) {\n      id\n      body\n      title\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetUserTest($input: UserInput!) {\n    user(input: $input) {\n      id\n      username\n      provider\n      created_at\n      updated_at\n      postsCount\n      commentsCount\n    }\n  }\n"): (typeof documents)["\n  query GetUserTest($input: UserInput!) {\n    user(input: $input) {\n      id\n      username\n      provider\n      created_at\n      updated_at\n      postsCount\n      commentsCount\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

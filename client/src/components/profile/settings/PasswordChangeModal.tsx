@@ -2,11 +2,7 @@ import { useState } from "react"
 import Modal from "../../misc/Modal"
 import TextInput from "../../misc/TextInput"
 import { ImSpinner11 } from "react-icons/im"
-import {
-  FieldState,
-  FieldStates,
-  initialFieldState,
-} from "../../../types/shared"
+import { FieldState, FieldStates, initialFieldState } from "../../../types/shared"
 import { useMutation } from "@tanstack/react-query"
 import { graphQLClient } from "../../../utils/graphql"
 import { setFieldStateSuccess, setFieldStateValue } from "../../../utils/form"
@@ -60,15 +56,11 @@ enum FieldErrorMsgs {
 }
 
 const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
-  const [fieldStates, setFieldStates] =
-    useState<FormFieldStates>(initialFieldStates)
+  const [fieldStates, setFieldStates] = useState<FormFieldStates>(initialFieldStates)
   const [submitting, setSubmitting] = useState<boolean>(false)
 
   const changePassword = useMutation({
-    mutationFn: async ({
-      currentPassword,
-      newPassword,
-    }: ChangePasswordInput) => {
+    mutationFn: async ({ currentPassword, newPassword }: ChangePasswordInput) => {
       return await graphQLClient.request(changePasswordDocument, {
         input: { currentPassword, newPassword },
       })
@@ -81,6 +73,8 @@ const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
         toast.success("Successfully changed password")
         onClose()
       } else if (data.changePassword.__typename == "ChangePasswordInputError") {
+        console.log(data)
+
         if (data.changePassword.inputErrors.currentPassword) {
           setFieldStateSuccess(
             setFieldStates,
@@ -91,12 +85,7 @@ const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
         }
 
         if (data.changePassword.inputErrors.newPassword) {
-          setFieldStateSuccess(
-            setFieldStates,
-            "newPassword",
-            false,
-            data.changePassword.inputErrors.newPassword
-          )
+          setFieldStateSuccess(setFieldStates, "newPassword", false, data.changePassword.inputErrors.newPassword)
         }
       }
     },
@@ -183,34 +172,15 @@ const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
       : fieldStates.confirmPassword.errorMsg
 
     currentPasswordSubmitError !== fieldStates.currentPassword.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "currentPassword",
-        false,
-        currentPasswordSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "currentPassword", false, currentPasswordSubmitError)
 
     newPasswordSubmitError !== fieldStates.newPassword.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "newPassword",
-        false,
-        newPasswordSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "newPassword", false, newPasswordSubmitError)
 
     confirmNewPasswordSubmitError !== fieldStates.confirmPassword.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "confirmPassword",
-        false,
-        confirmNewPasswordSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "confirmPassword", false, confirmNewPasswordSubmitError)
 
-    if (
-      currentPasswordSubmitError ||
-      newPasswordSubmitError ||
-      confirmNewPasswordSubmitError
-    ) {
+    if (currentPasswordSubmitError || newPasswordSubmitError || confirmNewPasswordSubmitError) {
       return
     }
 
@@ -222,6 +192,7 @@ const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
 
   return (
     <Modal
+      testid="password-change-modal"
       isOpen={isOpen}
       onClose={() => {
         fieldStates.currentPassword = initialFieldState
@@ -234,23 +205,17 @@ const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
         <h1 className="text-xl font-medium mb-4">Change Password</h1>
         <div className="flex flex-col">
           <TextInput
-            name="currentPassword"
+            name="password-change-current-password"
             type="password"
             placeholder="Current Password"
             value={fieldStates.currentPassword.value}
-            onChange={(e) =>
-              setFieldStateValue(
-                setFieldStates,
-                "currentPassword",
-                e.target.value
-              )
-            }
+            onChange={(e) => setFieldStateValue(setFieldStates, "currentPassword", e.target.value)}
             onBlur={(e) => validateCurrentPassword(e.target.value)}
             error={fieldStates.currentPassword.error}
             errorMsg={fieldStates.currentPassword.errorMsg}
           />
           <TextInput
-            name="newPassword"
+            name="password-change-new-password"
             type="password"
             placeholder="New Password"
             value={fieldStates.newPassword.value}
@@ -262,16 +227,12 @@ const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
             errorMsg={fieldStates.newPassword.errorMsg}
           />
           <TextInput
-            name="confirmPassword"
+            name="password-change-confirm-password"
             type="password"
             placeholder="Confirm New Password"
             value={fieldStates.confirmPassword.value}
             onChange={(e) => {
-              setFieldStateValue(
-                setFieldStates,
-                "confirmPassword",
-                e.target.value
-              )
+              setFieldStateValue(setFieldStates, "confirmPassword", e.target.value)
             }}
             onBlur={(e) => validateConfirmPassword(e.target.value)}
             error={fieldStates.confirmPassword.error}
@@ -279,6 +240,7 @@ const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
           />
         </div>
         <button
+          data-testid="password-change-submit-button"
           type="button"
           onClick={() => {
             submitPasswordChange()
@@ -287,11 +249,7 @@ const PasswordChangeModal = ({ isOpen, onClose }: PasswordChangeModalProps) => {
           className="btn_blue py-1 px-2 mt-2 self-end text-sm disabled:bg-blue-300"
           disabled={submitting}
         >
-          {submitting ? (
-            <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
-          ) : (
-            "Submit"
-          )}
+          {submitting ? <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" /> : "Submit"}
         </button>
       </form>
     </Modal>

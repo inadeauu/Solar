@@ -1,4 +1,4 @@
-import { graphql } from "../../src/graphql_codegen/gql"
+import { graphql } from "../../../src/graphql_codegen/gql"
 
 export const getCommentTestDoc = graphql(/* GraphQL */ `
   query GetCommentTest($input: CommentInput!) {

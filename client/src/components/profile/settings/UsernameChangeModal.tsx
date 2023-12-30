@@ -2,21 +2,14 @@ import { useCallback, useState } from "react"
 import Modal from "../../misc/Modal"
 import TextInput from "../../misc/TextInput"
 import { ImSpinner11 } from "react-icons/im"
-import {
-  FieldState,
-  FieldStates,
-  initialFieldState,
-} from "../../../types/shared"
+import { FieldState, FieldStates, initialFieldState } from "../../../types/shared"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../../../utils/graphql"
 import { usernameExistsDocument } from "../../../graphql/sharedDocuments"
 import { debounce } from "lodash"
 import { setFieldStateSuccess, setFieldStateValue } from "../../../utils/form"
 import { graphql } from "../../../graphql_codegen"
-import {
-  AuthUserQuery,
-  ChangeUsernameInput,
-} from "../../../graphql_codegen/graphql"
+import { AuthUserQuery, ChangeUsernameInput } from "../../../graphql_codegen/graphql"
 import { toast } from "react-toastify"
 
 const changeUsernameDocument = graphql(/* GraphQL */ `
@@ -70,8 +63,7 @@ enum FieldErrorMsgs {
 }
 
 const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
-  const [fieldStates, setFieldStates] =
-    useState<FormFieldStates>(initialFieldStates)
+  const [fieldStates, setFieldStates] = useState<FormFieldStates>(initialFieldStates)
   const [validatingUsername, setValidatingUsername] = useState<boolean>(false)
   const [submitting, setSubmitting] = useState<boolean>(false)
   const queryClient = useQueryClient()
@@ -102,21 +94,11 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
         onClose()
       } else if (data.changeUsername.__typename == "ChangeUsernameInputError") {
         if (data.changeUsername.inputErrors.username) {
-          setFieldStateSuccess(
-            setFieldStates,
-            "username",
-            false,
-            data.changeUsername.inputErrors.username
-          )
+          setFieldStateSuccess(setFieldStates, "username", false, data.changeUsername.inputErrors.username)
         }
 
         if (data.changeUsername.inputErrors.password) {
-          setFieldStateSuccess(
-            setFieldStates,
-            "password",
-            false,
-            data.changeUsername.inputErrors.password
-          )
+          setFieldStateSuccess(setFieldStates, "password", false, data.changeUsername.inputErrors.password)
         }
       }
     },
@@ -202,20 +184,10 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
       : fieldStates.password.errorMsg
 
     usernameSubmitError !== fieldStates.username.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "username",
-        false,
-        usernameSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "username", false, usernameSubmitError)
 
     passwordSubmitError !== fieldStates.password.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "password",
-        false,
-        passwordSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "password", false, passwordSubmitError)
 
     if (usernameSubmitError || passwordSubmitError) {
       return
@@ -229,6 +201,7 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
 
   return (
     <Modal
+      testid="username-change-modal"
       isOpen={isOpen}
       onClose={() => {
         fieldStates.username = initialFieldState
@@ -240,38 +213,27 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
         <h1 className="text-xl font-medium mb-4">Change Username</h1>
         <div className="flex flex-col">
           <TextInput
-            name="password"
+            name="username-change-password"
             type="password"
             placeholder="Current Password"
             value={fieldStates.password.value}
-            onChange={(e) =>
-              setFieldStateValue(setFieldStates, "password", e.target.value)
-            }
+            onChange={(e) => setFieldStateValue(setFieldStates, "password", e.target.value)}
             onBlur={(e) => validatePassword(e.target.value)}
             error={fieldStates.password.error}
             errorMsg={fieldStates.password.errorMsg}
           />
           <TextInput
-            name="newUsername"
+            name="username-change-newUsername"
             type="text"
             placeholder="New Username"
             value={fieldStates.username.value}
             onChange={(e) => {
-              setFieldStateValue(
-                setFieldStates,
-                "username",
-                e.target.value.trim()
-              )
+              setFieldStateValue(setFieldStates, "username", e.target.value.trim())
               validateUsername(e.target.value.trim())
             }}
             onBlur={(e) => {
               if (!e.target.value) {
-                setFieldStateSuccess(
-                  setFieldStates,
-                  "username",
-                  false,
-                  FieldErrorMsgs.REQUIRED
-                )
+                setFieldStateSuccess(setFieldStates, "username", false, FieldErrorMsgs.REQUIRED)
               }
             }}
             error={fieldStates.username.error}
@@ -280,6 +242,7 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
           />
         </div>
         <button
+          data-testid="username-change-submit-button"
           type="button"
           onClick={() => {
             submitUsernameChange()
@@ -288,11 +251,7 @@ const UsernameChangeModal = ({ isOpen, onClose }: UsernameChangeModalProps) => {
           className="btn_blue py-1 px-2 mt-2 self-end text-sm disabled:bg-blue-300"
           disabled={submitting}
         >
-          {submitting ? (
-            <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
-          ) : (
-            "Submit"
-          )}
+          {submitting ? <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" /> : "Submit"}
         </button>
       </form>
     </Modal>

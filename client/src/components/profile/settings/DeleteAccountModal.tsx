@@ -2,19 +2,12 @@ import { useState } from "react"
 import Modal from "../../misc/Modal"
 import TextInput from "../../misc/TextInput"
 import { ImSpinner11 } from "react-icons/im"
-import {
-  FieldState,
-  FieldStates,
-  initialFieldState,
-} from "../../../types/shared"
+import { FieldState, FieldStates, initialFieldState } from "../../../types/shared"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { graphQLClient } from "../../../utils/graphql"
 import { setFieldStateSuccess, setFieldStateValue } from "../../../utils/form"
 import { graphql } from "../../../graphql_codegen"
-import {
-  AuthUserQuery,
-  DeleteUserInput,
-} from "../../../graphql_codegen/graphql"
+import { AuthUserQuery, DeleteUserInput } from "../../../graphql_codegen/graphql"
 import { toast } from "react-toastify"
 import { useAuth } from "../../../hooks/useAuth"
 import Cookie from "js-cookie"
@@ -67,8 +60,7 @@ const DeleteAccountModal = ({ isOpen, onClose }: DeleteAccountModalProps) => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const [fieldStates, setFieldStates] =
-    useState<FormFieldStates>(initialFieldStates)
+  const [fieldStates, setFieldStates] = useState<FormFieldStates>(initialFieldStates)
   const [submitting, setSubmitting] = useState<boolean>(false)
 
   const deleteAccount = useMutation({
@@ -85,28 +77,16 @@ const DeleteAccountModal = ({ isOpen, onClose }: DeleteAccountModalProps) => {
         Cookie.remove("connect.sid")
         onClose()
         queryClient.setQueryData<AuthUserQuery>(["authUser"], (oldData) =>
-          oldData
-            ? { ...oldData, authUser: { ...oldData.authUser, user: null } }
-            : oldData
+          oldData ? { ...oldData, authUser: { ...oldData.authUser, user: null } } : oldData
         )
         navigate("/")
       } else if (data.deleteUser.__typename == "DeleteUserInputError") {
         if (data.deleteUser.inputErrors.username) {
-          setFieldStateSuccess(
-            setFieldStates,
-            "username",
-            false,
-            data.deleteUser.inputErrors.username
-          )
+          setFieldStateSuccess(setFieldStates, "username", false, data.deleteUser.inputErrors.username)
         }
 
         if (data.deleteUser.inputErrors.password) {
-          setFieldStateSuccess(
-            setFieldStates,
-            "password",
-            false,
-            data.deleteUser.inputErrors.password
-          )
+          setFieldStateSuccess(setFieldStates, "password", false, data.deleteUser.inputErrors.password)
         }
       }
     },
@@ -166,20 +146,10 @@ const DeleteAccountModal = ({ isOpen, onClose }: DeleteAccountModalProps) => {
       : fieldStates.password.errorMsg
 
     usernameSubmitError !== fieldStates.username.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "username",
-        false,
-        usernameSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "username", false, usernameSubmitError)
 
     passwordSubmitError !== fieldStates.password.errorMsg &&
-      setFieldStateSuccess(
-        setFieldStates,
-        "password",
-        false,
-        passwordSubmitError
-      )
+      setFieldStateSuccess(setFieldStates, "password", false, passwordSubmitError)
 
     if (usernameSubmitError || passwordSubmitError) {
       return
@@ -193,6 +163,7 @@ const DeleteAccountModal = ({ isOpen, onClose }: DeleteAccountModalProps) => {
 
   return (
     <Modal
+      testid="delete-account-modal"
       isOpen={isOpen}
       onClose={() => {
         fieldStates.username = initialFieldState
@@ -203,14 +174,11 @@ const DeleteAccountModal = ({ isOpen, onClose }: DeleteAccountModalProps) => {
       <form className="flex flex-col w-[80%]">
         <div className="flex flex-col gap-2 mb-4">
           <h1 className="text-xl font-medium">Delete Account</h1>
-          <p className="text-sm">
-            This will delete everything, including all of your posts and
-            comments.
-          </p>
+          <p className="text-sm">This will delete everything, including all of your posts and comments.</p>
         </div>
         <div className="flex flex-col">
           <TextInput
-            name="newUsername"
+            name="delete-account-username"
             type="text"
             placeholder="Username"
             value={fieldStates.username.value}
@@ -224,19 +192,18 @@ const DeleteAccountModal = ({ isOpen, onClose }: DeleteAccountModalProps) => {
             errorMsg={fieldStates.username.errorMsg}
           />
           <TextInput
-            name="password"
+            name="delete-account-password"
             type="password"
             placeholder="Password"
             value={fieldStates.password.value}
-            onChange={(e) =>
-              setFieldStateValue(setFieldStates, "password", e.target.value)
-            }
+            onChange={(e) => setFieldStateValue(setFieldStates, "password", e.target.value)}
             onBlur={(e) => validatePassword(e.target.value)}
             error={fieldStates.password.error}
             errorMsg={fieldStates.password.errorMsg}
           />
         </div>
         <button
+          data-testid="delete-account-submit-button"
           type="button"
           onClick={() => {
             submitDeleteAccount()
@@ -245,11 +212,7 @@ const DeleteAccountModal = ({ isOpen, onClose }: DeleteAccountModalProps) => {
           className="btn_red py-1 px-2 mt-2 self-end text-sm disabled:bg-red-300"
           disabled={submitting}
         >
-          {submitting ? (
-            <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" />
-          ) : (
-            "Delete"
-          )}
+          {submitting ? <ImSpinner11 className="animate-spin h-6 w-6 mx-auto" /> : "Delete"}
         </button>
       </form>
     </Modal>

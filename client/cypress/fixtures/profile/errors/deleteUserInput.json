@@ -1,0 +1,13 @@
+{
+  "data": {
+    "deleteUser": {
+      "__typename": "DeleteUserInputError",
+      "errorMsg": "Invalid input",
+      "inputErrors": {
+        "username": "Invalid username",
+        "password": "Invalid password"
+      },
+      "code": 400
+    }
+  }
+}

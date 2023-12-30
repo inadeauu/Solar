@@ -260,7 +260,7 @@ export const paginateCommunities = async (
   const memberId = filters.memberId
 
   if (paginateArgs.after && paginateArgs.after.title == null) {
-    throw new GraphQLError("Created at must be specified with title", {
+    throw new GraphQLError("Title must be specified with cursor", {
       extensions: { code: "PAGINATION_ERROR" },
     })
   }
@@ -324,7 +324,7 @@ export const paginateUsers = async (
   const usernameContains = filters.usernameContains
 
   if (paginateArgs.after && paginateArgs.after.title == null) {
-    throw new GraphQLError("Created at must be specified with title", {
+    throw new GraphQLError("Title must be specified with cursor", {
       extensions: { code: "PAGINATION_ERROR" },
     })
   }
@@ -333,7 +333,7 @@ export const paginateUsers = async (
 
   const id = paginateArgs.after?.id
   const title = paginateArgs.after?.title
-  const cursor = Prisma.sql`(${paginateArgs.after}::json IS NULL OR "u"."username" <= ${title} AND ("u"."id" > ${id} OR "u"."username" < ${title}))`
+  const cursor = Prisma.sql`(${paginateArgs.after}::json IS NULL OR "u"."username" >= ${title} AND ("u"."id" > ${id} OR "u"."username" > ${title}))`
 
   const where = Prisma.sql`WHERE 1=1 
     AND (${usernameContains}::text IS NULL OR "u"."username" LIKE ${usernameContains}::text || '%') 

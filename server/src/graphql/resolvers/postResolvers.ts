@@ -75,7 +75,7 @@ export const resolvers: Resolvers = {
 
       if (!post) {
         throw new GraphQLError("Post does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -170,7 +170,7 @@ export const resolvers: Resolvers = {
 
       if (!post) {
         throw new GraphQLError("Post does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -232,7 +232,7 @@ export const resolvers: Resolvers = {
 
       if (!post) {
         throw new GraphQLError("Post does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 

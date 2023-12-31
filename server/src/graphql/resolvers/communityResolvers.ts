@@ -24,10 +24,7 @@ export const resolvers: Resolvers = {
     communities: async (_0, args) => {
       const filters = args.input?.filters
 
-      const communities = await paginateCommunities(
-        args.input.paginate,
-        filters
-      )
+      const communities = await paginateCommunities(args.input.paginate, filters)
 
       return communities
     },
@@ -54,18 +51,18 @@ export const resolvers: Resolvers = {
         }
       }
 
-      if (args.input.title.trim().length > 25) {
+      if (args.input.title.trim().length > 25 || args.input.title.trim().length <= 0) {
         return {
           __typename: "CreateCommunityInputError",
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            title: "Title must be less than 25 characters long",
+            title: "Title must be 1-25 characters long",
           },
         }
       }
 
-      await prisma.community.create({
+      const newCommunity = await prisma.community.create({
         data: {
           title: args.input.title,
           userId: req.session.userId,
@@ -76,6 +73,7 @@ export const resolvers: Resolvers = {
         __typename: "CreateCommunitySuccess",
         successMsg: "Community successfully created",
         code: 200,
+        community: newCommunity,
       }
     },
     userJoinCommunity: async (_0, args, { req }) => {
@@ -98,7 +96,13 @@ export const resolvers: Resolvers = {
 
       if (!community) {
         throw new GraphQLError("Community does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
+        })
+      }
+
+      if (req.session.userId == community.userId) {
+        throw new GraphQLError("Cannot join an owned community", {
+          extensions: { code: "UNAUTHORIZED" },
         })
       }
 
@@ -160,7 +164,7 @@ export const resolvers: Resolvers = {
 
       if (!community) {
         throw new GraphQLError("Community does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -185,13 +189,13 @@ export const resolvers: Resolvers = {
         }
       }
 
-      if (args.input.newTitle.trim().length > 25) {
+      if (args.input.newTitle.trim().length > 25 || args.input.newTitle.trim().length <= 0) {
         return {
           __typename: "ChangeCommunityTitleInputError",
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            newTitle: "Title must be less than 25 characters long",
+            newTitle: "Title must be 1-25 characters long",
           },
         }
       }
@@ -230,7 +234,7 @@ export const resolvers: Resolvers = {
 
       if (!community) {
         throw new GraphQLError("Community does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -264,9 +268,7 @@ export const resolvers: Resolvers = {
   },
   Community: {
     owner: async (community) => {
-      const owner = (await prisma.community
-        .findUnique({ where: { id: community.id } })
-        .owner())!
+      const owner = (await prisma.community.findUnique({ where: { id: community.id } }).owner())!
 
       return owner
     },

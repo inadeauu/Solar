@@ -48,3 +48,65 @@ export const communityTitleExistsTestDoc = graphql(/* GraphQL */ `
     titleExists(title: $title)
   }
 `)
+
+export const createCommunityTestDoc = graphql(/* GraphQL */ `
+  mutation CreateCommunityTest($input: CreateCommunityInput!) {
+    createCommunity(input: $input) {
+      ... on CreateCommunitySuccess {
+        __typename
+        successMsg
+        code
+        community {
+          id
+        }
+      }
+      ... on CreateCommunityInputError {
+        __typename
+        errorMsg
+        code
+        inputErrors {
+          title
+        }
+      }
+    }
+  }
+`)
+
+export const joinCommunityTestDoc = graphql(/* GraphQL */ `
+  mutation JoinCommunityTest($input: UserJoinCommunityInput!) {
+    userJoinCommunity(input: $input) {
+      ... on UserJoinCommunitySuccess {
+        __typename
+        successMsg
+        code
+        community {
+          id
+          inCommunity
+        }
+      }
+    }
+  }
+`)
+
+export const changeCommunityTitleTestDoc = graphql(/* GraphQL */ `
+  mutation ChangeCommunityTitleTest($input: ChangeCommunityTitleInput!) {
+    changeCommunityTitle(input: $input) {
+      ... on ChangeCommunityTitleSuccess {
+        __typename
+        successMsg
+        code
+        community {
+          id
+        }
+      }
+      ... on ChangeCommunityTitleInputError {
+        __typename
+        errorMsg
+        code
+        inputErrors {
+          newTitle
+        }
+      }
+    }
+  }
+`)

@@ -16,10 +16,7 @@ export const resolvers: Resolvers = {
       return comment
     },
     comments: async (_0, args) => {
-      const comments = await paginateComments(
-        args.input.paginate,
-        args.input.filters
-      )
+      const comments = await paginateComments(args.input.paginate, args.input.filters)
 
       return comments
     },
@@ -32,8 +29,7 @@ export const resolvers: Resolvers = {
         })
       }
 
-      const bodyError =
-        args.input.body.trim().length <= 0 || args.input.body.length > 2000
+      const bodyError = args.input.body.trim().length <= 0 || args.input.body.length > 2000
 
       const post = await prisma.post.findUnique({
         where: { id: args.input.postId },
@@ -41,7 +37,7 @@ export const resolvers: Resolvers = {
 
       if (!post) {
         throw new GraphQLError("Post does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -51,9 +47,7 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            body: bodyError
-              ? "Body must be less than 2000 characters long"
-              : null,
+            body: bodyError ? "Body must be less than 2000 characters long" : null,
           },
         }
       }
@@ -80,8 +74,7 @@ export const resolvers: Resolvers = {
         })
       }
 
-      const bodyError =
-        args.input.body.trim().length <= 0 || args.input.body.length > 2000
+      const bodyError = args.input.body.trim().length <= 0 || args.input.body.length > 2000
 
       const parentComment = await prisma.comment.findUnique({
         where: { id: args.input.commentId },
@@ -89,7 +82,7 @@ export const resolvers: Resolvers = {
 
       if (!parentComment) {
         throw new GraphQLError("Parent comment does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -99,9 +92,7 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            body: bodyError
-              ? "Body must be less than 2000 characters long"
-              : null,
+            body: bodyError ? "Body must be less than 2000 characters long" : null,
             commentId: parentComment.parentId ? "Invalid comment ID" : null,
           },
         }
@@ -135,7 +126,7 @@ export const resolvers: Resolvers = {
 
       if (!comment) {
         throw new GraphQLError("Comment does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -166,10 +157,7 @@ export const resolvers: Resolvers = {
           },
         })
         successMsg = "Successfully " + doMsg + " post"
-      } else if (
-        (commentVote.like == 1 && args.input.like) ||
-        (commentVote.like == -1 && !args.input.like)
-      ) {
+      } else if ((commentVote.like == 1 && args.input.like) || (commentVote.like == -1 && !args.input.like)) {
         updatedComment = await prisma.comment.update({
           where: { id: args.input.commentId },
           data: {
@@ -233,7 +221,7 @@ export const resolvers: Resolvers = {
 
       if (!comment) {
         throw new GraphQLError("Comment does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -243,8 +231,7 @@ export const resolvers: Resolvers = {
         })
       }
 
-      const bodyError =
-        args.input.body.trim().length <= 0 || args.input.body.length > 2000
+      const bodyError = args.input.body.trim().length <= 0 || args.input.body.length > 2000
 
       if (bodyError) {
         return {
@@ -293,7 +280,7 @@ export const resolvers: Resolvers = {
 
       if (!comment) {
         throw new GraphQLError("Post does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -332,9 +319,7 @@ export const resolvers: Resolvers = {
       return post
     },
     parent: async (comment) => {
-      const parent = (await prisma.comment
-        .findUnique({ where: { id: comment.id } })
-        .parent())!
+      const parent = (await prisma.comment.findUnique({ where: { id: comment.id } }).parent())!
 
       return parent
     },

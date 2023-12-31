@@ -54,6 +54,7 @@ input CreateCommunityInput {
 type CreateCommunitySuccess implements Success {
   successMsg: String!
   code: Int!
+  community: Community!
 }
 
 type CreateCommunityInputError implements Error {

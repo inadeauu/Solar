@@ -9,10 +9,18 @@ import {
   usernameExistsTestDoc,
 } from "../../utils/graphql/userGraphQL"
 import { loginUsernameTestDoc } from "../../utils/graphql/authGraphQL"
+import { aliasMutation } from "../../utils/graphqlTest"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
   cy.exec("npm --prefix ../server run seed")
+
+  cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+    aliasMutation(req, "ChangeUsernameTest")
+    aliasMutation(req, "ChangePasswordTest")
+    aliasMutation(req, "DeleteUsertest")
+  })
+
   cy.visit("/")
 })
 
@@ -159,16 +167,22 @@ describe("Change username endpoint", function () {
       throw new Error("Uncaught error (should not be reached)")
     })
 
-    cy.wrap(
-      graphQLClient.request(changeUsernameTestDoc, { input: { newUsername: "newUsername", password: "password" } })
-    )
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(changeUsernameTestDoc, { input: { newUsername: "newUsername", password: "password" } })
+      )
+    })
+
+    cy.wait("@gqlChangeUsernameTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
   })
 
   it("Check user does not exist error response", function () {
     cy.on("fail", (error) => {
       if (error instanceof ClientError) {
         if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("INTERNAL_SERVER_ERROR")
+        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
         expect(error.response.errors[0].message).to.eq("User does not exist")
         return
       }
@@ -182,6 +196,10 @@ describe("Change username endpoint", function () {
       cy.wrap(
         graphQLClient.request(changeUsernameTestDoc, { input: { newUsername: "newUsername", password: "password" } })
       )
+    })
+
+    cy.wait("@gqlChangeUsernameTestMutation").then(() => {
+      throw new Error("No error returned")
     })
   })
 
@@ -261,18 +279,24 @@ describe("Change password endpoint", function () {
       throw new Error("Uncaught error (should not be reached)")
     })
 
-    cy.wrap(
-      graphQLClient.request(changePasswordTestDoc, {
-        input: { currentPassword: "password", newPassword: "newPassword" },
-      })
-    )
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(changePasswordTestDoc, {
+          input: { currentPassword: "password", newPassword: "newPassword" },
+        })
+      )
+    })
+
+    cy.wait("@gqlChangePasswordTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
   })
 
   it("Check user does not exist error response", function () {
     cy.on("fail", (error) => {
       if (error instanceof ClientError) {
         if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("INTERNAL_SERVER_ERROR")
+        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
         expect(error.response.errors[0].message).to.eq("User does not exist")
         return
       }
@@ -288,6 +312,10 @@ describe("Change password endpoint", function () {
           input: { currentPassword: "password", newPassword: "newPassword" },
         })
       )
+    })
+
+    cy.wait("@gqlChangePasswordTestMutation").then(() => {
+      throw new Error("No error returned")
     })
   })
 
@@ -349,18 +377,24 @@ describe("Delete user endpoint", function () {
       throw new Error("Uncaught error (should not be reached)")
     })
 
-    cy.wrap(
-      graphQLClient.request(deleteUserTestDoc, {
-        input: { username: "username1", password: "password" },
-      })
-    )
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(deleteUserTestDoc, {
+          input: { username: "username1", password: "password" },
+        })
+      )
+    })
+
+    cy.wait("@gqlDeleteUserTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
   })
 
   it("Check user does not exist error response", function () {
     cy.on("fail", (error) => {
       if (error instanceof ClientError) {
         if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("INTERNAL_SERVER_ERROR")
+        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
         expect(error.response.errors[0].message).to.eq("User does not exist")
         return
       }
@@ -376,6 +410,10 @@ describe("Delete user endpoint", function () {
           input: { username: "username1", password: "password" },
         })
       )
+    })
+
+    cy.wait("@gqlDeleteUserTestMutation").then(() => {
+      throw new Error("No error returned")
     })
   })
 

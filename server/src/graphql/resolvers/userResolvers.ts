@@ -40,7 +40,7 @@ export const resolvers: Resolvers = {
 
       if (!user) {
         throw new GraphQLError("User does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -101,7 +101,7 @@ export const resolvers: Resolvers = {
 
       if (!user) {
         throw new GraphQLError("User does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 
@@ -148,7 +148,7 @@ export const resolvers: Resolvers = {
 
       if (!user) {
         throw new GraphQLError("User does not exist", {
-          extensions: { code: "INTERNAL_SERVER_ERROR" },
+          extensions: { code: "BAD_USER_INPUT" },
         })
       }
 

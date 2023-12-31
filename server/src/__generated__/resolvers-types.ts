@@ -277,6 +277,7 @@ export type CreateCommunityResult = CreateCommunityInputError | CreateCommunityS
 export type CreateCommunitySuccess = Success & {
   __typename?: 'CreateCommunitySuccess';
   code: Scalars['Int']['output'];
+  community: Community;
   successMsg: Scalars['String']['output'];
 };
 
@@ -923,7 +924,7 @@ export type ResolversUnionTypes<RefType extends Record<string, unknown>> = Resol
   ChangeUsernameResult: ( ChangeUsernameInputError ) | ( Omit<ChangeUsernameSuccess, 'user'> & { user: RefType['User'] } );
   CreateCommentReplyResult: ( CreateCommentReplyInputError ) | ( CreateCommentReplySuccess );
   CreateCommentResult: ( CreateCommentInputError ) | ( CreateCommentSuccess );
-  CreateCommunityResult: ( CreateCommunityInputError ) | ( CreateCommunitySuccess );
+  CreateCommunityResult: ( CreateCommunityInputError ) | ( Omit<CreateCommunitySuccess, 'community'> & { community: RefType['Community'] } );
   CreatePostResult: ( CreatePostInputError ) | ( Omit<CreatePostSuccess, 'post'> & { post: RefType['Post'] } );
   DeleteCommentResult: ( DeleteCommentSuccess );
   DeleteCommunityResult: ( DeleteCommunityInputError ) | ( DeleteCommunitySuccess );
@@ -942,7 +943,7 @@ export type ResolversUnionTypes<RefType extends Record<string, unknown>> = Resol
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
   Error: ( ChangeCommunityTitleInputError ) | ( ChangePasswordInputError ) | ( ChangeUsernameInputError ) | ( CreateCommentInputError ) | ( CreateCommentReplyInputError ) | ( CreateCommunityInputError ) | ( CreatePostInputError ) | ( DeleteCommunityInputError ) | ( DeleteUserInputError ) | ( EditCommentInputError ) | ( EditPostInputError ) | ( LoginUsernameInputError ) | ( RegisterUsernameInputError );
-  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( Omit<ChangeCommunityTitleSuccess, 'community'> & { community: RefType['Community'] } ) | ( ChangePasswordSuccess ) | ( Omit<ChangeUsernameSuccess, 'user'> & { user: RefType['User'] } ) | ( CreateCommentReplySuccess ) | ( CreateCommentSuccess ) | ( CreateCommunitySuccess ) | ( Omit<CreatePostSuccess, 'post'> & { post: RefType['Post'] } ) | ( DeleteCommentSuccess ) | ( DeleteCommunitySuccess ) | ( DeletePostSuccess ) | ( DeleteUserSuccess ) | ( Omit<EditCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<EditPostSuccess, 'post'> & { post: RefType['Post'] } ) | ( Omit<LoginUsernameSuccess, 'user'> & { user: RefType['User'] } ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } ) | ( Omit<VoteCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<VotePostSuccess, 'post'> & { post: RefType['Post'] } );
+  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( Omit<ChangeCommunityTitleSuccess, 'community'> & { community: RefType['Community'] } ) | ( ChangePasswordSuccess ) | ( Omit<ChangeUsernameSuccess, 'user'> & { user: RefType['User'] } ) | ( CreateCommentReplySuccess ) | ( CreateCommentSuccess ) | ( Omit<CreateCommunitySuccess, 'community'> & { community: RefType['Community'] } ) | ( Omit<CreatePostSuccess, 'post'> & { post: RefType['Post'] } ) | ( DeleteCommentSuccess ) | ( DeleteCommunitySuccess ) | ( DeletePostSuccess ) | ( DeleteUserSuccess ) | ( Omit<EditCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<EditPostSuccess, 'post'> & { post: RefType['Post'] } ) | ( Omit<LoginUsernameSuccess, 'user'> & { user: RefType['User'] } ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } ) | ( Omit<VoteCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<VotePostSuccess, 'post'> & { post: RefType['Post'] } );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -993,7 +994,7 @@ export type ResolversTypes = ResolversObject<{
   CreateCommunityInputError: ResolverTypeWrapper<CreateCommunityInputError>;
   CreateCommunityInputErrors: ResolverTypeWrapper<CreateCommunityInputErrors>;
   CreateCommunityResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreateCommunityResult']>;
-  CreateCommunitySuccess: ResolverTypeWrapper<CreateCommunitySuccess>;
+  CreateCommunitySuccess: ResolverTypeWrapper<Omit<CreateCommunitySuccess, 'community'> & { community: ResolversTypes['Community'] }>;
   CreatePostInput: CreatePostInput;
   CreatePostInputError: ResolverTypeWrapper<CreatePostInputError>;
   CreatePostInputErrors: ResolverTypeWrapper<CreatePostInputErrors>;
@@ -1121,7 +1122,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreateCommunityInputError: CreateCommunityInputError;
   CreateCommunityInputErrors: CreateCommunityInputErrors;
   CreateCommunityResult: ResolversUnionTypes<ResolversParentTypes>['CreateCommunityResult'];
-  CreateCommunitySuccess: CreateCommunitySuccess;
+  CreateCommunitySuccess: Omit<CreateCommunitySuccess, 'community'> & { community: ResolversParentTypes['Community'] };
   CreatePostInput: CreatePostInput;
   CreatePostInputError: CreatePostInputError;
   CreatePostInputErrors: CreatePostInputErrors;
@@ -1396,6 +1397,7 @@ export type CreateCommunityResultResolvers<ContextType = Context, ParentType ext
 
 export type CreateCommunitySuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CreateCommunitySuccess'] = ResolversParentTypes['CreateCommunitySuccess']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  community?: Resolver<ResolversTypes['Community'], ParentType, ContextType>;
   successMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

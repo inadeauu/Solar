@@ -18,10 +18,19 @@ import {
   hasSameOwnerId,
   nodeIdsUnique,
 } from "../../utils/utils"
+import { aliasMutation } from "../../utils/graphqlTest"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
   cy.exec("npm --prefix ../server run seed")
+
+  cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+    aliasMutation(req, "CreatePostTest")
+    aliasMutation(req, "VotePostTest")
+    aliasMutation(req, "EditPostTest")
+    aliasMutation(req, "DeletePostTest")
+  })
+
   cy.visit("/")
 })
 
@@ -448,11 +457,17 @@ describe("Create post endpoint", function () {
       throw new Error("Uncaught error (should not be reached)")
     })
 
-    cy.wrap(
-      graphQLClient.request(createPostTestDoc, {
-        input: { communityId: "351146cd-1612-4a44-94da-e33d27bedf39", title: "Post title", body: "Post body" },
-      })
-    )
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(createPostTestDoc, {
+          input: { communityId: "351146cd-1612-4a44-94da-e33d27bedf39", title: "Post title", body: "Post body" },
+        })
+      )
+    })
+
+    cy.wait("@gqlCreatePostTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
   })
 
   it("Check invalid input responses", function () {
@@ -557,18 +572,24 @@ describe("Post vote endpoint", function () {
       throw new Error("Uncaught error (should not be reached)")
     })
 
-    cy.wrap(
-      graphQLClient.request(votePostTestDoc, {
-        input: { postId: "abc", like: true },
-      })
-    )
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "abc", like: true },
+        })
+      )
+    })
+
+    cy.wait("@gqlVotePostTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
   })
 
   it("Check post doesn't exist error response", function () {
     cy.on("fail", (error) => {
       if (error instanceof ClientError) {
         if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("INTERNAL_SERVER_ERROR")
+        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
         expect(error.response.errors[0].message).to.eq("Post does not exist")
         return
       }
@@ -584,6 +605,10 @@ describe("Post vote endpoint", function () {
           input: { postId: "abc", like: true },
         })
       )
+    })
+
+    cy.wait("@gqlVotePostTestMutation").then(() => {
+      throw new Error("No error returned")
     })
   })
 
@@ -767,18 +792,24 @@ describe("Edit post endpoint", function () {
       throw new Error("Uncaught error (should not be reached)")
     })
 
-    cy.wrap(
-      graphQLClient.request(editPostTestDoc, {
-        input: { postId: "abc", title: "new title", body: "new body" },
-      })
-    )
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(editPostTestDoc, {
+          input: { postId: "abc", title: "new title", body: "new body" },
+        })
+      )
+    })
+
+    cy.wait("@gqlEditPostTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
   })
 
   it("Check post does not exist error response", function () {
     cy.on("fail", (error) => {
       if (error instanceof ClientError) {
         if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("INTERNAL_SERVER_ERROR")
+        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
         expect(error.response.errors[0].message).to.eq("Post does not exist")
         return
       }
@@ -794,6 +825,10 @@ describe("Edit post endpoint", function () {
           input: { postId: "abc", title: "new title", body: "new body" },
         })
       )
+    })
+
+    cy.wait("@gqlEditPostTestMutation").then(() => {
+      throw new Error("No error returned")
     })
   })
 
@@ -888,18 +923,24 @@ describe("Delete post endpoint", function () {
       throw new Error("Uncaught error (should not be reached)")
     })
 
-    cy.wrap(
-      graphQLClient.request(deletePostTestDoc, {
-        input: { postId: "7dc6c6fe-e2d3-4b60-9d26-4cd81c1b8dd2" },
-      })
-    )
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(deletePostTestDoc, {
+          input: { postId: "7dc6c6fe-e2d3-4b60-9d26-4cd81c1b8dd2" },
+        })
+      )
+    })
+
+    cy.wait("@gqlDeletePostTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
   })
 
   it("Check post does not exist error response", function () {
     cy.on("fail", (error) => {
       if (error instanceof ClientError) {
         if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("INTERNAL_SERVER_ERROR")
+        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
         expect(error.response.errors[0].message).to.eq("Post does not exist")
         return
       }
@@ -915,6 +956,10 @@ describe("Delete post endpoint", function () {
           input: { postId: "abc" },
         })
       )
+    })
+
+    cy.wait("@gqlDeletePostTestMutation").then(() => {
+      throw new Error("No error returned")
     })
   })
 

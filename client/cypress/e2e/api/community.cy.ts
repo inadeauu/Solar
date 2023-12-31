@@ -2,9 +2,12 @@ import { ClientError } from "graphql-request"
 import { GetCommunitiesTestQuery } from "../../../src/graphql_codegen/graphql"
 import { graphQLClient } from "../../../src/utils/graphql"
 import {
+  changeCommunityTitleTestDoc,
   communityTitleExistsTestDoc,
+  createCommunityTestDoc,
   getCommunitiesTestDoc,
   getCommunityTestDoc,
+  joinCommunityTestDoc,
 } from "../../utils/graphql/communityGraphQL"
 import {
   allTitlesContain,
@@ -13,10 +16,18 @@ import {
   nodeIdsUnique,
   titlesInAlphabeticalOrder,
 } from "../../utils/utils"
+import { aliasMutation } from "../../utils/graphqlTest"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
   cy.exec("npm --prefix ../server run seed")
+
+  cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+    aliasMutation(req, "CreateCommunityTest")
+    aliasMutation(req, "JoinCommunityTest")
+    aliasMutation(req, "ChangeCommunityTitleTest")
+  })
+
   cy.visit("/")
 })
 
@@ -355,4 +366,310 @@ describe("Community title exists endpoint", function () {
       .its("titleExists")
       .should("eq", false)
   })
+})
+
+describe("Create community endpoint", function () {
+  it("Check not signed in error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
+        expect(error.response.errors[0].message).to.eq("Not signed in")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(createCommunityTestDoc, { input: { title: "newCommunity" } }))
+    })
+
+    cy.wait("@gqlCreateCommunityTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check invalid input responses", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(createCommunityTestDoc, { input: { title: "Community1" } }))
+        .its("createCommunity")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.title).to.eq("Title already in use"))
+    })
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(createCommunityTestDoc, { input: { title: "" } }))
+        .its("createCommunity")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.title).to.eq("Title must be 1-25 characters long"))
+    })
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(createCommunityTestDoc, { input: { title: "thisIsASuperLongCommunityName" } }))
+        .its("createCommunity")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.title).to.eq("Title must be 1-25 characters long"))
+    })
+  })
+
+  it("Check community successfully created", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(createCommunityTestDoc, { input: { title: "newCommunity" } }))
+        .its("createCommunity")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Community successfully created")
+
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getCommunityTestDoc, { input: { id: res.community.id } }))
+              .its("community")
+              .should((res) => expect(res.title).to.eq("newCommunity"))
+          })
+        })
+    })
+  })
+})
+
+describe("Join community endpoint", function () {
+  it("Check not signed in error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
+        expect(error.response.errors[0].message).to.eq("Not signed in")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(joinCommunityTestDoc, { input: { communityId: "abc" } }))
+    })
+
+    cy.wait("@gqlJoinCommunityTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check community does not exist error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
+        expect(error.response.errors[0].message).to.eq("Community does not exist")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(joinCommunityTestDoc, { input: { communityId: "abc" } }))
+    })
+
+    cy.wait("@gqlJoinCommunityTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check joining an owned community error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHORIZED")
+        expect(error.response.errors[0].message).to.eq("Cannot join an owned community")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(joinCommunityTestDoc, { input: { communityId: "351146cd-1612-4a44-94da-e33d27bedf39" } })
+      )
+    })
+
+    cy.wait("@gqlJoinCommunityTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check join community successfully", function () {
+    cy.setCookie("test-user", "f734d0b4-20a1-4b7b-9d95-f5ad532582df")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(joinCommunityTestDoc, {
+          input: { communityId: "5d148029-cac3-4cef-99f8-2208d5f6e3d2" },
+        })
+      )
+        .its("userJoinCommunity")
+        .should((res) => expect(res.code).to.eq(200))
+        .should((res) => expect(res.successMsg).to.eq("Successfully joined community"))
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(getCommunityTestDoc, {
+          input: { id: "5d148029-cac3-4cef-99f8-2208d5f6e3d2" },
+        })
+      )
+        .its("community")
+        .should((res) => expect(res.inCommunity).to.eq(true))
+    })
+  })
+
+  it("Check leave community successfully", function () {
+    cy.setCookie("test-user", "266c189f-5986-404a-9889-0a54c298acb2")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(joinCommunityTestDoc, {
+          input: { communityId: "5d148029-cac3-4cef-99f8-2208d5f6e3d2" },
+        })
+      )
+        .its("userJoinCommunity")
+        .should((res) => expect(res.code).to.eq(200))
+        .should((res) => expect(res.successMsg).to.eq("Successfully left community"))
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(getCommunityTestDoc, {
+          input: { id: "5d148029-cac3-4cef-99f8-2208d5f6e3d2" },
+        })
+      )
+        .its("community")
+        .should((res) => expect(res.inCommunity).to.eq(false))
+    })
+  })
+})
+
+describe("Change community title endpoint", function () {
+  it("Check not signed in error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
+        expect(error.response.errors[0].message).to.eq("Not signed in")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(changeCommunityTitleTestDoc, { input: { id: "abc", newTitle: "abc" } }))
+    })
+
+    cy.wait("@gqlChangeCommunityTitleTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check community does not exist error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
+        expect(error.response.errors[0].message).to.eq("Community does not exist")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(changeCommunityTitleTestDoc, { input: { id: "abc", newTitle: "abc" } }))
+    })
+
+    cy.wait("@gqlChangeCommunityTitleTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check user not owner of community error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHORIZED")
+        expect(error.response.errors[0].message).to.eq("Unauthorized")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(changeCommunityTitleTestDoc, {
+          input: { id: "41094cb6-470d-4409-85b4-484fd43dd41d", newTitle: "abc" },
+        })
+      )
+    })
+
+    cy.wait("@gqlChangeCommunityTitleTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check invalid input responses", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(changeCommunityTitleTestDoc, {
+          input: { id: "351146cd-1612-4a44-94da-e33d27bedf39", newTitle: "" },
+        })
+      )
+        .its("changeCommunityTitle")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.newTitle).to.eq("Title must be 1-25 characters long"))
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(changeCommunityTitleTestDoc, {
+          input: { id: "351146cd-1612-4a44-94da-e33d27bedf39", newTitle: "thisIsASuperLongCommunityTitle" },
+        })
+      )
+        .its("changeCommunityTitle")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.newTitle).to.eq("Title must be 1-25 characters long"))
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(changeCommunityTitleTestDoc, {
+          input: { id: "351146cd-1612-4a44-94da-e33d27bedf39", newTitle: "Community1" },
+        })
+      )
+        .its("changeCommunityTitle")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.newTitle).to.eq("Community title already in use"))
+    })
+  })
+
+  it("Check successfully change community title", function () {})
 })

@@ -8,8 +8,12 @@ type nodeWithCreatedAt = node & { node: { created_at: string } }
 type nodeWithVoteSum = node & { node: { voteSum: number } }
 type nodeWithCommunityId = node & { node: { community: { id: string } } }
 type nodeWithOwnerId = node & { node: { owner: { id: string } } }
+type nodeWithTitle = node & { node: { title: string } }
+type nodeWithInCommunity = node & { node: { inCommunity: boolean } }
 
 export const nodeIdsUnique = (arr: node[]) => {
+  if (arr.length == 0) return false
+
   const ids: string[] = []
 
   for (const item of arr) {
@@ -24,6 +28,8 @@ export const nodeIdsUnique = (arr: node[]) => {
 }
 
 export const hasNewOrdering = (arr: nodeWithCreatedAt[]) => {
+  if (arr.length == 0) return false
+
   return arr.every((e, i) => {
     if (i == 0) {
       return e.node.created_at > arr[i + 1].node.created_at
@@ -36,6 +42,8 @@ export const hasNewOrdering = (arr: nodeWithCreatedAt[]) => {
 }
 
 export const hasOldOrdering = (arr: nodeWithCreatedAt[]) => {
+  if (arr.length == 0) return false
+
   return arr.every((e, i) => {
     if (i == 0) {
       return e.node.created_at < arr[i + 1].node.created_at
@@ -48,6 +56,8 @@ export const hasOldOrdering = (arr: nodeWithCreatedAt[]) => {
 }
 
 export const hasIncreasingVoteSumOrdering = (arr: nodeWithVoteSum[]) => {
+  if (arr.length == 0) return false
+
   return arr.every((e, i) => {
     if (i == 0) {
       return e.node.voteSum <= arr[i + 1].node.voteSum
@@ -60,6 +70,8 @@ export const hasIncreasingVoteSumOrdering = (arr: nodeWithVoteSum[]) => {
 }
 
 export const hasDecreasingVoteSumOrdering = (arr: nodeWithVoteSum[]) => {
+  if (arr.length == 0) return false
+
   return arr.every((e, i) => {
     if (i == 0) {
       return e.node.voteSum >= arr[i + 1].node.voteSum
@@ -72,9 +84,39 @@ export const hasDecreasingVoteSumOrdering = (arr: nodeWithVoteSum[]) => {
 }
 
 export const hasSameCommunityId = (arr: nodeWithCommunityId[], id: string) => {
+  if (arr.length == 0) return false
+
   return arr.every((e) => e.node.community.id == id)
 }
 
 export const hasSameOwnerId = (arr: nodeWithOwnerId[], id: string) => {
+  if (arr.length == 0) return false
+
   return arr.every((e) => e.node.owner.id == id)
+}
+
+export const allTitlesContain = (arr: nodeWithTitle[], str: string) => {
+  if (arr.length == 0) return false
+
+  return arr.every((e) => e.node.title.includes(str) == true)
+}
+
+export const titlesInAlphabeticalOrder = (arr: nodeWithTitle[]) => {
+  if (arr.length == 0) return false
+
+  return arr.every((e, i) => {
+    if (i == 0) {
+      return e.node.title <= arr[i + 1].node.title
+    } else if (i == arr.length - 1) {
+      return e.node.title >= arr[i - 1].node.title
+    } else {
+      return e.node.title <= arr[i + 1].node.title && e.node.title >= arr[i - 1].node.title
+    }
+  })
+}
+
+export const inAllCommunities = (arr: nodeWithInCommunity[]) => {
+  if (arr.length == 0) return false
+
+  return arr.every((e) => e.node.inCommunity == true)
 }

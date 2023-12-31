@@ -117,8 +117,10 @@ describe("Posts endpoint", function () {
           .should("eq", "NEW")
       })
 
-      cy.wrap(nodeIdsUnique(posts)).should("eq", true)
-      cy.wrap(hasNewOrdering(posts)).should("eq", true)
+      cy.then(() => {
+        cy.wrap(nodeIdsUnique(posts)).should("eq", true)
+        cy.wrap(hasNewOrdering(posts)).should("eq", true)
+      })
     })
 
     it("Check pagination + old ordering", function () {
@@ -164,8 +166,10 @@ describe("Posts endpoint", function () {
           .should("eq", "OLD")
       })
 
-      cy.wrap(nodeIdsUnique(posts)).should("eq", true)
-      cy.wrap(hasOldOrdering(posts)).should("eq", true)
+      cy.then(() => {
+        cy.wrap(nodeIdsUnique(posts)).should("eq", true)
+        cy.wrap(hasOldOrdering(posts)).should("eq", true)
+      })
     })
 
     it("Check pagination + increasing vote count ordering", function () {
@@ -211,8 +215,10 @@ describe("Posts endpoint", function () {
           .should("eq", "LOW")
       })
 
-      cy.wrap(nodeIdsUnique(posts)).should("eq", true)
-      cy.wrap(hasIncreasingVoteSumOrdering(posts)).should("eq", true)
+      cy.then(() => {
+        cy.wrap(nodeIdsUnique(posts)).should("eq", true)
+        cy.wrap(hasIncreasingVoteSumOrdering(posts)).should("eq", true)
+      })
     })
 
     it("Check pagination + decreasing vote count ordering", function () {
@@ -258,8 +264,10 @@ describe("Posts endpoint", function () {
           .should("eq", "TOP")
       })
 
-      cy.wrap(nodeIdsUnique(posts)).should("eq", true)
-      cy.wrap(hasDecreasingVoteSumOrdering(posts)).should("eq", true)
+      cy.then(() => {
+        cy.wrap(nodeIdsUnique(posts)).should("eq", true)
+        cy.wrap(hasDecreasingVoteSumOrdering(posts)).should("eq", true)
+      })
     })
   })
 
@@ -593,9 +601,11 @@ describe("Post vote endpoint", function () {
           expect(res.code).to.eq(200)
           expect(res.successMsg).to.eq("Successfully liked post")
 
-          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
-            .its("post")
-            .should((res) => expect(res.voteSum).to.eq(1))
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+              .its("post")
+              .should((res) => expect(res.voteSum).to.eq(1))
+          })
         })
     })
 
@@ -610,9 +620,11 @@ describe("Post vote endpoint", function () {
           expect(res.code).to.eq(200)
           expect(res.successMsg).to.eq("Successfully disliked post")
 
-          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
-            .its("post")
-            .should((res) => expect(res.voteSum).to.eq(-1))
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+              .its("post")
+              .should((res) => expect(res.voteSum).to.eq(-1))
+          })
         })
     })
   })
@@ -631,9 +643,11 @@ describe("Post vote endpoint", function () {
           expect(res.code).to.eq(200)
           expect(res.successMsg).to.eq("Successfully disliked post")
 
-          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
-            .its("post")
-            .should((res) => expect(res.voteSum).to.eq(-1))
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+              .its("post")
+              .should((res) => expect(res.voteSum).to.eq(-1))
+          })
         })
     })
 
@@ -648,9 +662,11 @@ describe("Post vote endpoint", function () {
           expect(res.code).to.eq(200)
           expect(res.successMsg).to.eq("Successfully liked post")
 
-          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
-            .its("post")
-            .should((res) => expect(res.voteSum).to.eq(1))
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+              .its("post")
+              .should((res) => expect(res.voteSum).to.eq(1))
+          })
         })
     })
   })
@@ -669,9 +685,11 @@ describe("Post vote endpoint", function () {
           expect(res.code).to.eq(200)
           expect(res.successMsg).to.eq("Successfully liked post")
 
-          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
-            .its("post")
-            .should((res) => expect(res.voteSum).to.eq(1))
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+              .its("post")
+              .should((res) => expect(res.voteSum).to.eq(1))
+          })
         })
     })
 
@@ -686,9 +704,11 @@ describe("Post vote endpoint", function () {
           expect(res.code).to.eq(200)
           expect(res.successMsg).to.eq("Successfully unliked post")
 
-          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
-            .its("post")
-            .should((res) => expect(res.voteSum).to.eq(0))
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+              .its("post")
+              .should((res) => expect(res.voteSum).to.eq(0))
+          })
         })
     })
   })
@@ -724,9 +744,11 @@ describe("Post vote endpoint", function () {
           expect(res.code).to.eq(200)
           expect(res.successMsg).to.eq("Successfully undisliked post")
 
-          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
-            .its("post")
-            .should((res) => expect(res.voteSum).to.eq(0))
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+              .its("post")
+              .should((res) => expect(res.voteSum).to.eq(0))
+          })
         })
     })
   })

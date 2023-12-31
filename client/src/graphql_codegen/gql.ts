@@ -18,6 +18,9 @@ const documents = {
     "\n  mutation LoginUsernameTest($input: LoginUsernameInput!) {\n    loginUsername(input: $input) {\n      ... on LoginUsernameSuccess {\n        __typename\n        successMsg\n        user {\n          id\n        }\n        code\n      }\n      ... on Error {\n        __typename\n        errorMsg\n        code\n      }\n    }\n  }\n": types.LoginUsernameTestDocument,
     "\n  mutation LogoutTest {\n    logout {\n      ... on LogoutSuccess {\n        __typename\n        successMsg\n        code\n      }\n    }\n  }\n": types.LogoutTestDocument,
     "\n  query GetCommentTest($input: CommentInput!) {\n    comment(input: $input) {\n      id\n      body\n    }\n  }\n": types.GetCommentTestDocument,
+    "\n  query GetCommunityTest($input: CommunityInput!) {\n    community(input: $input) {\n      id\n      memberCount\n      postCount\n      inCommunity\n      owner {\n        id\n      }\n      title\n      created_at\n      updated_at\n    }\n  }\n": types.GetCommunityTestDocument,
+    "\n  query GetCommunitiesTest($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          id\n          inCommunity\n          owner {\n            id\n          }\n          title\n        }\n      }\n      pageInfo {\n        endCursor {\n          id\n          created_at\n          title\n        }\n        hasNextPage\n      }\n      memberOf\n    }\n  }\n": types.GetCommunitiesTestDocument,
+    "\n  query CommunityTitleExistsTest($title: String!) {\n    titleExists(title: $title)\n  }\n": types.CommunityTitleExistsTestDocument,
     "\n  query GetPostTest($input: PostInput!) {\n    post(input: $input) {\n      id\n      body\n      created_at\n      updated_at\n      title\n      commentCount\n      voteSum\n      voteStatus\n      community {\n        id\n      }\n      owner {\n        id\n      }\n    }\n  }\n": types.GetPostTestDocument,
     "\n  query GetPostsTestDoc($input: PostsInput!) {\n    posts(input: $input) {\n      edges {\n        node {\n          id\n          created_at\n          voteSum\n          community {\n            id\n          }\n          owner {\n            id\n          }\n        }\n      }\n      pageInfo {\n        endCursor {\n          id\n          voteSum\n          created_at\n        }\n        hasNextPage\n      }\n      orderBy\n    }\n  }\n": types.GetPostsTestDocDocument,
     "\n  mutation CreatePostTest($input: CreatePostInput!) {\n    createPost(input: $input) {\n      ... on CreatePostSuccess {\n        __typename\n        successMsg\n        code\n        post {\n          id\n        }\n      }\n      ... on CreatePostInputError {\n        __typename\n        errorMsg\n        code\n        inputErrors {\n          title\n          body\n          communityId\n        }\n      }\n    }\n  }\n": types.CreatePostTestDocument,
@@ -98,6 +101,18 @@ export function graphql(source: "\n  mutation LogoutTest {\n    logout {\n      
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query GetCommentTest($input: CommentInput!) {\n    comment(input: $input) {\n      id\n      body\n    }\n  }\n"): (typeof documents)["\n  query GetCommentTest($input: CommentInput!) {\n    comment(input: $input) {\n      id\n      body\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetCommunityTest($input: CommunityInput!) {\n    community(input: $input) {\n      id\n      memberCount\n      postCount\n      inCommunity\n      owner {\n        id\n      }\n      title\n      created_at\n      updated_at\n    }\n  }\n"): (typeof documents)["\n  query GetCommunityTest($input: CommunityInput!) {\n    community(input: $input) {\n      id\n      memberCount\n      postCount\n      inCommunity\n      owner {\n        id\n      }\n      title\n      created_at\n      updated_at\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetCommunitiesTest($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          id\n          inCommunity\n          owner {\n            id\n          }\n          title\n        }\n      }\n      pageInfo {\n        endCursor {\n          id\n          created_at\n          title\n        }\n        hasNextPage\n      }\n      memberOf\n    }\n  }\n"): (typeof documents)["\n  query GetCommunitiesTest($input: CommunitiesInput!) {\n    communities(input: $input) {\n      edges {\n        node {\n          id\n          inCommunity\n          owner {\n            id\n          }\n          title\n        }\n      }\n      pageInfo {\n        endCursor {\n          id\n          created_at\n          title\n        }\n        hasNextPage\n      }\n      memberOf\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query CommunityTitleExistsTest($title: String!) {\n    titleExists(title: $title)\n  }\n"): (typeof documents)["\n  query CommunityTitleExistsTest($title: String!) {\n    titleExists(title: $title)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

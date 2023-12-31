@@ -305,6 +305,7 @@ export type CreatePostResult = CreatePostInputError | CreatePostSuccess;
 export type CreatePostSuccess = Success & {
   __typename?: 'CreatePostSuccess';
   code: Scalars['Int']['output'];
+  post: Post;
   successMsg: Scalars['String']['output'];
 };
 
@@ -923,7 +924,7 @@ export type ResolversUnionTypes<RefType extends Record<string, unknown>> = Resol
   CreateCommentReplyResult: ( CreateCommentReplyInputError ) | ( CreateCommentReplySuccess );
   CreateCommentResult: ( CreateCommentInputError ) | ( CreateCommentSuccess );
   CreateCommunityResult: ( CreateCommunityInputError ) | ( CreateCommunitySuccess );
-  CreatePostResult: ( CreatePostInputError ) | ( CreatePostSuccess );
+  CreatePostResult: ( CreatePostInputError ) | ( Omit<CreatePostSuccess, 'post'> & { post: RefType['Post'] } );
   DeleteCommentResult: ( DeleteCommentSuccess );
   DeleteCommunityResult: ( DeleteCommunityInputError ) | ( DeleteCommunitySuccess );
   DeletePostResult: ( DeletePostSuccess );
@@ -941,7 +942,7 @@ export type ResolversUnionTypes<RefType extends Record<string, unknown>> = Resol
 /** Mapping of interface types */
 export type ResolversInterfaceTypes<RefType extends Record<string, unknown>> = ResolversObject<{
   Error: ( ChangeCommunityTitleInputError ) | ( ChangePasswordInputError ) | ( ChangeUsernameInputError ) | ( CreateCommentInputError ) | ( CreateCommentReplyInputError ) | ( CreateCommunityInputError ) | ( CreatePostInputError ) | ( DeleteCommunityInputError ) | ( DeleteUserInputError ) | ( EditCommentInputError ) | ( EditPostInputError ) | ( LoginUsernameInputError ) | ( RegisterUsernameInputError );
-  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( Omit<ChangeCommunityTitleSuccess, 'community'> & { community: RefType['Community'] } ) | ( ChangePasswordSuccess ) | ( Omit<ChangeUsernameSuccess, 'user'> & { user: RefType['User'] } ) | ( CreateCommentReplySuccess ) | ( CreateCommentSuccess ) | ( CreateCommunitySuccess ) | ( CreatePostSuccess ) | ( DeleteCommentSuccess ) | ( DeleteCommunitySuccess ) | ( DeletePostSuccess ) | ( DeleteUserSuccess ) | ( Omit<EditCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<EditPostSuccess, 'post'> & { post: RefType['Post'] } ) | ( Omit<LoginUsernameSuccess, 'user'> & { user: RefType['User'] } ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } ) | ( Omit<VoteCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<VotePostSuccess, 'post'> & { post: RefType['Post'] } );
+  Success: ( Omit<AuthUserSuccess, 'user'> & { user?: Maybe<RefType['User']> } ) | ( Omit<ChangeCommunityTitleSuccess, 'community'> & { community: RefType['Community'] } ) | ( ChangePasswordSuccess ) | ( Omit<ChangeUsernameSuccess, 'user'> & { user: RefType['User'] } ) | ( CreateCommentReplySuccess ) | ( CreateCommentSuccess ) | ( CreateCommunitySuccess ) | ( Omit<CreatePostSuccess, 'post'> & { post: RefType['Post'] } ) | ( DeleteCommentSuccess ) | ( DeleteCommunitySuccess ) | ( DeletePostSuccess ) | ( DeleteUserSuccess ) | ( Omit<EditCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<EditPostSuccess, 'post'> & { post: RefType['Post'] } ) | ( Omit<LoginUsernameSuccess, 'user'> & { user: RefType['User'] } ) | ( LogoutSuccess ) | ( RegisterUsernameSuccess ) | ( Omit<UserJoinCommunitySuccess, 'community'> & { community: RefType['Community'] } ) | ( Omit<VoteCommentSuccess, 'comment'> & { comment: RefType['Comment'] } ) | ( Omit<VotePostSuccess, 'post'> & { post: RefType['Post'] } );
 }>;
 
 /** Mapping between all available schema types and the resolvers types */
@@ -997,7 +998,7 @@ export type ResolversTypes = ResolversObject<{
   CreatePostInputError: ResolverTypeWrapper<CreatePostInputError>;
   CreatePostInputErrors: ResolverTypeWrapper<CreatePostInputErrors>;
   CreatePostResult: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['CreatePostResult']>;
-  CreatePostSuccess: ResolverTypeWrapper<CreatePostSuccess>;
+  CreatePostSuccess: ResolverTypeWrapper<Omit<CreatePostSuccess, 'post'> & { post: ResolversTypes['Post'] }>;
   Cursor: ResolverTypeWrapper<Cursor>;
   CursorInput: CursorInput;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
@@ -1125,7 +1126,7 @@ export type ResolversParentTypes = ResolversObject<{
   CreatePostInputError: CreatePostInputError;
   CreatePostInputErrors: CreatePostInputErrors;
   CreatePostResult: ResolversUnionTypes<ResolversParentTypes>['CreatePostResult'];
-  CreatePostSuccess: CreatePostSuccess;
+  CreatePostSuccess: Omit<CreatePostSuccess, 'post'> & { post: ResolversParentTypes['Post'] };
   Cursor: Cursor;
   CursorInput: CursorInput;
   DateTime: Scalars['DateTime']['output'];
@@ -1419,6 +1420,7 @@ export type CreatePostResultResolvers<ContextType = Context, ParentType extends 
 
 export type CreatePostSuccessResolvers<ContextType = Context, ParentType extends ResolversParentTypes['CreatePostSuccess'] = ResolversParentTypes['CreatePostSuccess']> = ResolversObject<{
   code?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  post?: Resolver<ResolversTypes['Post'], ParentType, ContextType>;
   successMsg?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;

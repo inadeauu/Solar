@@ -49,3 +49,78 @@ export const getPostsTestDoc = graphql(/* GraphQL */ `
     }
   }
 `)
+
+export const createPostTestDoc = graphql(/* GraphQL */ `
+  mutation CreatePostTest($input: CreatePostInput!) {
+    createPost(input: $input) {
+      ... on CreatePostSuccess {
+        __typename
+        successMsg
+        code
+        post {
+          id
+        }
+      }
+      ... on CreatePostInputError {
+        __typename
+        errorMsg
+        code
+        inputErrors {
+          title
+          body
+          communityId
+        }
+      }
+    }
+  }
+`)
+
+export const votePostTestDoc = graphql(/* GraphQL */ `
+  mutation VotePostTest($input: VotePostInput!) {
+    votePost(input: $input) {
+      ... on VotePostSuccess {
+        successMsg
+        code
+        post {
+          id
+        }
+      }
+    }
+  }
+`)
+
+export const editPostTestDoc = graphql(/* GraphQL */ `
+  mutation EditPostTest($input: EditPostInput!) {
+    editPost(input: $input) {
+      ... on EditPostSuccess {
+        __typename
+        successMsg
+        code
+        post {
+          id
+        }
+      }
+      ... on EditPostInputError {
+        __typename
+        errorMsg
+        code
+        inputErrors {
+          title
+          body
+        }
+      }
+    }
+  }
+`)
+
+export const deletePostTestDoc = graphql(/* GraphQL */ `
+  mutation DeletePostTest($input: DeletePostInput!) {
+    deletePost(input: $input) {
+      ... on DeletePostSuccess {
+        __typename
+        successMsg
+        code
+      }
+    }
+  }
+`)

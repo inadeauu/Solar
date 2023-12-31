@@ -346,7 +346,7 @@ describe("Comment card", function () {
   })
 })
 
-describe.only("Comment feed", function () {
+describe("Comment feed", function () {
   beforeEach(function () {
     cy.visit("/profile/username1")
     cy.get('[data-testid="profile-feed-tabs"]').children().as("tabs")

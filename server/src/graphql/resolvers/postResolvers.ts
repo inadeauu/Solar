@@ -27,8 +27,7 @@ export const resolvers: Resolvers = {
         })
       }
 
-      const titleError =
-        args.input.title.trim().length == 0 || args.input.title.length > 200
+      const titleError = args.input.title.trim().length == 0 || args.input.title.length > 200
       const bodyError = args.input.body && args.input.body.length > 20000
       const community = await prisma.community.findUnique({
         where: { id: args.input.communityId },
@@ -40,23 +39,19 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            title: titleError
-              ? "Title must be between 1 and 200 characters long"
-              : null,
-            body: bodyError
-              ? "Body must be less than 20,000 characters long"
-              : null,
+            title: titleError ? "Title must be between 1 and 200 characters long" : null,
+            body: bodyError ? "Body must be less than 20,000 characters long" : null,
             communityId: !community ? "Invalid community ID" : null,
           },
         }
       }
 
-      await prisma.post.create({
+      const newPost = await prisma.post.create({
         data: {
           userId: req.session.userId,
           communityId: args.input.communityId,
           title: args.input.title,
-          body: args.input.body,
+          body: args.input.body ?? "",
         },
       })
 
@@ -64,6 +59,7 @@ export const resolvers: Resolvers = {
         __typename: "CreatePostSuccess",
         successMsg: "Successfully created post",
         code: 200,
+        post: newPost,
       }
     },
     votePost: async (_0, args, { req }) => {
@@ -110,10 +106,7 @@ export const resolvers: Resolvers = {
           },
         })
         successMsg = "Successfully " + doMsg + " post"
-      } else if (
-        (postVote.like == 1 && args.input.like) ||
-        (postVote.like == -1 && !args.input.like)
-      ) {
+      } else if ((postVote.like == 1 && args.input.like) || (postVote.like == -1 && !args.input.like)) {
         updatedPost = await prisma.post.update({
           where: { id: args.input.postId },
           data: {
@@ -187,8 +180,7 @@ export const resolvers: Resolvers = {
         })
       }
 
-      const titleError =
-        args.input.title.trim().length == 0 || args.input.title.length > 200
+      const titleError = args.input.title.trim().length == 0 || args.input.title.length > 200
       const bodyError = args.input.body && args.input.body.length > 20000
 
       if (titleError || bodyError) {
@@ -197,12 +189,8 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            title: titleError
-              ? "Title must be between 1 and 200 characters long"
-              : null,
-            body: bodyError
-              ? "Body must be less than 20,000 characters long"
-              : null,
+            title: titleError ? "Title must be between 1 and 200 characters long" : null,
+            body: bodyError ? "Body must be less than 20,000 characters long" : null,
           },
         }
       }
@@ -265,16 +253,12 @@ export const resolvers: Resolvers = {
   },
   Post: {
     owner: async (post) => {
-      const owner = (await prisma.post
-        .findUnique({ where: { id: post.id } })
-        .owner())!
+      const owner = (await prisma.post.findUnique({ where: { id: post.id } }).owner())!
 
       return owner
     },
     community: async (post) => {
-      const community = (await prisma.post
-        .findUnique({ where: { id: post.id } })
-        .community())!
+      const community = (await prisma.post.findUnique({ where: { id: post.id } }).community())!
 
       return community
     },

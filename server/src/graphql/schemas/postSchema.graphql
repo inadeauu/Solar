@@ -56,6 +56,7 @@ input CreatePostInput {
 type CreatePostSuccess implements Success {
   successMsg: String!
   code: Int!
+  post: Post!
 }
 
 type CreatePostInputError implements Error {

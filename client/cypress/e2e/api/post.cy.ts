@@ -1,7 +1,14 @@
 import { ClientError } from "graphql-request"
 import { GetPostsTestDocQuery, PostOrderByType, VoteStatus } from "../../../src/graphql_codegen/graphql"
 import { graphQLClient } from "../../../src/utils/graphql"
-import { getPostTestDoc, getPostsTestDoc } from "../../utils/graphql/postGraphQL"
+import {
+  createPostTestDoc,
+  deletePostTestDoc,
+  editPostTestDoc,
+  getPostTestDoc,
+  getPostsTestDoc,
+  votePostTestDoc,
+} from "../../utils/graphql/postGraphQL"
 import {
   hasDecreasingVoteSumOrdering,
   hasIncreasingVoteSumOrdering,
@@ -256,36 +263,6 @@ describe("Posts endpoint", function () {
     })
   })
 
-  describe("Single filters", function () {
-    it("Check community id filter", function () {
-      cy.wrap(
-        graphQLClient.request(getPostsTestDoc, {
-          input: {
-            paginate: { first: 5 },
-            filters: { orderBy: PostOrderByType.New, communityId: "351146cd-1612-4a44-94da-e33d27bedf39" },
-          },
-        })
-      )
-        .its("posts")
-        .should((res) => expect(res.edges.length).to.eq(5))
-        .should((res) => expect(hasSameCommunityId(res.edges, "351146cd-1612-4a44-94da-e33d27bedf39")).to.be.true)
-    })
-
-    it("Check user id filter", function () {
-      cy.wrap(
-        graphQLClient.request(getPostsTestDoc, {
-          input: {
-            paginate: { first: 5 },
-            filters: { orderBy: PostOrderByType.New, userId: "8d2efb36-a726-425c-ad12-98f2683c5d86" },
-          },
-        })
-      )
-        .its("posts")
-        .should((res) => expect(res.edges.length).eq(5))
-        .should((res) => expect(hasSameOwnerId(res.edges, "8d2efb36-a726-425c-ad12-98f2683c5d86")).to.be.true)
-    })
-  })
-
   describe("Combining filters", function () {
     it("Check old ordering & community id", function () {
       cy.wrap(
@@ -446,6 +423,522 @@ describe("Posts endpoint", function () {
           },
         })
       )
+    })
+  })
+})
+
+describe("Create post endpoint", function () {
+  it("Check not signed in error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
+        expect(error.response.errors[0].message).to.eq("Not signed in")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.wrap(
+      graphQLClient.request(createPostTestDoc, {
+        input: { communityId: "351146cd-1612-4a44-94da-e33d27bedf39", title: "Post title", body: "Post body" },
+      })
+    )
+  })
+
+  it("Check invalid input responses", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(createPostTestDoc, {
+          input: { communityId: "abc", title: "", body: "A".repeat(21000) },
+        })
+      )
+        .its("createPost")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.title).to.eq("Title must be between 1 and 200 characters long"))
+        .should((res) => expect(res.inputErrors.body).to.eq("Body must be less than 20,000 characters long"))
+        .should((res) => expect(res.inputErrors.communityId).to.eq("Invalid community ID"))
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(createPostTestDoc, {
+          input: { communityId: "351146cd-1612-4a44-94da-e33d27bedf39", title: "A".repeat(201) },
+        })
+      )
+        .its("createPost")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.title).to.eq("Title must be between 1 and 200 characters long"))
+        .should((res) => expect(res.inputErrors.body).to.eq(null))
+        .should((res) => expect(res.inputErrors.communityId).to.eq(null))
+    })
+  })
+
+  it("Check post successfully created", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(createPostTestDoc, {
+          input: { communityId: "351146cd-1612-4a44-94da-e33d27bedf39", title: "Post title", body: "Post body" },
+        })
+      )
+        .its("createPost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully created post")
+
+          cy.then(() => {
+            cy.wrap(
+              graphQLClient.request(getPostTestDoc, {
+                input: {
+                  id: res.post.id,
+                },
+              })
+            )
+              .its("post")
+              .should((res) => expect(res.title).to.eq("Post title"))
+              .should((res) => expect(res.body).to.eq("Post body"))
+          })
+        })
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(createPostTestDoc, {
+          input: { communityId: "351146cd-1612-4a44-94da-e33d27bedf39", title: "Post, no body" },
+        })
+      )
+        .its("createPost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully created post")
+
+          cy.then(() => {
+            cy.wrap(
+              graphQLClient.request(getPostTestDoc, {
+                input: {
+                  id: res.post.id,
+                },
+              })
+            )
+              .its("post")
+              .should((res) => expect(res.title).to.eq("Post, no body"))
+              .should((res) => expect(res.body).to.eq(""))
+          })
+        })
+    })
+  })
+})
+
+describe("Post vote endpoint", function () {
+  it("Check not signed in error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
+        expect(error.response.errors[0].message).to.eq("Not signed in")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.wrap(
+      graphQLClient.request(votePostTestDoc, {
+        input: { postId: "abc", like: true },
+      })
+    )
+  })
+
+  it("Check post doesn't exist error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("INTERNAL_SERVER_ERROR")
+        expect(error.response.errors[0].message).to.eq("Post does not exist")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "abc", like: true },
+        })
+      )
+    })
+  })
+
+  it("Check post upvote then downvote", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3", like: true },
+        })
+      )
+        .its("votePost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully liked post")
+
+          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+            .its("post")
+            .should((res) => expect(res.voteSum).to.eq(1))
+        })
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3", like: false },
+        })
+      )
+        .its("votePost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully disliked post")
+
+          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+            .its("post")
+            .should((res) => expect(res.voteSum).to.eq(-1))
+        })
+    })
+  })
+
+  it("Check post downvote then upvote", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3", like: false },
+        })
+      )
+        .its("votePost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully disliked post")
+
+          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+            .its("post")
+            .should((res) => expect(res.voteSum).to.eq(-1))
+        })
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3", like: true },
+        })
+      )
+        .its("votePost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully liked post")
+
+          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+            .its("post")
+            .should((res) => expect(res.voteSum).to.eq(1))
+        })
+    })
+  })
+
+  it("Check post upvote then reversal", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3", like: true },
+        })
+      )
+        .its("votePost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully liked post")
+
+          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+            .its("post")
+            .should((res) => expect(res.voteSum).to.eq(1))
+        })
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3", like: true },
+        })
+      )
+        .its("votePost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully unliked post")
+
+          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+            .its("post")
+            .should((res) => expect(res.voteSum).to.eq(0))
+        })
+    })
+  })
+
+  it("Check post downvote then reversal", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3", like: false },
+        })
+      )
+        .its("votePost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully disliked post")
+
+          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+            .its("post")
+            .should((res) => expect(res.voteSum).to.eq(-1))
+        })
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(votePostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3", like: false },
+        })
+      )
+        .its("votePost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully undisliked post")
+
+          cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" } }))
+            .its("post")
+            .should((res) => expect(res.voteSum).to.eq(0))
+        })
+    })
+  })
+})
+
+describe("Edit post endpoint", function () {
+  it("Check not signed in error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
+        expect(error.response.errors[0].message).to.eq("Not signed in")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.wrap(
+      graphQLClient.request(editPostTestDoc, {
+        input: { postId: "abc", title: "new title", body: "new body" },
+      })
+    )
+  })
+
+  it("Check post does not exist error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("INTERNAL_SERVER_ERROR")
+        expect(error.response.errors[0].message).to.eq("Post does not exist")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(editPostTestDoc, {
+          input: { postId: "abc", title: "new title", body: "new body" },
+        })
+      )
+    })
+  })
+
+  it("Check error if user who doesn't own post tries to edit it", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHORIZED")
+        expect(error.response.errors[0].message).to.eq("Unauthorized")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(editPostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3", title: "new title", body: "new body" },
+        })
+      )
+    })
+  })
+
+  it("Check invalid input responses", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(editPostTestDoc, {
+          input: { postId: "7dc6c6fe-e2d3-4b60-9d26-4cd81c1b8dd2", title: "", body: "A".repeat(21000) },
+        })
+      )
+        .its("editPost")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.title).to.eq("Title must be between 1 and 200 characters long"))
+        .should((res) => expect(res.inputErrors.body).to.eq("Body must be less than 20,000 characters long"))
+    })
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(editPostTestDoc, {
+          input: { postId: "7dc6c6fe-e2d3-4b60-9d26-4cd81c1b8dd2", title: "A".repeat(210), body: "" },
+        })
+      )
+        .its("editPost")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
+        .should((res) => expect(res.inputErrors.title).to.eq("Title must be between 1 and 200 characters long"))
+        .should((res) => expect(res.inputErrors.body).to.eq(null))
+    })
+  })
+
+  it("Check successfully edits post", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(editPostTestDoc, {
+          input: { postId: "7dc6c6fe-e2d3-4b60-9d26-4cd81c1b8dd2", title: "New post title", body: "New post body" },
+        })
+      )
+        .its("editPost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully edited post")
+
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "7dc6c6fe-e2d3-4b60-9d26-4cd81c1b8dd2" } }))
+              .its("post")
+              .should((res) => expect(res.title).to.eq("New post title"))
+              .should((res) => expect(res.body).to.eq("New post body"))
+          })
+        })
+    })
+  })
+})
+
+describe("Delete post endpoint", function () {
+  it("Check not signed in error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
+        expect(error.response.errors[0].message).to.eq("Not signed in")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.wrap(
+      graphQLClient.request(deletePostTestDoc, {
+        input: { postId: "7dc6c6fe-e2d3-4b60-9d26-4cd81c1b8dd2" },
+      })
+    )
+  })
+
+  it("Check post does not exist error response", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("INTERNAL_SERVER_ERROR")
+        expect(error.response.errors[0].message).to.eq("Post does not exist")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(deletePostTestDoc, {
+          input: { postId: "abc" },
+        })
+      )
+    })
+  })
+
+  it("Check error if user who doesn't own post tries to delete it", function () {
+    cy.on("fail", (error) => {
+      if (error instanceof ClientError) {
+        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHORIZED")
+        expect(error.response.errors[0].message).to.eq("Unauthorized")
+        return
+      }
+
+      throw new Error("Uncaught error (should not be reached)")
+    })
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(deletePostTestDoc, {
+          input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" },
+        })
+      )
+    })
+  })
+
+  it("Check successfully deletes post", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(deletePostTestDoc, {
+          input: { postId: "f19afc1b-1a61-4f93-b2b5-ce87d499feee" },
+        })
+      )
+        .its("deletePost")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully deleted post")
+
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getPostTestDoc, { input: { id: "f19afc1b-1a61-4f93-b2b5-ce87d499feee" } }))
+              .its("post")
+              .should("eq", null)
+          })
+        })
     })
   })
 })

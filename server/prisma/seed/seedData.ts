@@ -25,6 +25,14 @@ export const users = [
     created_at: "2022-02-24T16:42:12.432Z",
     updated_at: "2022-02-24T16:42:12.432Z",
   },
+  {
+    id: "54d3c81b-c3a2-4a41-b18c-f426ccd485ff",
+    username: "random",
+    password: "$2b$10$BRCtrv3HsQUkCnMJoaSOWewJG3OpaTTggJGZLQzib1Wj69qb5rx16",
+    provider: Provider.USERNAME,
+    created_at: "2022-02-28T16:42:12.432Z",
+    updated_at: "2022-02-28T16:42:12.432Z",
+  },
 ]
 
 export const communities = [

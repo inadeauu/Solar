@@ -37,7 +37,7 @@ describe("Post", function () {
     cy.get('[data-testid="post-1-title"]').should("have.text", "Post 5")
     cy.get('[data-testid="post-1-body"]').should("have.text", "Post body 5")
 
-    cy.get('[data-testid="post-0-vote-sum"]').should("have.text", "-2")
+    cy.get('[data-testid="post-0-vote-sum"]').should("have.text", "-1")
     cy.get('[data-testid="post-0-comment-count"]').should("have.text", "2")
   })
 
@@ -79,14 +79,14 @@ describe("Post", function () {
   })
 
   it("Check upvoting and downvoting works", function () {
-    cy.setCookie("test-user", "266c189f-5986-404a-9889-0a54c298acb2")
+    cy.setCookie("test-user", "54d3c81b-c3a2-4a41-b18c-f426ccd485ff")
     cy.visit("/")
 
     cy.get('[data-testid="post-0-upvote-icon"]').should("not.exist")
     cy.get('[data-testid="post-0-downvote-icon"]').should("not.exist")
 
     cy.get('[data-testid="post-0-upvote"]').as("upvote-button").click()
-    cy.get('[data-testid="post-0-vote-sum"]').as("vote-sum").should("have.text", "-1")
+    cy.get('[data-testid="post-0-vote-sum"]').as("vote-sum").should("have.text", "0")
     cy.get('[data-testid="post-0-upvote-icon"]').as("upvote-icon").should("have.css", "color", "rgb(7, 219, 53)")
     cy.wait("@gqlVotePostMutation")
 
@@ -94,11 +94,11 @@ describe("Post", function () {
     cy.get("@upvote-icon").should("exist")
 
     cy.get("@upvote-button").click()
-    cy.get("@vote-sum").should("have.text", "-2")
+    cy.get("@vote-sum").should("have.text", "-1")
     cy.wait("@gqlVotePostMutation")
 
     cy.get('[data-testid="post-0-downvote"]').as("downvote-button").click()
-    cy.get("@vote-sum").should("have.text", "-3")
+    cy.get("@vote-sum").should("have.text", "-2")
     cy.get('[data-testid="post-0-downvote-icon"]').as("downvote-icon").should("have.css", "color", "rgb(239, 68, 68)")
     cy.wait("@gqlVotePostMutation")
 
@@ -106,22 +106,22 @@ describe("Post", function () {
     cy.get("@downvote-icon").should("exist")
 
     cy.get("@downvote-button").click()
-    cy.get("@vote-sum").should("have.text", "-2")
-    cy.wait("@gqlVotePostMutation")
-
-    cy.get("@downvote-button").click()
-    cy.get("@upvote-button").click()
     cy.get("@vote-sum").should("have.text", "-1")
     cy.wait("@gqlVotePostMutation")
 
     cy.get("@downvote-button").click()
-    cy.get("@vote-sum").should("have.text", "-3")
+    cy.get("@upvote-button").click()
+    cy.get("@vote-sum").should("have.text", "0")
+    cy.wait("@gqlVotePostMutation")
+
+    cy.get("@downvote-button").click()
+    cy.get("@vote-sum").should("have.text", "-2")
     cy.wait("@gqlVotePostMutation")
   })
 
   describe("Success and error combos (optimistic updates)", function () {
     beforeEach(function () {
-      cy.setCookie("test-user", "266c189f-5986-404a-9889-0a54c298acb2")
+      cy.setCookie("test-user", "54d3c81b-c3a2-4a41-b18c-f426ccd485ff")
       cy.visit("/")
     })
 
@@ -133,10 +133,10 @@ describe("Post", function () {
       })
 
       cy.get('[data-testid="post-0-upvote"]').click()
-      cy.get('[data-testid="post-0-vote-sum"]').as("vote-sum").should("have.text", "-2")
+      cy.get('[data-testid="post-0-vote-sum"]').as("vote-sum").should("have.text", "-1")
 
       cy.get('[data-testid="post-0-downvote"]').click()
-      cy.get("@vote-sum").should("have.text", "-2")
+      cy.get("@vote-sum").should("have.text", "-1")
     })
 
     it("Upvote error + upvote success + downvote error", function () {
@@ -156,7 +156,7 @@ describe("Post", function () {
       cy.get("@upvote").click()
       cy.get('[data-testid="post-0-downvote"]').click()
 
-      cy.get('[data-testid="post-0-vote-sum"]').should("have.text", "-1")
+      cy.get('[data-testid="post-0-vote-sum"]').should("have.text", "0")
     })
 
     it("Upvote success + downvote error + downvote success", function () {
@@ -176,7 +176,7 @@ describe("Post", function () {
       cy.get('[data-testid="post-0-downvote"]').as("downvote").click()
       cy.get("@downvote").click()
 
-      cy.get('[data-testid="post-0-vote-sum"]').should("have.text", "-3")
+      cy.get('[data-testid="post-0-vote-sum"]').should("have.text", "-2")
     })
 
     it("Downvote success + upvote error + upvote success", function () {
@@ -195,7 +195,7 @@ describe("Post", function () {
       cy.get('[data-testid="post-0-downvote"]').click()
       cy.get('[data-testid="post-0-upvote"]').as("upvote").click()
       cy.get("@upvote").click()
-      cy.get('[data-testid="post-0-vote-sum"]').as("vote-sum").should("have.text", "-1")
+      cy.get('[data-testid="post-0-vote-sum"]').as("vote-sum").should("have.text", "0")
     })
   })
 })

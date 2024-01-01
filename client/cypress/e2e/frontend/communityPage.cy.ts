@@ -318,7 +318,7 @@ describe("Post", function () {
     cy.get('[data-testid="community-post-1-title"]').should("have.text", "Post 2")
     cy.get('[data-testid="community-post-1-body"]').should("have.text", "Post body 2")
 
-    cy.get('[data-testid="community-post-0-vote-sum"]').should("have.text", "-2")
+    cy.get('[data-testid="community-post-0-vote-sum"]').should("have.text", "-1")
     cy.get('[data-testid="community-post-0-comment-count"]').should("have.text", "2")
   })
 

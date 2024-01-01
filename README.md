@@ -17,6 +17,10 @@
   </ol>
 </ol>
 
+
+<h2>Testing</h2>
+<p>Front end and back end testing completed using Cypress. The tests are located at client/cypress/e2e. Database seeding materials are located at server/prisma/seed.</p>
+
 <h2>Demo</h2>
 <p>Click here to view a demo of the website.</p>
 https://github.com/inadeauu/solar/assets/123025115/dec62bce-0611-4c19-80fc-98efce12cac5

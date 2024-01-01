@@ -1,5 +1,4 @@
-import { ClientError } from "graphql-request"
-import { GetPostsTestDocQuery, PostOrderByType, VoteStatus } from "../../../src/graphql_codegen/graphql"
+import { GetPostsTestQuery, PostOrderByType, VoteStatus } from "../../../src/graphql_codegen/graphql"
 import { graphQLClient } from "../../../src/utils/graphql"
 import {
   createPostTestDoc,
@@ -8,8 +7,9 @@ import {
   getPostTestDoc,
   getPostsTestDoc,
   votePostTestDoc,
-} from "../../utils/graphql/postGraphQL"
+} from "../../utils/graphqlDocs/postGraphQL"
 import {
+  cypressCheckOnFail,
   hasDecreasingVoteSumOrdering,
   hasIncreasingVoteSumOrdering,
   hasNewOrdering,
@@ -18,13 +18,15 @@ import {
   hasSameOwnerId,
   nodeIdsUnique,
 } from "../../utils/utils"
-import { aliasMutation } from "../../utils/graphqlTest"
+import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
   cy.exec("npm --prefix ../server run seed")
 
   cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+    aliasQuery(req, "GetPostsTest")
+
     aliasMutation(req, "CreatePostTest")
     aliasMutation(req, "VotePostTest")
     aliasMutation(req, "EditPostTest")
@@ -84,8 +86,8 @@ describe("Post endpoint", function () {
 describe("Posts endpoint", function () {
   describe("Pagination & ordering", function () {
     it("Check pagination + new ordering", function () {
-      let posts: GetPostsTestDocQuery["posts"]["edges"] = []
-      let afterCursor: GetPostsTestDocQuery["posts"]["pageInfo"]["endCursor"]
+      let posts: GetPostsTestQuery["posts"]["edges"] = []
+      let afterCursor: GetPostsTestQuery["posts"]["pageInfo"]["endCursor"]
 
       cy.then(() => {
         cy.wrap(
@@ -133,8 +135,8 @@ describe("Posts endpoint", function () {
     })
 
     it("Check pagination + old ordering", function () {
-      let posts: GetPostsTestDocQuery["posts"]["edges"] = []
-      let afterCursor: GetPostsTestDocQuery["posts"]["pageInfo"]["endCursor"]
+      let posts: GetPostsTestQuery["posts"]["edges"] = []
+      let afterCursor: GetPostsTestQuery["posts"]["pageInfo"]["endCursor"]
 
       cy.then(() => {
         cy.wrap(
@@ -182,8 +184,8 @@ describe("Posts endpoint", function () {
     })
 
     it("Check pagination + increasing vote count ordering", function () {
-      let posts: GetPostsTestDocQuery["posts"]["edges"] = []
-      let afterCursor: GetPostsTestDocQuery["posts"]["pageInfo"]["endCursor"]
+      let posts: GetPostsTestQuery["posts"]["edges"] = []
+      let afterCursor: GetPostsTestQuery["posts"]["pageInfo"]["endCursor"]
 
       cy.then(() => {
         cy.wrap(
@@ -231,8 +233,8 @@ describe("Posts endpoint", function () {
     })
 
     it("Check pagination + decreasing vote count ordering", function () {
-      let posts: GetPostsTestDocQuery["posts"]["edges"] = []
-      let afterCursor: GetPostsTestDocQuery["posts"]["pageInfo"]["endCursor"]
+      let posts: GetPostsTestQuery["posts"]["edges"] = []
+      let afterCursor: GetPostsTestQuery["posts"]["pageInfo"]["endCursor"]
 
       cy.then(() => {
         cy.wrap(
@@ -334,128 +336,128 @@ describe("Posts endpoint", function () {
 
   describe("Pagination input validation - Take", function () {
     beforeEach(function () {
-      cy.on("fail", (error) => {
-        if (error instanceof ClientError) {
-          if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-          expect(error.response.errors[0].extensions.code).to.eq("PAGINATION_ERROR")
-          expect(error.response.errors[0].message).to.eq("First must be between 0 and 100")
-          return
-        }
-
-        throw new Error("Uncaught error (should not be reached)")
-      })
+      cypressCheckOnFail("PAGINATION_ERROR", "First must be between 0 and 100")
     })
 
     it("Check error with negative amount", function () {
-      cy.wrap(
-        graphQLClient.request(getPostsTestDoc, {
-          input: {
-            paginate: { first: -2 },
-            filters: { orderBy: PostOrderByType.New },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getPostsTestDoc, {
+            input: {
+              paginate: { first: -2 },
+              filters: { orderBy: PostOrderByType.New },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetPostsTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
 
     it("Check error with amount over 100", function () {
-      cy.wrap(
-        graphQLClient.request(getPostsTestDoc, {
-          input: {
-            paginate: { first: 110 },
-            filters: { orderBy: PostOrderByType.New },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getPostsTestDoc, {
+            input: {
+              paginate: { first: 110 },
+              filters: { orderBy: PostOrderByType.New },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetPostsTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
   })
 
   describe("Pagination input validation - check error if no 'created at' supplied with a cursor & new/old ordering", function () {
     beforeEach(function () {
-      cy.on("fail", (error) => {
-        if (error instanceof ClientError) {
-          if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-          expect(error.response.errors[0].extensions.code).to.eq("PAGINATION_ERROR")
-          expect(error.response.errors[0].message).to.eq("Created at must be specified with cursor")
-          return
-        }
-
-        throw new Error("Uncaught error (should not be reached)")
-      })
+      cypressCheckOnFail("PAGINATION_ERROR", "Created at must be specified with cursor")
     })
 
     it("Check new ordering", function () {
-      cy.wrap(
-        graphQLClient.request(getPostsTestDoc, {
-          input: {
-            filters: { orderBy: PostOrderByType.New },
-            paginate: { first: 5, after: { id: "abc" } },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getPostsTestDoc, {
+            input: {
+              filters: { orderBy: PostOrderByType.New },
+              paginate: { first: 5, after: { id: "abc" } },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetPostsTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
 
     it("Check old ordering", function () {
-      cy.wrap(
-        graphQLClient.request(getPostsTestDoc, {
-          input: {
-            filters: { orderBy: PostOrderByType.Old },
-            paginate: { first: 5, after: { id: "abc" } },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getPostsTestDoc, {
+            input: {
+              filters: { orderBy: PostOrderByType.Old },
+              paginate: { first: 5, after: { id: "abc" } },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetPostsTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
   })
 
   describe("Pagination input validation - check error if no 'vote sum' supplied with a cursor & low/top ordering", function () {
     beforeEach(function () {
-      cy.on("fail", (error) => {
-        if (error instanceof ClientError) {
-          if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-          expect(error.response.errors[0].extensions.code).to.eq("PAGINATION_ERROR")
-          expect(error.response.errors[0].message).to.eq("Vote sum must be specified with cursor")
-          return
-        }
-
-        throw new Error("Uncaught error (should not be reached)")
-      })
+      cypressCheckOnFail("PAGINATION_ERROR", "Vote sum must be specified with cursor")
     })
 
     it("Check low ordering", function () {
-      cy.wrap(
-        graphQLClient.request(getPostsTestDoc, {
-          input: {
-            filters: { orderBy: PostOrderByType.Low },
-            paginate: { first: 5, after: { id: "abc" } },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getPostsTestDoc, {
+            input: {
+              filters: { orderBy: PostOrderByType.Low },
+              paginate: { first: 5, after: { id: "abc" } },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetPostsTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
 
     it("Check top ordering", function () {
-      cy.wrap(
-        graphQLClient.request(getPostsTestDoc, {
-          input: {
-            filters: { orderBy: PostOrderByType.Top },
-            paginate: { first: 5, after: { id: "abc" } },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getPostsTestDoc, {
+            input: {
+              filters: { orderBy: PostOrderByType.Top },
+              paginate: { first: 5, after: { id: "abc" } },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetPostsTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
   })
 })
 
 describe("Create post endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(
@@ -476,7 +478,7 @@ describe("Create post endpoint", function () {
     cy.then(() => {
       cy.wrap(
         graphQLClient.request(createPostTestDoc, {
-          input: { communityId: "abc", title: "", body: "A".repeat(21000) },
+          input: { communityId: "abc", title: "  ", body: "A".repeat(21000) },
         })
       )
         .its("createPost")
@@ -561,16 +563,7 @@ describe("Create post endpoint", function () {
 
 describe("Post vote endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(
@@ -586,16 +579,7 @@ describe("Post vote endpoint", function () {
   })
 
   it("Check post doesn't exist error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
-        expect(error.response.errors[0].message).to.eq("Post does not exist")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("BAD_USER_INPUT", "Post does not exist")
 
     cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
 
@@ -781,16 +765,7 @@ describe("Post vote endpoint", function () {
 
 describe("Edit post endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(
@@ -806,16 +781,7 @@ describe("Edit post endpoint", function () {
   })
 
   it("Check post does not exist error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
-        expect(error.response.errors[0].message).to.eq("Post does not exist")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("BAD_USER_INPUT", "Post does not exist")
 
     cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
 
@@ -833,16 +799,7 @@ describe("Edit post endpoint", function () {
   })
 
   it("Check error if user who doesn't own post tries to edit it", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHORIZED")
-        expect(error.response.errors[0].message).to.eq("Unauthorized")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHORIZED", "Unauthorized")
 
     cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
 
@@ -853,6 +810,10 @@ describe("Edit post endpoint", function () {
         })
       )
     })
+
+    cy.wait("@gqlEditPostTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
   })
 
   it("Check invalid input responses", function () {
@@ -861,7 +822,7 @@ describe("Edit post endpoint", function () {
     cy.then(() => {
       cy.wrap(
         graphQLClient.request(editPostTestDoc, {
-          input: { postId: "7dc6c6fe-e2d3-4b60-9d26-4cd81c1b8dd2", title: "", body: "A".repeat(21000) },
+          input: { postId: "7dc6c6fe-e2d3-4b60-9d26-4cd81c1b8dd2", title: "  ", body: "A".repeat(21000) },
         })
       )
         .its("editPost")
@@ -912,16 +873,7 @@ describe("Edit post endpoint", function () {
 
 describe("Delete post endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(
@@ -937,16 +889,7 @@ describe("Delete post endpoint", function () {
   })
 
   it("Check post does not exist error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
-        expect(error.response.errors[0].message).to.eq("Post does not exist")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("BAD_USER_INPUT", "Post does not exist")
 
     cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
 
@@ -964,16 +907,7 @@ describe("Delete post endpoint", function () {
   })
 
   it("Check error if user who doesn't own post tries to delete it", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHORIZED")
-        expect(error.response.errors[0].message).to.eq("Unauthorized")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHORIZED", "Unauthorized")
 
     cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
 
@@ -983,6 +917,10 @@ describe("Delete post endpoint", function () {
           input: { postId: "cfccc3c0-21b5-47f8-ab16-08f3ad2400c3" },
         })
       )
+    })
+
+    cy.wait("@gqlDeletePostTestMutation").then(() => {
+      throw new Error("No error returned")
     })
   })
 

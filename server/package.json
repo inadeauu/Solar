@@ -5,9 +5,9 @@
   "scripts": {
     "generate": "graphql-codegen --config codegen.yml --watch",
     "dev": "concurrently \"nyc --silent nodemon --config nodemon.json src/index.ts\" \"npm run generate\"",
-    "seed": "ts-node prisma/seed.ts",
-    "resetDb": "ts-node prisma/resetDb.ts",
-    "deletePosts": "ts-node prisma/deletePosts.ts"
+    "seed": "ts-node prisma/seed/seed.ts",
+    "resetDb": "ts-node prisma/seed/resetDb.ts",
+    "deletePosts": "ts-node prisma/scripts/deletePosts.ts"
   },
   "author": "",
   "license": "ISC",

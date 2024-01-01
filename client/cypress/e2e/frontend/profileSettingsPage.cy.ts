@@ -1,6 +1,6 @@
 import { graphQLClient } from "../../../src/utils/graphql"
-import { loginUsernameTestDoc } from "../../utils/graphql/authGraphQL"
-import { getUserTestDoc } from "../../utils/graphql/userGraphQL"
+import { loginUsernameTestDoc } from "../../utils/graphqlDocs/authGraphQL"
+import { getUserTestDoc } from "../../utils/graphqlDocs/userGraphQL"
 import { aliasMutation } from "../../utils/graphqlTest"
 
 beforeEach(function () {

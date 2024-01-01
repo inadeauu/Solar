@@ -22,7 +22,7 @@ export const getPostTestDoc = graphql(/* GraphQL */ `
 `)
 
 export const getPostsTestDoc = graphql(/* GraphQL */ `
-  query GetPostsTestDoc($input: PostsInput!) {
+  query GetPostsTest($input: PostsInput!) {
     posts(input: $input) {
       edges {
         node {

@@ -1,3 +1,5 @@
+import { ClientError } from "graphql-request"
+
 type node = {
   node: {
     id: string
@@ -10,6 +12,8 @@ type nodeWithCommunityId = node & { node: { community: { id: string } } }
 type nodeWithOwnerId = node & { node: { owner: { id: string } } }
 type nodeWithTitle = node & { node: { title: string } }
 type nodeWithInCommunity = node & { node: { inCommunity: boolean } }
+type nodeWithPost = node & { node: { post: { id: string } } }
+type nodeWithParent = node & { node: { parent?: { id: string } | null } }
 
 export const nodeIdsUnique = (arr: node[]) => {
   if (arr.length == 0) return false
@@ -119,4 +123,29 @@ export const inAllCommunities = (arr: nodeWithInCommunity[]) => {
   if (arr.length == 0) return false
 
   return arr.every((e) => e.node.inCommunity == true)
+}
+
+export const hasSamePostId = (arr: nodeWithPost[], postId: string) => {
+  if (arr.length == 0) return false
+
+  return arr.every((e) => e.node.post.id == postId)
+}
+
+export const hasSameParentId = (arr: nodeWithParent[], parentId: string) => {
+  if (arr.length == 0) return false
+
+  return arr.every((e) => e.node.parent?.id == parentId)
+}
+
+export const cypressCheckOnFail = (errorCode: string, errorMsg: string) => {
+  cy.on("fail", (error) => {
+    if (error instanceof ClientError) {
+      if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
+      expect(error.response.errors[0].extensions.code).to.eq(errorCode)
+      expect(error.response.errors[0].message).to.eq(errorMsg)
+      return
+    }
+
+    throw new Error("Uncaught error (should not be reached)")
+  })
 }

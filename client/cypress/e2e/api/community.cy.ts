@@ -1,31 +1,35 @@
-import { ClientError } from "graphql-request"
 import { GetCommunitiesTestQuery } from "../../../src/graphql_codegen/graphql"
 import { graphQLClient } from "../../../src/utils/graphql"
 import {
   changeCommunityTitleTestDoc,
   communityTitleExistsTestDoc,
   createCommunityTestDoc,
+  deleteCommunityTestDoc,
   getCommunitiesTestDoc,
   getCommunityTestDoc,
   joinCommunityTestDoc,
-} from "../../utils/graphql/communityGraphQL"
+} from "../../utils/graphqlDocs/communityGraphQL"
 import {
   allTitlesContain,
+  cypressCheckOnFail,
   hasSameOwnerId,
   inAllCommunities,
   nodeIdsUnique,
   titlesInAlphabeticalOrder,
 } from "../../utils/utils"
-import { aliasMutation } from "../../utils/graphqlTest"
+import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
   cy.exec("npm --prefix ../server run seed")
 
   cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+    aliasQuery(req, "GetCommunitiesTest")
+
     aliasMutation(req, "CreateCommunityTest")
     aliasMutation(req, "JoinCommunityTest")
     aliasMutation(req, "ChangeCommunityTitleTest")
+    aliasMutation(req, "DeleteCommunityTest")
   })
 
   cy.visit("/")
@@ -294,62 +298,62 @@ describe("Communities endpoint", function () {
 
   describe("Pagination input validation - Take", function () {
     beforeEach(function () {
-      cy.on("fail", (error) => {
-        if (error instanceof ClientError) {
-          if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-          expect(error.response.errors[0].extensions.code).to.eq("PAGINATION_ERROR")
-          expect(error.response.errors[0].message).to.eq("First must be between 0 and 100")
-          return
-        }
-
-        throw new Error("Uncaught error (should not be reached)")
-      })
+      cypressCheckOnFail("PAGINATION_ERROR", "First must be between 0 and 100")
     })
 
     it("Check error with negative amount", function () {
-      cy.wrap(
-        graphQLClient.request(getCommunitiesTestDoc, {
-          input: {
-            paginate: { first: -5 },
-            filters: { titleContains: "Community" },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getCommunitiesTestDoc, {
+            input: {
+              paginate: { first: -5 },
+              filters: { titleContains: "Community" },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetCommunitiesTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
 
     it("Check error with amount over 100", function () {
-      cy.wrap(
-        graphQLClient.request(getCommunitiesTestDoc, {
-          input: {
-            paginate: { first: 110 },
-            filters: { titleContains: "Community" },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getCommunitiesTestDoc, {
+            input: {
+              paginate: { first: 110 },
+              filters: { titleContains: "Community" },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetCommunitiesTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
   })
 
   describe("Pagination input validation - Cursor", function () {
     it("Check error if no title supplied when cursor given", function () {
-      cy.on("fail", (error) => {
-        if (error instanceof ClientError) {
-          if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-          expect(error.response.errors[0].extensions.code).to.eq("PAGINATION_ERROR")
-          expect(error.response.errors[0].message).to.eq("Title must be specified with cursor")
-          return
-        }
+      cypressCheckOnFail("PAGINATION_ERROR", "Title must be specified with cursor")
 
-        throw new Error("Uncaught error (should not be reached)")
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getCommunitiesTestDoc, {
+            input: {
+              paginate: { first: 5, after: { id: "abc" } },
+              filters: { titleContains: "Community" },
+            },
+          })
+        )
       })
 
-      cy.wrap(
-        graphQLClient.request(getCommunitiesTestDoc, {
-          input: {
-            paginate: { first: 5, after: { id: "abc" } },
-            filters: { titleContains: "Community" },
-          },
-        })
-      )
+      cy.wait("@gqlGetCommunitiesTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
   })
 })
@@ -370,16 +374,7 @@ describe("Community title exists endpoint", function () {
 
 describe("Create community endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(graphQLClient.request(createCommunityTestDoc, { input: { title: "newCommunity" } }))
@@ -402,7 +397,7 @@ describe("Create community endpoint", function () {
     })
 
     cy.then(() => {
-      cy.wrap(graphQLClient.request(createCommunityTestDoc, { input: { title: "" } }))
+      cy.wrap(graphQLClient.request(createCommunityTestDoc, { input: { title: "  " } }))
         .its("createCommunity")
         .should((res) => expect(res.code).to.eq(400))
         .should((res) => expect(res.errorMsg).to.eq("Invalid input"))
@@ -440,16 +435,7 @@ describe("Create community endpoint", function () {
 
 describe("Join community endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(graphQLClient.request(joinCommunityTestDoc, { input: { communityId: "abc" } }))
@@ -461,16 +447,7 @@ describe("Join community endpoint", function () {
   })
 
   it("Check community does not exist error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
-        expect(error.response.errors[0].message).to.eq("Community does not exist")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("BAD_USER_INPUT", "Community does not exist")
 
     cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
 
@@ -484,16 +461,7 @@ describe("Join community endpoint", function () {
   })
 
   it("Check joining an owned community error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHORIZED")
-        expect(error.response.errors[0].message).to.eq("Cannot join an owned community")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHORIZED", "Cannot join an owned community")
 
     cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
 
@@ -561,16 +529,7 @@ describe("Join community endpoint", function () {
 
 describe("Change community title endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(graphQLClient.request(changeCommunityTitleTestDoc, { input: { id: "abc", newTitle: "abc" } }))
@@ -582,16 +541,7 @@ describe("Change community title endpoint", function () {
   })
 
   it("Check community does not exist error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
-        expect(error.response.errors[0].message).to.eq("Community does not exist")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("BAD_USER_INPUT", "Community does not exist")
 
     cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
 
@@ -605,16 +555,7 @@ describe("Change community title endpoint", function () {
   })
 
   it("Check user not owner of community error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHORIZED")
-        expect(error.response.errors[0].message).to.eq("Unauthorized")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHORIZED", "Unauthorized")
 
     cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
 
@@ -637,7 +578,7 @@ describe("Change community title endpoint", function () {
     cy.then(() => {
       cy.wrap(
         graphQLClient.request(changeCommunityTitleTestDoc, {
-          input: { id: "351146cd-1612-4a44-94da-e33d27bedf39", newTitle: "" },
+          input: { id: "351146cd-1612-4a44-94da-e33d27bedf39", newTitle: "  " },
         })
       )
         .its("changeCommunityTitle")
@@ -671,5 +612,107 @@ describe("Change community title endpoint", function () {
     })
   })
 
-  it("Check successfully change community title", function () {})
+  it("Check successfully change community title", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(changeCommunityTitleTestDoc, {
+          input: { id: "351146cd-1612-4a44-94da-e33d27bedf39", newTitle: "newTitle" },
+        })
+      )
+        .its("changeCommunityTitle")
+        .then((res) => {
+          expect(res.code).to.eq(200)
+          expect(res.successMsg).to.eq("Successfully changed community title")
+
+          cy.then(() => {
+            cy.wrap(graphQLClient.request(getCommunityTestDoc, { input: { id: res.community.id } }))
+              .its("community")
+              .should((res) => expect(res.title).to.eq("newTitle"))
+          })
+        })
+    })
+  })
+})
+
+describe("Delete community endpoint", function () {
+  it("Check not signed in error response", function () {
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(deleteCommunityTestDoc, { input: { id: "abc", title: "abc" } }))
+    })
+
+    cy.wait("@gqlDeleteCommunityTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check community does not exist error response", function () {
+    cypressCheckOnFail("BAD_USER_INPUT", "Community does not exist")
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(deleteCommunityTestDoc, { input: { id: "abc", title: "abc" } }))
+    })
+
+    cy.wait("@gqlDeleteCommunityTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check user does not own community error response", function () {
+    cypressCheckOnFail("BAD_USER_INPUT", "Community does not exist")
+
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(deleteCommunityTestDoc, { input: { id: "abc", title: "abc" } }))
+    })
+
+    cy.wait("@gqlDeleteCommunityTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
+  })
+
+  it("Check invalid input response", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(deleteCommunityTestDoc, {
+          input: { id: "351146cd-1612-4a44-94da-e33d27bedf39", title: "abc" },
+        })
+      )
+        .its("deleteCommunity")
+        .should((res) => expect(res.code).to.eq(400))
+        .should((res) => expect(res.errorMsg).to.eq("Invalid title"))
+        .should((res) => expect(res.inputErrors.title).to.eq("Please enter your community's title"))
+    })
+  })
+
+  it("Check successfully deletes community", function () {
+    cy.setCookie("test-user", "8d2efb36-a726-425c-ad12-98f2683c5d86")
+
+    cy.then(() => {
+      cy.wrap(
+        graphQLClient.request(deleteCommunityTestDoc, {
+          input: { id: "351146cd-1612-4a44-94da-e33d27bedf39", title: "Community1" },
+        })
+      )
+        .its("deleteCommunity")
+        .should((res) => expect(res.code).to.eq(200))
+        .should((res) => expect(res.successMsg).to.eq("Successfully deleted community"))
+    })
+
+    cy.then(() => {
+      cy.then(() => {
+        cy.wrap(graphQLClient.request(getCommunityTestDoc, { input: { id: "351146cd-1612-4a44-94da-e33d27bedf39" } }))
+          .its("community")
+          .should("eq", null)
+      })
+    })
+  })
 })

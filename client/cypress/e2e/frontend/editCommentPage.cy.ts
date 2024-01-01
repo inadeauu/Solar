@@ -1,5 +1,5 @@
 import { graphQLClient } from "../../../src/utils/graphql"
-import { getCommentTestDoc } from "../../utils/graphql/commentGraphQL"
+import { getCommentTestDoc } from "../../utils/graphqlDocs/commentGraphQL"
 import { aliasMutation } from "../../utils/graphqlTest"
 
 beforeEach(function () {

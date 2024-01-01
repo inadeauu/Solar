@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client"
-import { communities, posts, users, comments, inCommunities, votedPosts, commentVotes } from "./seedData"
+import { communities, posts, users, comments, inCommunities, votedPosts, commentVotes } from "../seed/seedData"
 
 const prisma = new PrismaClient()
 

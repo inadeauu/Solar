@@ -1,6 +1,6 @@
 import { graphQLClient } from "../../../src/utils/graphql"
 import { aliasMutation } from "../../utils/graphqlTest"
-import { getPostTestDoc } from "../../utils/graphql/postGraphQL"
+import { getPostTestDoc } from "../../utils/graphqlDocs/postGraphQL"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")

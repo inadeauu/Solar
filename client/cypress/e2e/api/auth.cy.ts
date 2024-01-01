@@ -1,16 +1,21 @@
-import { ClientError } from "graphql-request"
 import { graphQLClient } from "../../../src/utils/graphql"
 import {
   authUserTestDoc,
   loginUsernameTestDoc,
   logoutTestDoc,
   registerUsernameTestDoc,
-} from "../../utils/graphql/authGraphQL"
-import { getUserTestDoc } from "../../utils/graphql/userGraphQL"
+} from "../../utils/graphqlDocs/authGraphQL"
+import { getUserTestDoc } from "../../utils/graphqlDocs/userGraphQL"
+import { aliasMutation } from "../../utils/graphqlTest"
+import { cypressCheckOnFail } from "../../utils/utils"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
   cy.exec("npm --prefix ../server run seed")
+
+  cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+    aliasMutation(req, "LogoutTest")
+  })
   cy.visit("/")
 })
 
@@ -89,17 +94,15 @@ describe("Login endpoint", function () {
 
 describe("Logout endpoint", function () {
   it("Check response when not signed in", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
-      throw new Error("Uncaught error (should not be reached)")
+    cy.then(() => {
+      cy.wrap(graphQLClient.request(logoutTestDoc))
     })
 
-    cy.wrap(graphQLClient.request(logoutTestDoc))
+    cy.wait("@gqlLogoutTestMutation").then(() => {
+      throw new Error("No error returned")
+    })
   })
 
   it("Check response when signed in", function () {

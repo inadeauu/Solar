@@ -1,4 +1,3 @@
-import { ClientError } from "graphql-request"
 import { graphQLClient } from "../../../src/utils/graphql"
 import {
   changePasswordTestDoc,
@@ -7,15 +6,18 @@ import {
   getUserTestDoc,
   getUsersTestDoc,
   usernameExistsTestDoc,
-} from "../../utils/graphql/userGraphQL"
-import { loginUsernameTestDoc } from "../../utils/graphql/authGraphQL"
-import { aliasMutation } from "../../utils/graphqlTest"
+} from "../../utils/graphqlDocs/userGraphQL"
+import { loginUsernameTestDoc } from "../../utils/graphqlDocs/authGraphQL"
+import { aliasMutation, aliasQuery } from "../../utils/graphqlTest"
+import { cypressCheckOnFail } from "../../utils/utils"
 
 beforeEach(function () {
   cy.exec("npm --prefix ../server run resetDb")
   cy.exec("npm --prefix ../server run seed")
 
   cy.intercept("POST", "http://localhost:4000/graphql", (req) => {
+    aliasQuery(req, "GetUsersTest")
+
     aliasMutation(req, "ChangeUsernameTest")
     aliasMutation(req, "ChangePasswordTest")
     aliasMutation(req, "DeleteUsertest")
@@ -80,62 +82,62 @@ describe("Users endpoint", function () {
 
   describe("Pagination input validation - Take", function () {
     beforeEach(function () {
-      cy.on("fail", (error) => {
-        if (error instanceof ClientError) {
-          if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-          expect(error.response.errors[0].extensions.code).to.eq("PAGINATION_ERROR")
-          expect(error.response.errors[0].message).to.eq("First must be between 0 and 100")
-          return
-        }
-
-        throw new Error("Uncaught error (should not be reached)")
-      })
+      cypressCheckOnFail("PAGINATION_ERROR", "First must be between 0 and 100")
     })
 
     it("Check error with negative amount", function () {
-      cy.wrap(
-        graphQLClient.request(getUsersTestDoc, {
-          input: {
-            paginate: { first: -2 },
-            filters: { usernameContains: "user" },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getUsersTestDoc, {
+            input: {
+              paginate: { first: -2 },
+              filters: { usernameContains: "user" },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetUsersTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
 
     it("Check error with amount over 100", function () {
-      cy.wrap(
-        graphQLClient.request(getUsersTestDoc, {
-          input: {
-            paginate: { first: 105 },
-            filters: { usernameContains: "user" },
-          },
-        })
-      )
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getUsersTestDoc, {
+            input: {
+              paginate: { first: 105 },
+              filters: { usernameContains: "user" },
+            },
+          })
+        )
+      })
+
+      cy.wait("@gqlGetUsersTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
   })
 
   describe("Pagination input validation - Cursor", function () {
     it("Check error if no title supplied when cursor given", function () {
-      cy.on("fail", (error) => {
-        if (error instanceof ClientError) {
-          if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-          expect(error.response.errors[0].extensions.code).to.eq("PAGINATION_ERROR")
-          expect(error.response.errors[0].message).to.eq("Title must be specified with cursor")
-          return
-        }
+      cypressCheckOnFail("PAGINATION_ERROR", "Title must be specified with cursor")
 
-        throw new Error("Uncaught error (should not be reached)")
+      cy.then(() => {
+        cy.wrap(
+          graphQLClient.request(getUsersTestDoc, {
+            input: {
+              paginate: { first: 5, after: { id: "abc" } },
+              filters: { usernameContains: "user" },
+            },
+          })
+        )
       })
 
-      cy.wrap(
-        graphQLClient.request(getUsersTestDoc, {
-          input: {
-            paginate: { first: 5, after: { id: "abc" } },
-            filters: { usernameContains: "user" },
-          },
-        })
-      )
+      cy.wait("@gqlGetUsersTestQuery").then(() => {
+        throw new Error("No error returned")
+      })
     })
   })
 })
@@ -156,16 +158,7 @@ describe("Username exists endpoint", function () {
 
 describe("Change username endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(
@@ -179,16 +172,7 @@ describe("Change username endpoint", function () {
   })
 
   it("Check user does not exist error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
-        expect(error.response.errors[0].message).to.eq("User does not exist")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("BAD_USER_INPUT", "User does not exist")
 
     cy.setCookie("test-user", "abc")
 
@@ -268,16 +252,7 @@ describe("Change username endpoint", function () {
 
 describe("Change password endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(
@@ -293,16 +268,7 @@ describe("Change password endpoint", function () {
   })
 
   it("Check user does not exist error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
-        expect(error.response.errors[0].message).to.eq("User does not exist")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("BAD_USER_INPUT", "User does not exist")
 
     cy.setCookie("test-user", "abc")
 
@@ -366,16 +332,7 @@ describe("Change password endpoint", function () {
 
 describe("Delete user endpoint", function () {
   it("Check not signed in error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("UNAUTHENTICATED")
-        expect(error.response.errors[0].message).to.eq("Not signed in")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("UNAUTHENTICATED", "Not signed in")
 
     cy.then(() => {
       cy.wrap(
@@ -391,16 +348,7 @@ describe("Delete user endpoint", function () {
   })
 
   it("Check user does not exist error response", function () {
-    cy.on("fail", (error) => {
-      if (error instanceof ClientError) {
-        if (!error.response.errors || error.response.errors?.length == 0) throw new Error("No error returned")
-        expect(error.response.errors[0].extensions.code).to.eq("BAD_USER_INPUT")
-        expect(error.response.errors[0].message).to.eq("User does not exist")
-        return
-      }
-
-      throw new Error("Uncaught error (should not be reached)")
-    })
+    cypressCheckOnFail("BAD_USER_INPUT", "User does not exist")
 
     cy.setCookie("test-user", "abc")
 

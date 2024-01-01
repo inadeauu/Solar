@@ -47,12 +47,12 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            body: bodyError ? "Body must be less than 2000 characters long" : null,
+            body: bodyError ? "Body must be 1-2000 characters long" : null,
           },
         }
       }
 
-      await prisma.comment.create({
+      const newComment = await prisma.comment.create({
         data: {
           userId: req.session.userId,
           postId: args.input.postId,
@@ -65,6 +65,7 @@ export const resolvers: Resolvers = {
         __typename: "CreateCommentSuccess",
         successMsg: "Successfully created comment",
         code: 200,
+        comment: newComment,
       }
     },
     createCommentReply: async (_0, args, { req }) => {
@@ -92,13 +93,13 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            body: bodyError ? "Body must be less than 2000 characters long" : null,
+            body: bodyError ? "Body must be 1-2000 characters long" : null,
             commentId: parentComment.parentId ? "Invalid comment ID" : null,
           },
         }
       }
 
-      await prisma.comment.create({
+      const newComment = await prisma.comment.create({
         data: {
           userId: req.session.userId,
           postId: parentComment.postId,
@@ -111,6 +112,7 @@ export const resolvers: Resolvers = {
         __typename: "CreateCommentReplySuccess",
         successMsg: "Successfully replied",
         code: 200,
+        comment: newComment,
       }
     },
     voteComment: async (_0, args, { req }) => {
@@ -156,7 +158,7 @@ export const resolvers: Resolvers = {
             },
           },
         })
-        successMsg = "Successfully " + doMsg + " post"
+        successMsg = "Successfully " + doMsg + " comment"
       } else if ((commentVote.like == 1 && args.input.like) || (commentVote.like == -1 && !args.input.like)) {
         updatedComment = await prisma.comment.update({
           where: { id: args.input.commentId },
@@ -171,7 +173,7 @@ export const resolvers: Resolvers = {
             },
           },
         })
-        successMsg = "Successfully " + undoMsg + " post"
+        successMsg = "Successfully " + undoMsg + " comment"
       } else {
         updatedComment = await prisma.comment.update({
           where: { id: args.input.commentId },
@@ -191,7 +193,7 @@ export const resolvers: Resolvers = {
             },
           },
         })
-        successMsg = "Successfully " + doMsg + " post"
+        successMsg = "Successfully " + doMsg + " comment"
       }
 
       return {
@@ -239,7 +241,7 @@ export const resolvers: Resolvers = {
           errorMsg: "Invalid input",
           code: 400,
           inputErrors: {
-            body: "Body must be less than 2000 characters long",
+            body: "Body must be 1-2000 characters long",
           },
         }
       }
@@ -279,7 +281,7 @@ export const resolvers: Resolvers = {
       })
 
       if (!comment) {
-        throw new GraphQLError("Post does not exist", {
+        throw new GraphQLError("Comment does not exist", {
           extensions: { code: "BAD_USER_INPUT" },
         })
       }

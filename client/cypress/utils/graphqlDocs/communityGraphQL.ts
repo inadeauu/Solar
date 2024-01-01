@@ -110,3 +110,23 @@ export const changeCommunityTitleTestDoc = graphql(/* GraphQL */ `
     }
   }
 `)
+
+export const deleteCommunityTestDoc = graphql(/* GraphQL */ `
+  mutation DeleteCommunityTest($input: DeleteCommunityInput!) {
+    deleteCommunity(input: $input) {
+      ... on DeleteCommunitySuccess {
+        __typename
+        successMsg
+        code
+      }
+      ... on DeleteCommunityInputError {
+        __typename
+        errorMsg
+        code
+        inputErrors {
+          title
+        }
+      }
+    }
+  }
+`)

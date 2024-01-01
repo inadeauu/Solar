@@ -58,6 +58,7 @@ input CreateCommentInput {
 type CreateCommentSuccess implements Success {
   successMsg: String!
   code: Int!
+  comment: Comment!
 }
 
 type CreateCommentInputError implements Error {
@@ -81,6 +82,7 @@ input CreateCommentReplyInput {
 type CreateCommentReplySuccess implements Success {
   successMsg: String!
   code: Int!
+  comment: Comment!
 }
 
 type CreateCommentReplyInputError implements Error {
